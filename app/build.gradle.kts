@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.niki914.zafiro"
+        applicationId = "com.niki914.zafiro5"
         minSdk = 26
         targetSdk = 34
         versionName = "1.5.0"

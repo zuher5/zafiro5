@@ -25,7 +25,7 @@ class XRepoRuntimeGatewayTest {
         object : ContextWrapper(null) {
             override fun getFilesDir(): File = filesDir
             override fun getApplicationContext(): Context = this
-            override fun getPackageName(): String = "com.niki914.zafiro"
+            override fun getPackageName(): String = "com.niki914.zafiro5"
         }
     }
 

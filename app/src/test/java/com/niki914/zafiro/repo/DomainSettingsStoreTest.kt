@@ -22,7 +22,7 @@ class DomainSettingsStoreTest {
 
     @Test
     fun readMissingStoreReturnsDescriptorDefaultJson() = runTest {
-        val context = testContext(packageName = "com.niki914.zafiro")
+        val context = testContext(packageName = "com.niki914.zafiro5")
 
         val json = XIpcDomainSettingsStore(null).readJson(
             context,

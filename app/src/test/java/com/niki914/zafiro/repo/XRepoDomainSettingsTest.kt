@@ -30,7 +30,7 @@ class XRepoDomainSettingsTest {
 
     private val context: Context = object : ContextWrapper(null) {
         override fun getApplicationContext(): Context = this
-        override fun getPackageName(): String = "com.niki914.zafiro"
+        override fun getPackageName(): String = "com.niki914.zafiro5"
     }
 
     @After
