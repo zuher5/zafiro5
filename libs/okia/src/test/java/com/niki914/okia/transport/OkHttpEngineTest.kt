@@ -257,6 +257,61 @@ class OkHttpEngineTest {
 
     // ── 请求超时参数 ────────────────────────────────────────────────────────
 
+    // ── relay 出口 ──────────────────────────────────────────────────────────
+
+    @Test
+    fun `relay rewrites url and attaches target headers`() = runBlocking {
+        server.enqueue(MockResponse().setBody("ok"))
+        val relayEngine = OkHttpEngine(proxyUrl = "relay+${server.url("/")}".trimEnd('/'))
+        // MockWebServer 出 URL http://127.0.0.1:port/；relay 前缀为根
+        val response = relayEngine.unary(
+            HttpRequest(
+                "https://opencode.ai/zen/v1/chat/completions?x=1",
+                "POST",
+                mapOf("Authorization" to "Bearer public"),
+                "{}",
+                defaultTimeouts
+            )
+        )
+
+        assertEquals(200, response.statusCode)
+        val recorded = server.takeRequest()
+        assertEquals("/zen/v1/chat/completions?x=1", recorded.path)
+        assertEquals("https://opencode.ai", recorded.getHeader("x-relay-target"))
+        assertEquals("/zen/v1/chat/completions?x=1", recorded.getHeader("x-relay-path"))
+        assertEquals("Bearer public", recorded.getHeader("Authorization"))
+    }
+
+    @Test
+    fun `relay url with non-default port preserves port in target`() = runBlocking {
+        server.enqueue(MockResponse().setBody("ok"))
+        val relayEngine = OkHttpEngine(proxyUrl = "relay+http://127.0.0.1:${server.port}")
+        relayEngine.unary(
+            HttpRequest(
+                "http://127.0.0.1:9/v1/models",
+                "GET",
+                emptyMap(),
+                null,
+                defaultTimeouts
+            )
+        )
+        val recorded = server.takeRequest()
+        assertEquals("http://127.0.0.1:9", recorded.getHeader("x-relay-target"))
+    }
+
+    @Test
+    fun `plain https proxy url does not enable relay`() = runBlocking {
+        server.enqueue(MockResponse().setBody("ok"))
+        val plainEngine = OkHttpEngine(proxyUrl = "https://proxy.invalid:8443")
+        // 无 relay → 请求直连 server，不带 relay 头
+        plainEngine.unary(
+            HttpRequest(server.url("/plain").toString(), "GET", emptyMap(), null, defaultTimeouts)
+        )
+        val recorded = server.takeRequest()
+        assertNull(recorded.getHeader("x-relay-target"))
+        assertEquals("/plain", recorded.path)
+    }
+
     @Test
     fun `injected OkHttpClient is used for requests`() = runBlocking {
         // D-T2B-4：OkHttpEngine 接受自定义 OkHttpClient（proxy/interceptor 注入点）。

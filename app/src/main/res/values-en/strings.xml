@@ -203,7 +203,7 @@
     <string name="prompt_editor_description">Edit the System Prompt. Saved changes apply in the next conversation.</string>
     <string name="prompt_error_load_failed">Failed to load the prompt. Go back and retry.</string>
     <string name="ui_settings_configure_proxy_label">Proxy</string>
-    <string name="ui_settings_configure_proxy_placeholder">For example: http://127.0.0.1:7890</string>
+    <string name="ui_settings_configure_proxy_placeholder">For example: http://127.0.0.1:7890 or relay+https://relay.example.app</string>
     <string name="ui_settings_configure_error_required">This field cannot be empty</string>
     <string name="ui_settings_configure_error_name_duplicate">Configuration name already exists. Please use a different name.</string>
     <string name="ui_settings_configure_error_proxy_invalid">Proxy address is not a valid URI</string>

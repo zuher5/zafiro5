@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -31,10 +33,21 @@ import kotlin.coroutines.resumeWithException
 /**
  * 默认 HttpEngine：OkHttp 4 实现。public（D-T2B-4）：构造接受自定义
  * OkHttpClient，供 host 注入 proxy interceptor 等；默认 client 门面自建。
- * proxy：构造传入初始代理 URL（http/https = HTTP 代理，socks = SOCKS），
- * updateProxy 热更新——client 不可变，代理经 ProxySelector 每次连接动态
- * 读取 AtomicReference，变更对后续连接立即生效，已建连接不受影响。
+ * proxy：构造传入初始代理 URL。URL 可以是 socket 代理（http/https = HTTP
+ * 代理，socks/socks5 = SOCKS），也可以是 relay 出口（relay+http / relay+https /
+ * relay，见下）。updateProxy 热更新——client 不可变，代理经 ProxySelector 每次
+ * 连接动态读取 AtomicReference，变更对后续连接立即生效，已建连接不受影响。
  * 解析失败（非法 URI / 未知 scheme）回退直连。
+ *
+ * relay（x-relay-target 出口代理，pi-bansos 同款协议）：socket 代理只改连接
+ * 出口，relay 则是把请求整体改写到 relay 主机，并附 x-relay-target /
+ * x-relay-path 头让 relay 转发到真实上游。适合无 socket 代理可用的中转
+ * （如 Vercel/Cloudflare worker）。relay URL 形如：
+ *   relay+https://relay.example.app        → https
+ *   relay+http://relay.example.app         → http（本地 worker）
+ *   relay://relay.example.app              → 同 relay+https
+ * 路径部分可作为 relay 的前缀路径（如 relay+https://host/prefix → POST /prefix）。
+ *
  * 经 OkiaConfig.httpEngine 注入或门面自建；KMP 迁移时本文件进入 jvm/android
  * actual（OkHttp5 或 Ktor 替代，HttpEngine 契约不动）。
  * stream：异步 enqueue 挂起到响应头；2xx → body 分块读字符流经 SseLineParser
@@ -52,15 +65,19 @@ class OkHttpEngine(
     proxyUrl: String = ""
 ) : HttpEngine {
 
-    // ponytail: 解析失败静默回退直连——okia 模块无 Logger，UI 层已有 URI 校验兜底
-    private val proxy = AtomicReference(parseProxy(proxyUrl))
+    /** socket 代理（ProxySelector 用）；relay 模式下不设 socket 代理。 */
+    private val proxy = AtomicReference(parseSocketProxy(proxyUrl))
 
-    /** 热更新代理：空串 = 直连；解析失败回退直连。对后续连接立即生效。 */
+    /** relay 出口；null = 未启用 relay。 */
+    private val relay = AtomicReference(parseRelay(proxyUrl))
+
+    /** 热更新出口：空串 = 直连；解析失败回退直连。对后续连接立即生效。 */
     fun updateProxy(proxyUrl: String) {
-        proxy.set(parseProxy(proxyUrl))
+        proxy.set(parseSocketProxy(proxyUrl))
+        relay.set(parseRelay(proxyUrl))
     }
 
-    private fun parseProxy(url: String): Proxy? {
+    private fun parseSocketProxy(url: String): Proxy? {
         val trimmed = url.trim()
         if (trimmed.isEmpty()) return null
         return runCatching {
@@ -72,6 +89,29 @@ class OkHttpEngine(
                 "socks", "socks5" -> Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, port))
                 else -> null
             }
+        }.getOrNull()
+    }
+
+    /**
+     * relay URL 解析：relay+http / relay+https / relay（默认 https）。
+     * 返回 relay 的 http(s) 基址（含可选前缀路径），供请求改写使用。
+     */
+    private fun parseRelay(url: String): String? {
+        val trimmed = url.trim()
+        if (trimmed.isEmpty()) return null
+        return runCatching {
+            val uri = URI(trimmed)
+            val scheme = uri.scheme?.lowercase() ?: return null
+            if (scheme != "relay" && !scheme.startsWith("relay+")) return null
+            val upstreamScheme = when (scheme) {
+                "relay", "relay+https" -> "https"
+                "relay+http" -> "http"
+                else -> return null
+            }
+            val host = uri.host ?: return null
+            val port = if (uri.port > 0) ":${uri.port}" else ""
+            val prefix = uri.rawPath.orEmpty().trimEnd('/')
+            "$upstreamScheme://$host$port$prefix"
         }.getOrNull()
     }
 
@@ -202,9 +242,29 @@ class OkHttpEngine(
             method == "GET" || method == "HEAD" || method == "DELETE" -> null
             else -> emptyBody
         }
-        val builder = Request.Builder().url(url).method(method, body)
-        headers.forEach { (name, value) -> builder.header(name, value) }
+        val relayBase = relay.get()
+        val target = if (relayBase != null) rewriteThroughRelay(relayBase) else this
+        val builder = Request.Builder().url(target.url).method(target.method, body)
+        target.headers.forEach { (name, value) -> builder.header(name, value) }
         return builder.build()
+    }
+
+    /**
+     * relay 改写：请求 URL 指向 relay，附 x-relay-target（原上游 scheme://host）
+     * 与 x-relay-path（原 upstream path + query）。relay 前缀路径保留在 relay URL 上
+     * （`relay+https://host/prefix` → `https://host/prefix/<path>`）。
+     * URL 无法解析时保持原样（回退直连语义）。
+     */
+    private fun HttpRequest.rewriteThroughRelay(relayBase: String): HttpRequest {
+        val upstream = url.toHttpUrlOrNull() ?: return this
+        val isDefaultPort = upstream.port == HttpUrl.defaultPort(upstream.scheme)
+        val upstreamOrigin = "${upstream.scheme}://${upstream.host}${if (isDefaultPort) "" else ":${upstream.port}"}"
+        val upstreamPath = upstream.encodedPath + upstream.encodedQuery?.let { "?$it" }.orEmpty()
+        val relayUrl = (relayBase + upstreamPath).toHttpUrlOrNull() ?: return this
+        val relayHeaders = headers.toMutableMap()
+        relayHeaders["x-relay-target"] = upstreamOrigin
+        relayHeaders["x-relay-path"] = upstreamPath
+        return copy(url = relayUrl.toString(), headers = relayHeaders)
     }
 
     private fun Response.headersMap(): Map<String, String> =

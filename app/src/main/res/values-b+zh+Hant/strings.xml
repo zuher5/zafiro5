@@ -202,7 +202,7 @@
     <string name="prompt_editor_description">編輯 System Prompt。儲存後，變更會在下一次對話時生效。</string>
     <string name="prompt_error_load_failed">讀取提示詞失敗，請返回重試。</string>
     <string name="ui_settings_configure_proxy_label">代理</string>
-    <string name="ui_settings_configure_proxy_placeholder">例如：http://127.0.0.1:7890</string>
+    <string name="ui_settings_configure_proxy_placeholder">例如：http://127.0.0.1:7890 或 relay+https://relay.example.app</string>
     <string name="ui_settings_configure_error_required">必填欄位不能為空</string>
     <string name="ui_settings_configure_error_name_duplicate">配置名稱已存在，請更換後重試</string>
     <string name="ui_settings_configure_error_proxy_invalid">代理位址不是有效的 URI</string>

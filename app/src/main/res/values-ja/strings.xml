@@ -202,7 +202,7 @@
     <string name="prompt_editor_description">システムプロンプトを編集します。保存された変更は次回の会話から反映されます。</string>
     <string name="prompt_error_load_failed">プロンプトの読み込みに失敗しました。戻って再試行してください。</string>
     <string name="ui_settings_configure_proxy_label">プロキシ</string>
-    <string name="ui_settings_configure_proxy_placeholder">例：http://127.0.0.1:7890</string>
+    <string name="ui_settings_configure_proxy_placeholder">例：http://127.0.0.1:7890 または relay+https://relay.example.app</string>
     <string name="ui_settings_configure_error_required">必須項目を入力してください</string>
     <string name="ui_settings_configure_error_name_duplicate">この設定名は既に存在します。別の名前を試してください</string>
     <string name="ui_settings_configure_error_proxy_invalid">プロキシアドレスが有効な URI ではありません</string>
