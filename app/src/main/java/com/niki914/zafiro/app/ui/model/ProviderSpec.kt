@@ -54,7 +54,6 @@ object ProviderSpecs {
         OpenCodeSpec,
         CommandCodeSpec,
         KiloFreeSpec,
-        BansosProxySpec,
         OpenCodeFreeSpec,
     )
 
@@ -252,7 +251,7 @@ private data object CommandCodeSpec : ProviderSpec {
 private data object OpenCodeFreeSpec : ProviderSpec {
     override val id: String = "opencode-zen-free"
     override val brandName: String = "OpenCode Free"
-    override val officialEndpoint: String = "http://127.0.0.1:18080/v1/chat/completions"
+    override val officialEndpoint: String = "https://opencode.ai/zen/v1/chat/completions"
     override val exampleModelId: String = "mimo-v2.5-free"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
@@ -273,21 +272,6 @@ private data object KiloFreeSpec : ProviderSpec {
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true
     override val iconRes: Int = R.drawable.kilo
-    override val tintIcon: Boolean = true
-    override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
-        button = ProviderButtonTokens(),
-    )
-}
-
-private data object BansosProxySpec : ProviderSpec {
-    override val id: String = "bansos-proxy"
-    override val brandName: String = "Bansos Proxy"
-    override val officialEndpoint: String = "http://127.0.0.1:18080/v1/chat/completions"
-    override val exampleModelId: String = "mimo-v2.5-free"
-    override val allowsCustomEndpointInNewConfig: Boolean = true
-    override val defaultProtocol: String = "openai-chat-completions"
-    override val allowsEmptyApiKey: Boolean = true
-    override val iconRes: Int = R.drawable.opencode
     override val tintIcon: Boolean = true
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
         button = ProviderButtonTokens(),

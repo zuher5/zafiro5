@@ -24,6 +24,8 @@ import com.niki914.okia.protocol.OpenAIChatCompletionCompat
 import com.niki914.okia.protocol.OpenAIChatCompletionProtocol
 import com.niki914.okia.ImageSaver
 import com.niki914.okia.protocol.OpenAIResponsesProtocol
+import com.niki914.okia.protocol.RequestSnapshot
+import com.niki914.okia.protocol.ProtocolEvent
 import com.niki914.okia.tooling.DefaultToolRegistry
 import com.niki914.okia.tooling.ToolDescriptor
 import com.niki914.okia.tooling.ToolKind
@@ -31,9 +33,10 @@ import com.niki914.okia.tooling.ToolRegistry
 import com.niki914.xposed.api.util.ContextProvider
 import com.niki914.xposed.api.util.LockState
 import com.niki914.zafiro.api.model.FileRef
-import com.niki914.zafiro.api.text.FilesBlock
-import com.niki914.zafiro.api.text.TurnTextComposer
-import com.niki914.zafiro.chat.agentic.AndroidImageLoader
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import com.niki914.okia.transport.HttpRequest
+import com.niki914.okia.transport.SseLine
 import com.niki914.zafiro.chat.agentic.IngestedImage
 import com.niki914.zafiro.chat.agentic.LocalToolExecutor
 import com.niki914.zafiro.chat.agentic.PromptComposer
@@ -59,7 +62,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import java.io.File
 import com.niki914.zafiro.settings.model.RuntimeLlmConfig as LlmConfig
 
@@ -672,7 +674,9 @@ object LLMController {
         config: ResolvedLlmConfig,
     ): Okia {
         val endpoint = config.endpoint.ifBlank { protocolDefaultEndpointFallback(protocol) }
-        val wireProtocol = wireProtocolFor(protocol)
+        val baseProtocol = wireProtocolFor(protocol)
+        val isOpenCodeFree = endpoint.contains("opencode.ai/zen", ignoreCase = true)
+        val wireProtocol = if (isOpenCodeFree) OpenCodeFreeProtocol(baseProtocol) else baseProtocol
         val saver = ensureImageSaver()
         return Okia.open(wireProtocol, restore) {
             this.endpoint = endpoint
@@ -693,6 +697,9 @@ object LLMController {
             supportsImages = imageLoader != null && config.supportsImages
             thinkingLevel = config.thinkingLevel
             proxy = config.proxy
+            if (isOpenCodeFree) {
+                headers = OpenCodeFreeSupport.headers()
+            }
         }
     }
 
@@ -710,6 +717,26 @@ object LLMController {
 
         LlmProtocol.OpenAiResponses -> OpenAIResponsesProtocol()
         LlmProtocol.AnthropicMessages -> AnthropicMessagesProtocol()
+    }
+
+    /**
+     * OpenCode Zen free 路由：直接打 upstream，移植 pi-bansos 的身份头与请求体重写。
+     */
+    private class OpenCodeFreeProtocol(private val base: ChatProtocol) : ChatProtocol {
+        override val id: String get() = base.id
+        override val defaultEndpoint: String? get() = base.defaultEndpoint
+        override fun withCodec(codec: Json): ChatProtocol = base.withCodec(codec)
+        override fun useApiKey(apiKey: String): Map<String, String> = emptyMap()
+        override suspend fun buildRequest(snapshot: RequestSnapshot, history: List<Message>): HttpRequest {
+            val request = base.buildRequest(snapshot, history)
+            val body = request.body ?: return request
+            val transformed = OpenCodeFreeSupport.transform(Json.parseToJsonElement(body) as JsonObject)
+            return request.copy(body = transformed.toString())
+        }
+        override fun parseStream(rawSseLines: Flow<SseLine>): Flow<ProtocolEvent> = base.parseStream(rawSseLines)
+        override fun encodeToolResult(call: ContentBlock.ToolCall, outcome: ToolCallOutcome): Message =
+            base.encodeToolResult(call, outcome)
+        override val compat: com.niki914.okia.protocol.Compat get() = base.compat
     }
 
     /**
