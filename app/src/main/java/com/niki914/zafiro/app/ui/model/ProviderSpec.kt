@@ -253,7 +253,7 @@ private data object OpenCodeFreeSpec : ProviderSpec {
     override val id: String = "opencode-zen-free"
     override val brandName: String = "OpenCode Free"
     override val officialEndpoint: String = "https://opencode.ai/zen/v1/chat/completions"
-    override val exampleModelId: String = "mimo-v2.5-free"
+    override val exampleModelId: String = "mimo-v2.6-flash-free"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true
@@ -283,7 +283,7 @@ private data object OpenCodePIProxySpec : ProviderSpec {
     override val id: String = "opencode-pi"
     override val brandName: String = "OpenCode PI"
     override val officialEndpoint: String = "http://127.0.0.1:18080/v1/chat/completions"
-    override val exampleModelId: String = "mimo-v2.5-free"
+    override val exampleModelId: String = "mimo-v2.6-flash-free"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true

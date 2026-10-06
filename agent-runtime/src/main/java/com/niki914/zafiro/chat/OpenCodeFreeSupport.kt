@@ -25,7 +25,7 @@ object OpenCodeFreeSupport {
         val traceId = randomHex(16)
         val spanId = randomHex(8)
         return mapOf(
-            "User-Agent" to "opencode/1.18.31",
+            "User-Agent" to "opencode/1.18.34",
             "Authorization" to "Bearer public",
             "x-opencode-client" to "desktop",
             "x-opencode-project" to projectId,
