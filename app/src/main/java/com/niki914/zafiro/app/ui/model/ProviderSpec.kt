@@ -55,6 +55,7 @@ object ProviderSpecs {
         CommandCodeSpec,
         KiloFreeSpec,
         OpenCodeFreeSpec,
+        OpenCodePIProxySpec,
     )
 
     fun find(providerId: String?): ProviderSpec {
@@ -256,7 +257,7 @@ private data object OpenCodeFreeSpec : ProviderSpec {
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true
-    override val iconRes: Int = R.drawable.opencode
+    override val iconRes: Int = R.drawable.opencode_free
     override val tintIcon: Boolean = true
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
         button = ProviderButtonTokens(),
@@ -273,6 +274,21 @@ private data object KiloFreeSpec : ProviderSpec {
     override val allowsEmptyApiKey: Boolean = true
     override val iconRes: Int = R.drawable.kilo
     override val tintIcon: Boolean = true
+    override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
+        button = ProviderButtonTokens(),
+    )
+}
+
+private data object OpenCodePIProxySpec : ProviderSpec {
+    override val id: String = "opencode-pi"
+    override val brandName: String = "OpenCode PI"
+    override val officialEndpoint: String = "http://127.0.0.1:18080/v1/chat/completions"
+    override val exampleModelId: String = "mimo-v2.5-free"
+    override val allowsCustomEndpointInNewConfig: Boolean = true
+    override val defaultProtocol: String = "openai-chat-completions"
+    override val allowsEmptyApiKey: Boolean = true
+    override val iconRes: Int = R.drawable.opencode_pi
+    override val tintIcon: Boolean = false
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
         button = ProviderButtonTokens(),
     )

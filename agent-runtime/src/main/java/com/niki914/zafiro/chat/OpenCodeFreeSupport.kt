@@ -58,7 +58,7 @@ object OpenCodeFreeSupport {
             mutable["input"] = sanitizeResponsesItems(body)
         } else {
             mutable["tools"] = ensureChatFingerprintTools(body)
-            if (body["tool_choice"] == null && hasFingerprintTools(body)) {
+            if (body["tool_choice"] == null) {
                 mutable["tool_choice"] = JsonPrimitive("none")
             }
         }
