@@ -460,7 +460,7 @@ class ConfigureViewModel internal constructor(
             )
             if (key == lastCatalogKey) return@launch
             // 空值短路：Key 或 endpoint 为空直接不发，保留旧缓存
-            if (key.endpoint.isBlank() || (key.apiKey.isBlank() && !providerSpec.allowsEmptyApiKey)) return@launch
+            if (key.endpoint.isBlank() || (key.apiKey.isBlank() && !state.providerSpec.allowsEmptyApiKey)) return@launch
             val protocol = LlmProtocol.fromWire(key.protocolWireId)
             val modelsUrl = EndpointInference.modelsUrl(key.endpoint, protocol)
                 ?: return@launch
