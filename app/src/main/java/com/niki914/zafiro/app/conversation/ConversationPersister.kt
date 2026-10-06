@@ -66,10 +66,16 @@ object ConversationPersister {
     /** 单条快照的增量落盘（internal 供测试直接调用，绕开流接线与 Room IO 时序）。 */
     internal suspend fun persistNow(conversation: Conversation) {
         val sessionId = conversation.id
-        val persisted = persistedCountBySession.getOrPut(sessionId) {
+        var persisted = persistedCountBySession.getOrPut(sessionId) {
             ConversationRepo.countEntries(sessionId)
         }
         val history = conversation.history
+        // 原地截断（重生成）：树比已持久化条数短，旧基准会让后续增量被吞。
+        // 截断已原子落盘，DB 是权威：以现有条数重算基准再走增量。
+        if (history.size < persisted) {
+            persisted = ConversationRepo.countEntries(sessionId)
+            persistedCountBySession[sessionId] = persisted
+        }
         if (history.size <= persisted) return
 
         val newEntries = history.drop(persisted).mapIndexed { index, entry ->

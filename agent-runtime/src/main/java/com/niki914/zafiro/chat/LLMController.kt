@@ -170,6 +170,11 @@ object LLMController {
     internal var okia: Okia? = null
     private var sessionProtocol: LlmProtocol? = null
 
+    // OpenCode Zen free 路由（同 OpenAiChatCompletions 协议壳）必须重建实例，
+    // 否则与普通 OpenAI 兼容 provider 互切时会复用装了 OpenCodeFreeProtocol /
+    // 身份头的旧实例。仅 [sessionProtocol] 无法区分，故单独记一位。
+    private var sessionOpenCodeFree: Boolean? = null
+
     // T3：当前会话快照统一流（持久化器观察它做消息级增量落盘，D3-8）。
     // OKIA conversation StateFlow 是每实例的（切会话 = 换实例 = 换引用），
     // 这里转发当前实例的流，实例切换时重发射，观察者对实例切换透明。
@@ -210,6 +215,7 @@ object LLMController {
         kotlinx.coroutines.runBlocking { okia?.close() }
         okia = null
         sessionProtocol = null
+        sessionOpenCodeFree = null
         runtimeState = null
         sessionForwardJob?.cancel()
         sessionForwardJob = null
@@ -604,6 +610,7 @@ object LLMController {
         okia?.close()
         okia = null
         sessionProtocol = null
+        sessionOpenCodeFree = null
         conversationFlow.value = null
         Logger.i(LOG_TAG, "reset conversation done")
     }
@@ -630,16 +637,26 @@ object LLMController {
         restore: SessionSnapshot? = null,
         forceNew: Boolean = false,
     ): Okia {
+        // OpenCode free 走独立的 wire 协议 + 身份头，但 LlmProtocol 与普通
+        // OpenAI 兼容 provider 相同；不比这一位就会复用错实例（无重启切 provider 失效）
+        val effectiveEndpoint = config.endpoint.ifBlank {
+            protocolDefaultEndpointFallback(protocol ?: LlmProtocol.Default)
+        }
+        val isOpenCodeFree = isOpenCodeFreeEndpoint(effectiveEndpoint)
         if (!forceNew && restore == null) {
-            okia?.takeIf { sessionProtocol == protocol }?.let { return it }
+            okia?.takeIf { sessionProtocol == protocol && sessionOpenCodeFree == isOpenCodeFree }
+                ?.let { return it }
         }
         // 协议切换（P1 #3）：关旧实例前导出当前树，restore 给新协议实例，
         // 会话 id + 历史跨 Provider 延续（okia §5.7：协议 id 不进会话数据）
-        val carried = restore ?: okia?.takeIf { sessionProtocol != protocol }?.export()
+        val carried = restore ?: okia?.takeIf {
+            sessionProtocol != protocol || sessionOpenCodeFree != isOpenCodeFree
+        }?.export()
         okia?.close()
         return openSession(protocol ?: LlmProtocol.Default, config, carried).also {
             okia = it
             sessionProtocol = protocol
+            sessionOpenCodeFree = isOpenCodeFree
             forwardConversation(it)
         }
     }
@@ -671,6 +688,10 @@ object LLMController {
         }
     }
 
+    /** OpenCode Zen free 路由判定：需要独立 wire 协议 + 身份头，独立于 LlmProtocol。 */
+    private fun isOpenCodeFreeEndpoint(endpoint: String): Boolean =
+        endpoint.contains("opencode.ai/zen", ignoreCase = true)
+
     private suspend fun openOkiaWithDefaultProtocol(
         protocol: LlmProtocol,
         restore: SessionSnapshot?,
@@ -678,7 +699,7 @@ object LLMController {
     ): Okia {
         val endpoint = config.endpoint.ifBlank { protocolDefaultEndpointFallback(protocol) }
         val baseProtocol = wireProtocolFor(protocol)
-        val isOpenCodeFree = endpoint.contains("opencode.ai/zen", ignoreCase = true)
+        val isOpenCodeFree = isOpenCodeFreeEndpoint(endpoint)
         val wireProtocol = if (isOpenCodeFree) OpenCodeFreeProtocol(baseProtocol) else baseProtocol
         val saver = ensureImageSaver()
         return Okia.open(wireProtocol, restore) {

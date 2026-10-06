@@ -517,10 +517,12 @@ class HomeChatViewModel internal constructor(
     private suspend fun reGenerateAt(turnId: Long) {
         if (currentState.isGenerating) return
         val currentId = agent.conversation.value.id?.value ?: return
-        val result = conversations.forkAtTurn(currentId, turnId.toInt(), ForkKind.Regenerate)
+        // 原地重生成：截断当前会话到该回合，不派生新会话。
+        // 「分叉」是显式动作（ForkKind.Fork，走 forkAt），重生成不应产生新会话。
+        val result = conversations.truncateAtTurn(currentId, turnId.toInt())
             ?: return
-        Logger.i(LOG_TAG, "regenerate fork sourceId=$currentId turnId=$turnId newId=${result.newConversationId}")
-        loadConversation(result.newConversationId)
+        Logger.i(LOG_TAG, "regenerate truncate conversationId=$currentId turnId=$turnId")
+        loadConversation(currentId)
         agent.updateDraft { draft ->
             draft.copy(
                 text = result.promptText,

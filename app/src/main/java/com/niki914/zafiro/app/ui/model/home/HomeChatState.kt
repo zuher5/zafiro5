@@ -19,6 +19,9 @@ internal interface HomeConversationStore {
     //  fork（仓储）→ load（Agent）→ stream（Agent）。契约暂无 fork / delete 命令，为此不改。
     //  截断点与回填内容由仓储按回合计算，UI 侧不见底层条目与 okia 消息。
     suspend fun forkAtTurn(sourceId: String, turnIndex: Int, kind: ForkKind): ForkResult?
+
+    /** 原地重生成：截断当前会话到该回合（不派生新会话），返回需回填的输入。 */
+    suspend fun truncateAtTurn(conversationId: String, turnIndex: Int): ForkResult?
 }
 
 

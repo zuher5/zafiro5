@@ -98,6 +98,52 @@ interface ConversationDao {
     @Query("DELETE FROM conversation WHERE id = :id")
     suspend fun deleteConversation(id: String): Int
 
+    /** 删除指定会话下的指定 entry（重生成原地截断：丢弃该回合及其之后的条目）。 */
+    @Query(
+        """
+        DELETE FROM conversation_entry
+        WHERE conversation_id = :conversationId AND id IN (:entryIds)
+        """,
+    )
+    suspend fun deleteEntries(conversationId: String, entryIds: List<String>): Int
+
+    @Query(
+        """
+        UPDATE conversation
+        SET updated_at = :updatedAt,
+            last_message_preview = :lastMessagePreview,
+            turn_count = :turnCount,
+            leaf_id = :leafId
+        WHERE id = :conversationId
+        """,
+    )
+    suspend fun updateConversationAfterTruncate(
+        conversationId: String,
+        updatedAt: Long,
+        lastMessagePreview: String,
+        turnCount: Int,
+        leafId: String?,
+    ): Int
+
+    @Transaction
+    suspend fun truncateEntriesTransaction(
+        conversationId: String,
+        entryIds: List<String>,
+        updatedAt: Long,
+        lastMessagePreview: String,
+        turnCount: Int,
+        leafId: String?,
+    ) {
+        if (entryIds.isNotEmpty()) deleteEntries(conversationId, entryIds)
+        updateConversationAfterTruncate(
+            conversationId = conversationId,
+            updatedAt = updatedAt,
+            lastMessagePreview = lastMessagePreview,
+            turnCount = turnCount,
+            leafId = leafId,
+        )
+    }
+
     @Query("UPDATE conversation SET title = :title, title_edited = 1 WHERE id = :id")
     suspend fun renameConversation(id: String, title: String): Int
 

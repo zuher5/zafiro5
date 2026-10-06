@@ -225,6 +225,60 @@ object ConversationRepo {
     }
 
     /**
+     * 回合级原地截断（重生成）：把当前会话的持久化条目截断到某个回合的条目边界，
+     * 丢弃该回合及其之后的全部条目，会话 id 不变。
+     *
+     * 与 [forkAtTurn] 的区别是「原地」：不派生新会话。截断点由 leaf 投影上的
+     * User 计数反推（UI 的 turnId 就是回合下标），被丢弃的回合内容随
+     * [ForkResult] 回来，由调用方回填草稿后重发。
+     *
+     * @param turnIndex 目标回合下标（第 N 个用户消息）。
+     * @return 源会话不存在或该回合不存在时 null。
+     */
+    suspend fun truncateAtTurn(
+        conversationId: String,
+        turnIndex: Int,
+        now: Long = System.currentTimeMillis(),
+    ): ForkResult? {
+        val startedAtMs = System.currentTimeMillis()
+        val source = dao().getConversation(conversationId) ?: return null
+
+        val projected = ConversationFormatter.projectLeaf(
+            dao().listEntries(conversationId).mapNotNull { it.toConversationEntry() },
+            source.leafId,
+        )
+        val userEntryIndex = projected.indexOfUserTurn(turnIndex)
+        if (userEntryIndex < 0) return null
+        val truncated = projected.take(userEntryIndex)
+        val discarded = projected.drop(userEntryIndex)
+
+        val preview = ConversationFormatter.previewFromEntries(truncated)
+        dao().truncateEntriesTransaction(
+            conversationId = conversationId,
+            entryIds = discarded.map { it.id },
+            updatedAt = now,
+            lastMessagePreview = preview,
+            turnCount = truncated.size,
+            leafId = truncated.lastOrNull()?.id,
+        )
+        Logger.i(
+            LOG_TAG,
+            "truncate done conversationId=$conversationId turnIndex=$turnIndex " +
+                    "keep=${truncated.size} drop=${discarded.size} " +
+                    "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
+        )
+        val userMessage = projected[userEntryIndex].message as Message.User
+        // 注入块不进输入框，但里面的文件引用要回填：两者都从同一次切头里拿
+        val stripped = FilesBlock.strip(userMessage.text())
+        return ForkResult(
+            newConversationId = conversationId,
+            promptText = stripped.text,
+            images = userMessage.images(),
+            files = stripped.files,
+        )
+    }
+
+    /**
      * 会话级完整派生：在当前会话的全部历史基础上复制出一条新分支会话。
      *
      * @param sourceId 源会话 id

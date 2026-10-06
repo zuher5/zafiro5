@@ -274,6 +274,28 @@ internal class FakeHomeConversationStore(
                 .filterIsInstance<ContentBlock.Image>().map { Attachment(it.path, it.mimeType) },
         )
     }
+
+    override suspend fun truncateAtTurn(conversationId: String, turnIndex: Int): ForkResult? {
+        val source = records[conversationId] ?: return null
+        val projected = ConversationFormatter.projectLeaf(source.snapshot.entries, source.snapshot.leafId)
+        val userEntryIndex = projected.withIndex()
+            .filter { (_, entry) -> entry.message is Message.User }
+            .let { users -> users.getOrNull(turnIndex)?.index ?: -1 }
+        if (userEntryIndex < 0) return null
+        val entries = projected.take(userEntryIndex)
+        // 原地：会话 id 不变，只替换快照
+        records[conversationId] = source.copy(
+            snapshot = SessionSnapshot(conversationId, entries.lastOrNull()?.id, 1, entries),
+        )
+        val userMessage = projected[userEntryIndex].message as Message.User
+        return ForkResult(
+            newConversationId = conversationId,
+            promptText = userMessage.content
+                .filterIsInstance<ContentBlock.Text>().joinToString("\n") { it.text },
+            images = userMessage.content
+                .filterIsInstance<ContentBlock.Image>().map { Attachment(it.path, it.mimeType) },
+        )
+    }
 }
 
 internal fun snapshotOf(vararg messages: Message): SessionSnapshot {

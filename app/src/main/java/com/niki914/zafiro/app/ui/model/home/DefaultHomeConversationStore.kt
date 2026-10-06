@@ -39,4 +39,11 @@ object DefaultHomeConversationStore : HomeConversationStore {
             kind = kind,
         )
     }
+
+    override suspend fun truncateAtTurn(conversationId: String, turnIndex: Int): ForkResult? {
+        return ConversationRepo.truncateAtTurn(
+            conversationId = conversationId,
+            turnIndex = turnIndex,
+        )
+    }
 }

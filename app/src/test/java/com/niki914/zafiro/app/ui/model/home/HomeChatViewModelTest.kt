@@ -224,6 +224,9 @@ class HomeChatViewModelTest {
         advanceUntilIdle()
         assertEquals("first", fixture.agent.sentDrafts.last().text)
         assertEquals(listOf("/image.jpg"), fixture.agent.sentImages.last().map { it.path })
+        // 原地重生成：源会话被截断（turn 0 之前 = 0 条），不派生新会话
+        assertEquals(0, fixture.store.getConversation("source")!!.snapshot.entries.size)
+        assertEquals("source", fixture.agent.lastLoadedId?.value)
     }
 
     @Test

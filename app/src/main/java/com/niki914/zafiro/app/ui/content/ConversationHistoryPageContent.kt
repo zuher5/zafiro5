@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -260,7 +261,7 @@ private fun ConversationHistoryListContent(
             end = 16.dp,
             bottom = liquidScreenBottomPadding(),
         ),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         sections.forEach { section ->
             val expanded = section.bucket !in collapsedBuckets
@@ -405,11 +406,17 @@ private fun ConversationHistoryItem(
         highlightPulseKey = activeConversationId?.takeIf { it == conversation.id },
         highlightPulseDurationMillis = 500,
         minHeight = 0.dp,
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         modifier = modifier
             .fillMaxWidth()
-            .clip(cardShape)
-            .background(MaterialTheme.colorScheme.surface),
+            // shadow 先于 clip：先按圆角形状投射柔和阴影，再裁剪内容，
+            // 阴影落在裁剪之外才可见（顺序反了会被 clip 吃掉）
+            .shadow(
+                elevation = 2.dp,
+                shape = cardShape,
+                clip = false,
+            )
+            .background(MaterialTheme.colorScheme.surfaceContainerLow, cardShape),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -422,7 +429,10 @@ private fun ConversationHistoryItem(
             ) {
                 Text(
                     text = displayTitle,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 16.5.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -459,7 +469,7 @@ private fun ConversationHistoryItem(
             if (conversation.lastMessagePreview.isNotBlank()) {
                 Text(
                     text = conversation.lastMessagePreview,
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.5.sp),
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.5.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

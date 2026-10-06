@@ -213,6 +213,43 @@ class ConversationRepoTest {
     }
 
     @Test
+    fun truncateAtTurn_dropsTurnInPlaceAndExtractsInput() = runTest {
+        val sourceId = ConversationRepo.createConversation("session-src", "original")
+        val entries = linearEntries(
+            Message.User(listOf(ContentBlock.Text("u1"))),
+            Message.Assistant(AssistantMessage(listOf(ContentBlock.Text("a1")))),
+            Message.User(listOf(ContentBlock.Text("u2"))),
+            Message.Assistant(AssistantMessage(listOf(ContentBlock.Text("a2")))),
+        )
+        ConversationRepo.insertEntries(sourceId, entries)
+        ConversationRepo.updateLeafId(sourceId, entries.last().id)
+
+        val result = ConversationRepo.truncateAtTurn(sourceId, turnIndex = 1)!!
+
+        // 原地：会话 id 不变，不派生新会话
+        assertEquals(sourceId, result.newConversationId)
+        assertEquals("u2", result.promptText)
+        // 截在该回合用户条目之前：保留 turn 0 两条
+        val record = ConversationRepo.getConversation(sourceId)!!
+        assertEquals(2, record.snapshot.entries.size)
+        assertEquals(entries[1].id, record.snapshot.leafId)
+        assertEquals(2, record.summary.turnCount)
+        // 被丢弃的回合确实从库中消失
+        assertEquals(2, ConversationRepo.countEntries(sourceId))
+    }
+
+    @Test
+    fun truncateAtTurn_missingSourceOrTurnReturnsNull() = runTest {
+        val sourceId = ConversationRepo.createConversation("session-src", "original")
+        val entries = linearEntries(Message.User(listOf(ContentBlock.Text("u1"))))
+        ConversationRepo.insertEntries(sourceId, entries)
+        ConversationRepo.updateLeafId(sourceId, entries.last().id)
+
+        assertNull(ConversationRepo.truncateAtTurn("session-nope", turnIndex = 0))
+        assertNull(ConversationRepo.truncateAtTurn(sourceId, turnIndex = 1))
+    }
+
+    @Test
     fun forkConversation_createsCompleteCopy() = runTest {
         val sourceId = ConversationRepo.createConversation("session-src", "original")
         val entries = linearEntries(

@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App / Module -->
+    <string name="app_name">Zafiro</string>
+    <string name="xposed_desc">Hadirkan model Anda sendiri di asisten suara\n\nDidukung saat ini:\n\n- ColorOS Breeno\n- HyperOS XiaoAi</string>
+
+    <!-- Onboarding -->
+    <string name="ui_onboard_startup_demo_button">Mulai</string>
+    <string name="ui_onboard_provider_pick_title">Pilih Penyedia</string>
+    <string name="ui_onboard_provider_pick_description">Mulai dari sini untuk menghubungkan model Anda.\nPilih penyedia untuk melanjutkan.</string>
+    <string name="ui_onboard_configure_title">Konfigurasikan Akses Model</string>
+    <string name="ui_onboard_configure_description">Isi pengaturan model untuk memulai.</string>
+    <string name="ui_onboard_configure_next">Berikutnya</string>
+    <string name="ui_onboard_configure_endpoint_override_title">Endpoint Kustom</string>
+    <string name="ui_onboard_configure_endpoint_override_description_off">Menggunakan endpoint default</string>
+    <string name="ui_onboard_configure_endpoint_override_description_on">Menggunakan endpoint kustom</string>
+    <string name="ui_onboard_configure_endpoint_label">URL Endpoint</string>
+    <string name="ui_onboard_configure_endpoint_placeholder">Masukkan URL endpoint Anda</string>
+    <string name="ui_onboard_configure_model_label">ID Model</string>
+    <string name="ui_onboard_configure_model_placeholder">Masukkan ID model Anda</string>
+    <string name="ui_onboard_configure_model_example">Contoh: %1$s</string>
+    <string name="ui_onboard_configure_model_catalog_open">Pilih model</string>
+    <string name="ui_onboard_configure_model_catalog_title">Pilih model</string>
+    <string name="ui_onboard_configure_model_catalog_search_placeholder">Cari model</string>
+    <string name="ui_onboard_configure_model_catalog_empty">Tidak ada model yang cocok</string>
+    <string name="ui_onboard_configure_api_key_label">API Key</string>
+    <string name="ui_onboard_configure_api_key_placeholder">Masukkan API Key Anda</string>
+    <string name="ui_onboard_configure_api_key_show">Tampilkan API Key</string>
+    <string name="ui_onboard_configure_api_key_hide">Sembunyikan API Key</string>
+    <string name="ui_onboard_configure_error_load_failed">Gagal memuat konfigurasi: %1$s</string>
+    <string name="ui_onboard_configure_error_save_failed">Gagal menyimpan konfigurasi: %1$s</string>
+    <string name="ui_onboard_done_headline">Selesai.</string>
+    <string name="ui_onboard_done_description">Penyiapan selesai. Anda bisa mulai menggunakan Zafiro sekarang atau menyesuaikannya nanti di Pengaturan.</string>
+    <string name="ui_onboard_done_enter_home">Buka Zafiro</string>
+
+    <!-- Home -->
+    <string name="ui_home_title">Zafiro</string>
+    <string name="ui_home_menu_new_conversation">Percakapan baru</string>
+    <string name="ui_home_input_placeholder">Ketik pesan...</string>
+    <string name="ui_tool_status_called">Dipanggil</string>
+    <string name="ui_tool_status_running">Berjalan</string>
+    <string name="ui_tool_status_success">Berhasil</string>
+    <string name="ui_tool_status_failed">Gagal</string>
+    <plurals name="ui_tool_chain_count">
+        <item quantity="other">%d alat</item>
+    </plurals>
+    <string name="ui_home_send_content_description">Kirim pesan</string>
+    <string name="ui_home_add_image_content_description">Tambah gambar</string>
+    <string name="ui_home_attach_sheet_title">Tambahkan ke percakapan</string>
+    <string name="ui_home_attach_photos">Foto</string>
+    <string name="ui_home_attach_camera">Kamera</string>
+    <string name="ui_home_attach_file">Berkas</string>
+    <string name="ui_home_attach_folder">Folder</string>
+    <string name="ui_home_attach_unresolvable">Tidak dapat memperoleh jalur lokal untuk berkas tersebut</string>
+    <string name="ui_home_attach_no_permission">Berikan akses semua berkas terlebih dahulu</string>
+    <string name="ui_home_attach_unreadable">Tidak dapat membaca berkas tersebut</string>
+    <string name="ui_home_file_remove_content_description">Hapus berkas</string>
+    <string name="ui_home_image_remove_content_description">Hapus gambar</string>
+    <string name="ui_home_file_category_folder">Folder</string>
+    <string name="ui_home_file_category_code">Kode</string>
+    <string name="ui_home_file_category_document">Dokumen</string>
+    <string name="ui_home_file_category_audio">Audio</string>
+    <string name="ui_home_file_category_video">Video</string>
+    <string name="ui_home_file_category_image">Gambar</string>
+    <string name="ui_home_file_category_archive">Arsip</string>
+    <string name="ui_home_file_category_apk">APK</string>
+    <string name="ui_home_file_category_file">Berkas</string>
+    <string name="ui_home_scroll_to_bottom_content_description">Gulir ke bawah</string>
+    <string name="ui_home_stop_content_description">Hentikan pembuatan</string>
+    <string name="ui_home_action_copy_content_description">Salin</string>
+    <string name="ui_home_action_regenerate_content_description">Buat ulang</string>
+    <string name="ui_home_action_fork_content_description">Percabangan percakapan</string>
+    <string name="ui_home_action_rewind_content_description">Rewind</string>
+    <string name="ui_toast_copied">Disalin</string>
+    <string name="ui_toast_generating">Sedang membuat, harap tunggu</string>
+    <string name="ui_home_error_retry_body">Silakan coba lagi nanti.</string>
+    <string name="ui_home_error_config_required_title">Konfigurasi model belum lengkap</string>
+    <string name="ui_home_error_config_required_body">Silakan isi konfigurasi model.</string>
+    <string name="ui_home_error_network_title">Kesalahan jaringan</string>
+    <string name="ui_home_error_idle_timeout_title">Respons habis waktu</string>
+    <string name="ui_home_error_output_truncated_title">Keluaran terpotong</string>
+    <string name="ui_home_error_output_truncated_body">Batas keluaran sekali respons tercapai dan balasan tidak lengkap. Naikkan Max Tokens di konfigurasi model lalu buat ulang.</string>
+    <string name="ui_home_error_retry_exhausted_title">Percobaan ulang otomatis habis</string>
+    <string name="ui_home_error_internal_title">Kesalahan internal</string>
+    <string name="ui_home_retrying_title">Jaringan tersendat, mencoba lagi…</string>
+    <string name="ui_home_retrying_attempt">Mencoba ulang %1$d/%2$d</string>
+    <string name="runtime_error_internal">Kesalahan internal</string>
+    <string name="ui_home_history_content_description">Riwayat percakapan</string>
+    <string name="ui_conversation_history_today">Hari ini</string>
+    <string name="ui_conversation_history_this_week">Minggu ini</string>
+    <string name="ui_conversation_history_this_month">Bulan ini</string>
+    <string name="ui_conversation_history_older">Lebih awal</string>
+    <string name="ui_conversation_history_back_content_description">Kembali</string>
+    <string name="ui_conversation_history_loading">Memuat riwayat percakapan...</string>
+    <string name="ui_conversation_history_empty_title">Belum ada riwayat percakapan</string>
+    <string name="ui_conversation_history_empty_body">Kirim pesan dan percakapan akan muncul di sini.</string>
+    <string name="ui_conversation_history_error_title">Tidak dapat memuat riwayat percakapan</string>
+    <string name="ui_conversation_history_untitled">Percakapan tanpa judul</string>
+    <string name="ui_conversation_history_delete_dialog_title">Hapus percakapan</string>
+    <string name="ui_conversation_history_delete_dialog_text">Hapus percakapan ini? Tindakan ini tidak dapat dibatalkan.\n\n%1$s</string>
+    <string name="ui_conversation_history_delete_dialog_confirm">Hapus</string>
+    <string name="ui_conversation_history_delete_dialog_cancel">Batal</string>
+    <string name="ui_conversation_history_delete_error">Gagal menghapus percakapan: %1$s</string>
+    <string name="ui_conversation_action_load">Muat</string>
+    <string name="ui_conversation_action_fork">Cabangkan dari sini</string>
+    <string name="ui_conversation_action_rename">Ubah nama</string>
+    <string name="ui_conversation_action_delete">Hapus</string>
+    <string name="ui_conversation_rename_dialog_title">Ubah nama percakapan</string>
+    <string name="ui_conversation_rename_dialog_hint">Judul percakapan</string>
+    <string name="ui_conversation_rename_dialog_confirm">Simpan</string>
+    <string name="ui_conversation_rename_dialog_cancel">Batal</string>
+    <string name="ui_time_just_now">Baru saja</string>
+    <string name="ui_time_minutes_ago">%1$dm lalu</string>
+    <string name="ui_time_hours_ago">%1$dj lalu</string>
+    <string name="ui_time_yesterday">Kemarin</string>
+    <string name="ui_root_back_to_home_hint">Tekan kembali lagi untuk ke layar Beranda</string>
+
+    <!-- Settings Shell -->
+    <string name="ui_settings_title">Pengaturan</string>
+    <string name="ui_settings_menu_entry">Pengaturan</string>
+
+    <!-- Settings Home Sections -->
+    <string name="ui_settings_section_model">Model</string>
+    <string name="ui_settings_section_ability">Kemampuan</string>
+    <string name="ui_settings_section_rules">Aturan</string>
+    <string name="ui_settings_section_app">Aplikasi</string>
+
+    <!-- Settings Home Items -->
+    <string name="ui_settings_model_config">Konfigurasi Model</string>
+    <string name="ui_settings_model_config_summary">Sesuaikan cara Zafiro terhubung ke model Anda</string>
+    <string name="ui_settings_memory">Memori</string>
+    <string name="ui_settings_memory_summary">Kelola memori dan preferensi tersimpan</string>
+    <string name="ui_settings_tools">Alat</string>
+    <string name="ui_settings_tools_summary">Kelola alat yang tersedia</string>
+    <string name="ui_settings_skills">Skill</string>
+    <string name="ui_settings_skills_summary">Kelola Skill lokal</string>
+    <string name="skill_page_description">Aktifkan atau nonaktifkan Skill lokal. Skill yang aktif dapat digunakan Agen saat diperlukan.</string>
+    <string name="skill_loading">Memuat Skill...</string>
+    <string name="skill_empty">Belum ada Skill yang tersedia saat ini.</string>
+    <string name="skill_editor_description">Edit SKILL.md secara penuh. Perubahan tersimpan berlaku pada percakapan berikutnya.</string>
+    <string name="skill_save_action">Simpan</string>
+    <string name="skill_error_load_failed">Gagal memuat Skill: %1$s</string>
+    <string name="skill_error_save_failed">Gagal menyimpan Skill: %1$s</string>
+    <string name="skill_delete_dialog_title">Hapus Skill</string>
+    <string name="skill_delete_dialog_text">Yakin ingin menghapus Skill \"%1$s\"? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="skill_error_delete_failed">Gagal menghapus Skill: %1$s</string>
+    <string name="skill_import_button">Impor Skill</string>
+    <string name="skill_import_no_skill_file">SKILL.md tidak ditemukan di folder terpilih, tidak dapat mengimpor</string>
+    <string name="skill_import_conflict_title">Skill Duplikat</string>
+    <string name="skill_import_conflict_text">Skill \"%1$s\" sudah ada. Timpa?</string>
+    <string name="skill_import_overwrite">Timpa</string>
+    <string name="skill_import_cancel">Batal</string>
+    <string name="skill_import_resolve_failed">Tidak dapat mengakses folder terpilih</string>
+    <string name="ui_settings_mcp">MCP Server</string>
+    <string name="ui_settings_mcp_summary">Hubungkan server dan alat MCP eksternal</string>
+    <string name="ui_settings_takeover">Aturan Takeover</string>
+    <string name="ui_settings_takeover_summary">Arahkan permintaan yang cocok ke asisten bawaan atau Zafiro</string>
+    <string name="ui_settings_execution_rules">Aturan Eksekusi</string>
+    <string name="ui_settings_execution_rules_summary">Tetapkan aturan keamanan untuk eksekusi Shell</string>
+    <string name="ui_settings_storage">Penyimpanan</string>
+    <string name="ui_settings_storage_summary">Bersihkan cache dan berkas yang diunduh</string>
+    <string name="ui_settings_about">Tentang</string>
+    <string name="ui_settings_about_summary"></string>
+    <string name="ui_settings_about_description">Hadirkan model Anda sendiri di asisten suara</string>
+    <string name="ui_settings_about_author_homepage">Situs Penulis</string>
+    <string name="ui_settings_about_github">GitHub</string>
+    <string name="ui_settings_about_afdian">Afdian</string>
+    <string name="ui_settings_about_telegram">Grup Telegram</string>
+    <string name="ui_settings_about_feedback_feature">Permintaan Fitur</string>
+    <string name="ui_settings_about_feedback_bug">Laporan Bug</string>
+    <string name="ui_settings_about_version">Versi</string>
+
+    <string name="ui_settings_storage_description">Lihat berapa banyak ruang yang digunakan tiap cache. Ketuk item untuk membersihkannya. Pembersihan tidak pernah menyentuh pengaturan, memori, atau percakapan.</string>
+    <string name="ui_settings_storage_tool_output">Cache keluaran alat</string>
+    <string name="ui_settings_storage_tool_output_summary">Keluaran lengkap hasil alat yang terpotong</string>
+    <string name="ui_settings_storage_image_cache">Cache gambar</string>
+    <string name="ui_settings_storage_image_cache_summary">Gambar pada percakapan lama tidak akan dimuat lagi</string>
+    <string name="ui_settings_storage_downloads">Berkas yang diunduh</string>
+    <string name="ui_settings_storage_downloads_summary">Berkas yang diunduh Agen selama tugas</string>
+    <string name="ui_settings_storage_other_cache">Cache lain</string>
+    <string name="ui_settings_storage_other_cache_summary">Berkas sementara dari operasi normal aplikasi</string>
+    <string name="ui_settings_storage_loading">Mengukur penyimpanan...</string>
+    <string name="ui_settings_storage_clear_dialog_title">Bersihkan cache</string>
+    <string name="ui_settings_storage_clear_dialog_text">Bersihkan \"%1$s\"? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="ui_settings_storage_clear_dialog_confirm">Bersihkan</string>
+    <string name="ui_settings_storage_clear_dialog_cancel">Batal</string>
+    <string name="ui_settings_storage_error_load_failed">Gagal mengukur penyimpanan: %1$s</string>
+    <string name="ui_settings_storage_error_clear_failed">Gagal membersihkan: %1$s</string>
+
+    <!-- Settings Detail Shared -->
+    <string name="ui_todo_page_title">Segera Hadir</string>
+    <string name="ui_todo_page_description">Fitur ini akan tersedia pada rilis mendatang. Nantikan.</string>
+    <string name="unsaved_changes_dialog_title">Perubahan Belum Disimpan</string>
+    <string name="unsaved_changes_dialog_text">Keluar tanpa menyimpan?</string>
+    <string name="unsaved_changes_dialog_confirm_exit">Keluar</string>
+    <string name="unsaved_changes_dialog_cancel">Batal</string>
+
+    <!-- Settings Configure Page -->
+    <string name="ui_settings_configure_description">Konfigurasikan akses model, prompt, dan pengaturan proxy.</string>
+    <string name="ui_settings_configure_save">Simpan Konfigurasi</string>
+    <string name="ui_settings_configure_prompt_label">Prompt</string>
+    <string name="prompt_editor_description">Edit System Prompt. Perubahan tersimpan berlaku pada percakapan berikutnya.</string>
+    <string name="prompt_error_load_failed">Gagal memuat prompt. Kembali dan coba lagi.</string>
+    <string name="ui_settings_configure_proxy_label">Proxy</string>
+    <string name="ui_settings_configure_proxy_placeholder">Contoh: http://127.0.0.1:7890 atau relay+https://relay.example.app</string>
+    <string name="ui_settings_configure_error_required">Kolom ini tidak boleh kosong</string>
+    <string name="ui_settings_configure_error_name_duplicate">Nama konfigurasi sudah ada. Gunakan nama lain.</string>
+    <string name="ui_settings_configure_error_proxy_invalid">Alamat proxy bukan URI yang valid</string>
+    <string name="ui_settings_mcp_config">Konfigurasi MCP Server</string>
+
+    <!-- Memory Module -->
+    <string name="memory_page_description">Kelola memori tersimpan. Geser kiri atau kanan untuk menghapus, atau ketuk item untuk mengeditnya. Setelah ditambahkan, Agen akan mengingat informasi ini bahkan di percakapan baru.</string>
+    <string name="memory_page_empty_description">Belum ada memori tersimpan. Ketuk kanan atas untuk menambahkan memori pertama Anda.</string>
+    <string name="memory_loading">Memuat memori...</string>
+    <string name="memory_editor_title_create">Memori Baru</string>
+    <string name="memory_editor_title_edit">Edit Memori</string>
+    <string name="memory_field_content">Konten</string>
+    <string name="memory_field_content_hint">Contoh: Ulang tahun pengguna adalah Bulan X Tanggal Y</string>
+    <string name="memory_save_action">Simpan Memori</string>
+    <string name="memory_cancel_action">Batal</string>
+    <string name="memory_delete_dialog_title">Hapus Memori</string>
+    <string name="memory_delete_dialog_text">Yakin ingin menghapus memori ini?\n\n%1$s</string>
+    <string name="memory_delete_dialog_confirm">Hapus</string>
+    <string name="memory_delete_dialog_cancel">Batal</string>
+    <string name="delete_dialog_confirm">Hapus</string>
+    <string name="delete_dialog_cancel">Batal</string>
+    <string name="memory_error_load_failed">Gagal memuat memori: %1$s</string>
+    <string name="memory_error_save_failed">Gagal menyimpan memori: %1$s</string>
+    <string name="memory_error_delete_failed">Gagal menghapus memori: %1$s</string>
+
+    <!-- Execution Rules Module -->
+    <string name="execution_rules_page_description">Konfigurasikan aturan untuk eksekusi Shell dan alat. Halaman ini saat ini hanya menyediakan kerangka UI dan belum terhubung ke alur intersepsi sebenarnya.</string>
+    <string name="execution_rules_empty_action_hint">Ketuk kanan atas untuk menambahkan aturan draf pertama Anda.</string>
+    <string name="execution_rules_loading">Memuat aturan eksekusi...</string>
+    <string name="execution_rules_editor_title_create">Aturan Eksekusi Baru</string>
+    <string name="execution_rules_delete_dialog_title">Hapus Aturan Eksekusi</string>
+    <string name="execution_rules_delete_dialog_text">Yakin ingin menghapus aturan eksekusi \"%1$s\"? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="execution_rules_editor_description">Siapkan aturan untuk eksekusi Shell dan alat. Untuk saat ini, editor ini memungkinkan Anda mengelola draf aturan di UI dan belum terhubung ke alur intersepsi sebenarnya.</string>
+    <string name="execution_rules_field_name">Nama Aturan</string>
+    <string name="execution_rules_field_name_hint">Contoh: Perintah hapus berbahaya</string>
+    <string name="execution_rules_field_enabled_mode">Berlaku Saat</string>
+    <string name="execution_rules_enabled_mode_enabled">Selalu</string>
+    <string name="execution_rules_enabled_mode_locked_only">Saat layar terkunci</string>
+    <string name="execution_rules_enabled_mode_disabled">Nonaktif</string>
+    <string name="execution_rules_enabled_mode_confirm">Tanya saya</string>
+    <string name="tool_permission_dialog_title">AI meminta menjalankan operasi</string>
+    <string name="tool_permission_request_intro">Alat Zafiro \"%1$s\" ingin menjalankan perintah berikut:</string>
+    <string name="tool_permission_matched_rule">Cocok dengan aturan \"%1$s\"</string>
+    <string name="tool_permission_allow">Izinkan sekali</string>
+    <string name="tool_permission_deny">Tolak</string>
+    <string name="screen_control_consent_title">Permintaan izin kontrol layar</string>
+    <string name="screen_control_consent_body">Zafiro memerlukan izin berikut untuk mengontrol layar:\n1. Layanan aksesibilitas: membaca UI dan melakukan ketukan\n2. Tampil di atas aplikasi lain: menampilkan indikator pointer\n\nPrompt sistem atau halaman Pengaturan mungkin muncul berikutnya.</string>
+    <string name="screen_control_consent_agree">Setuju</string>
+    <string name="screen_control_consent_deny">Tolak</string>
+    <string name="execution_rules_field_patterns">Pola</string>
+    <string name="execution_rules_field_patterns_hint">Contoh: \brm\s+-rf\b</string>
+    <string name="execution_rules_field_patterns_description">Masukkan satu kata kunci atau ekspresi reguler per baris. Perintah diblokir begitu ada aturan yang cocok.</string>
+    <string name="execution_rules_error_name_required">Masukkan nama aturan</string>
+    <string name="execution_rules_error_patterns_required">Masukkan setidaknya satu pola</string>
+    <string name="execution_rules_save_action">Simpan Aturan</string>
+
+    <!-- Takeover Module -->
+    <string name="takeover_default_responder">Responder Default</string>
+    <string name="takeover_page_description">Periksa aturan secara berurutan dan pilih siapa yang harus merespons.</string>
+    <string name="takeover_empty_action_hint">Ketuk kanan atas untuk menambahkan aturan takeover pertama Anda.</string>
+    <string name="takeover_loading">Memuat aturan takeover...</string>
+    <string name="takeover_editor_title_create">Aturan Takeover Baru</string>
+    <string name="takeover_editor_description">Pilih permintaan mana yang masuk ke asisten bawaan dan mana yang tetap di Zafiro.</string>
+    <string name="takeover_field_name">Nama Aturan</string>
+    <string name="takeover_field_name_hint">Contoh: Layanan asisten bawaan</string>
+    <string name="takeover_field_enabled">Aktifkan Aturan</string>
+    <string name="takeover_field_target">Responder Saat Cocok</string>
+    <string name="takeover_target_native_assistant">Asisten Bawaan</string>
+    <string name="takeover_target_zafiro">Zafiro</string>
+    <string name="takeover_field_patterns">Aturan</string>
+    <string name="takeover_field_patterns_hint">cuaca\n.*alarm.*\nbuka.*</string>
+    <string name="takeover_field_patterns_description">Masukkan satu kata kunci atau ekspresi reguler per baris. Responder yang dipilih dipakai begitu ada aturan yang cocok.</string>
+    <string name="takeover_save_action">Simpan Aturan</string>
+    <string name="takeover_error_name_required">Silakan masukkan nama aturan</string>
+    <string name="takeover_error_patterns_required">Silakan masukkan setidaknya satu pola</string>
+    <string name="takeover_error_load_failed_generic">Gagal memuat aturan takeover</string>
+    <string name="takeover_error_load_failed">Gagal memuat aturan takeover: %1$s</string>
+    <string name="takeover_error_save_failed_generic">Gagal menyimpan aturan takeover</string>
+    <string name="takeover_error_save_failed">Gagal menyimpan aturan takeover: %1$s</string>
+    <string name="takeover_error_delete_failed_generic">Gagal menghapus aturan takeover</string>
+    <string name="takeover_delete_dialog_title">Hapus Aturan Takeover</string>
+    <string name="takeover_delete_dialog_text">Yakin ingin menghapus aturan takeover \"%1$s\"? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="takeover_error_delete_failed">Gagal menghapus aturan takeover: %1$s</string>
+
+    <!-- Tool Module -->
+    <string name="tool_page_description">Aktifkan atau nonaktifkan alat. Perubahan berlaku pada percakapan berikutnya.</string>
+    <string name="tool_loading">Memuat status alat...</string>
+    <string name="tool_empty">Belum ada alat yang tersedia saat ini.</string>
+    <string name="tool_load_failed">Gagal memuat: %1$s</string>
+    <string name="tool_save_failed">Gagal menyimpan: %1$s</string>
+    <string name="tool_group_dev_tools">Alat Pengembang</string>
+    <string name="tool_group_dev_tools_summary">Jalankan perintah shell dan kode Python di perangkat Anda</string>
+    <string name="tool_group_android_native">Android Native</string>
+    <string name="tool_group_android_native_summary">Aksi bawaan sistem: buka tautan, cari dan luncurkan aplikasi, kirim notifikasi</string>
+    <string name="tool_group_screen_operation">Operasi Layar</string>
+    <string name="tool_group_screen_operation_summary">Baca dan operasikan layar melalui layanan aksesibilitas atau shell</string>
+    <string name="tool_custom_py_tools_entry">Alat Python kustom</string>
+    <string name="tool_custom_py_tools_entry_summary">Alat Python kustom berparameter yang dapat dibuat, diubah, dan diuji jalankan oleh agen</string>
+
+    <!-- Python Tool Module -->
+    <string name="custom_py_tool_page_title">Alat Meta Python</string>
+    <string name="custom_py_tool_page_description">Kelola alat Python kustom Anda.</string>
+    <string name="custom_py_tool_page_empty_description">Biarkan Agen Anda membuatnya, atau ketuk kanan atas untuk menambahkan alat baru.</string>
+    <string name="custom_py_tool_loading">Memuat alat Python kustom tersimpan...</string>
+    <string name="custom_py_tool_editor_title_create">Alat Python Baru</string>
+    <string name="custom_py_tool_editor_description">Konfigurasikan alat Python Anda. Deskripsi dan skema parameter diambil dari docstring main() dan anotasi tipe. Setelah disimpan, Agen dapat memanggilnya saat diperlukan.</string>
+    <string name="custom_py_tool_field_name">Nama Alat</string>
+    <string name="custom_py_tool_field_name_hint">Contoh: py_web_search</string>
+    <string name="custom_py_tool_field_enabled">Aktifkan Alat</string>
+    <string name="custom_py_tool_field_code">Kode Python</string>
+    <string name="custom_py_tool_field_code_hint">Definisikan fungsi entri dengan anotasi tipe, mis. main(query: str)</string>
+    <string name="custom_py_tool_save_action">Simpan Alat Python</string>
+    <string name="custom_py_tool_error_name_required">Silakan masukkan nama alat</string>
+    <string name="custom_py_tool_error_code_required">Silakan masukkan kode alat</string>
+    <string name="custom_py_tool_error_name_invalid">Nama harus cocok dengan py_[a-z][a-z0-9_]</string>
+    <string name="custom_py_tool_error_name_duplicate">Nama ini sudah ada. Pilih yang lain dan coba lagi</string>
+    <string name="custom_py_tool_error_name_reserved">Nama ini sudah dipakai oleh alat bawaan</string>
+    <string name="custom_py_tool_error_load_failed">Gagal memuat alat Python kustom: %1$s</string>
+    <string name="custom_py_tool_error_save_failed">Gagal menyimpan alat Python: %1$s</string>
+    <string name="custom_py_tool_error_delete_failed">Gagal menghapus alat Python: %1$s</string>
+    <string name="custom_py_tool_delete_dialog_title">Hapus Alat Python</string>
+    <string name="custom_py_tool_delete_dialog_text">Yakin ingin menghapus alat \"%1$s\"? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="custom_py_tool_save_failed">Gagal menyimpan: %1$s</string>
+
+    <string name="mcp_page_description">Konfigurasikan koneksi dan autentikasi untuk layanan MCP. Setelah disimpan, Zafiro akan otomatis menemukan alat yang tersedia saat runtime.</string>
+    <string name="mcp_page_empty_description">Ketuk kanan atas untuk menambahkan server pertama Anda.</string>
+    <string name="mcp_loading">Memuat layanan MCP tersimpan...</string>
+    <string name="mcp_editor_title_create">Layanan MCP Baru</string>
+    <string name="mcp_field_name">Nama</string>
+    <string name="mcp_field_name_hint">Contoh: my-xxx-mcp-server</string>
+    <string name="mcp_field_url">URL</string>
+    <string name="mcp_field_url_hint">Contoh: https://a.b.c/mcp</string>
+    <string name="mcp_field_enabled">Aktifkan Layanan</string>
+    <string name="mcp_field_headers">Header Kustom</string>
+    <string name="mcp_field_headers_hint">{\n  \"Authorization\": \"Bearer xxx\"\n}</string>
+    <string name="mcp_save_action">Simpan Layanan MCP</string>
+    <string name="mcp_error_name_required">Silakan masukkan nama</string>
+    <string name="mcp_error_name_duplicate">Nama ini sudah ada. Pilih yang lain dan coba lagi</string>
+    <string name="mcp_error_url_required">Silakan masukkan URL</string>
+    <string name="mcp_error_url_invalid">Hanya URL http:// atau https:// yang didukung</string>
+    <string name="mcp_error_headers_invalid_json">Header bukan JSON yang valid</string>
+    <string name="mcp_error_headers_not_object">Header harus berupa objek JSON</string>
+    <string name="mcp_error_headers_empty_key">Nama header tidak boleh kosong</string>
+    <string name="mcp_delete_dialog_title">Hapus MCP Server</string>
+    <string name="mcp_delete_dialog_text">Yakin ingin menghapus server MCP \"%1$s\"? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="mcp_error_headers_non_string">Nilai header harus berupa string</string>
+    <string name="update_dialog_title">Versi Baru Tersedia</string>
+    <string name="update_dialog_text">v%1$s kini tersedia. Tingkatkan untuk mendapatkan fitur dan perbaikan terbaru.</string>
+    <string name="update_dialog_confirm">Perbarui</string>
+    <string name="update_dialog_cancel">Nanti</string>
+
+    <!-- Notification strings -->
+
+    <!-- Fallback -->
+
+    <!-- Host App Display Names -->
+    <string name="host_breeno_display_name">Breeno</string>
+    <string name="host_xiaoai_display_name">XiaoAi</string>
+
+    <!-- Error: MCP -->
+    <string name="error_mcp_load_failed">Gagal memuat konfigurasi MCP</string>
+    <string name="error_mcp_save_failed">Gagal menyimpan konfigurasi MCP</string>
+    <string name="error_mcp_delete_failed">Gagal menghapus konfigurasi MCP</string>
+
+    <!-- Error: Execution Rules -->
+    <string name="error_exec_rules_load_failed">Gagal memuat aturan eksekusi</string>
+    <string name="error_exec_rules_save_failed">Gagal menyimpan aturan eksekusi</string>
+    <string name="error_exec_rules_delete_failed">Gagal menghapus aturan eksekusi</string>
+
+    <!-- Error: Skill -->
+    <string name="error_skill_load_failed">Gagal memuat skill</string>
+    <string name="error_skill_save_failed">Gagal menyimpan skill</string>
+    <string name="error_skill_read_failed">Gagal membaca skill</string>
+    <string name="error_skill_import_failed">Gagal mengimpor skill</string>
+    <string name="error_skill_delete_failed">Gagal menghapus skill</string>
+
+    <string name="error_custom_py_tool_load_failed">Gagal memuat alat Python kustom</string>
+    <string name="error_custom_py_tool_save_failed">Gagal menyimpan alat Python</string>
+    <string name="error_custom_py_tool_delete_failed">Gagal menghapus alat Python</string>
+
+    <string name="error_memory_load_failed">Gagal memuat memori</string>
+    <string name="error_memory_save_failed">Gagal menyimpan memori</string>
+    <string name="error_memory_delete_failed">Gagal menghapus memori</string>
+
+    <!-- Feedback templates -->
+    <string name="feedback_feature_template">## Saran Fitur\n\n## Kasus Penggunaan\n\n## Hasil yang Diharapkan</string>
+    <string name="feedback_bug_template">## Deskripsi Masalah\n\n## Langkah Reproduksi\n\n## Perilaku yang Diharapkan\n\n## Perilaku Aktual\n\n## Info Perangkat\n- Versi Android:\n- Asisten (Breeno atau lain):\n- Versi modul:\n\n## Lainnya\nAnda dapat melampirkan log, tangkapan layar, atau rekaman untuk membantu kami memahami masalah.</string>
+    <string name="conversation_fork_title">Percabangan · %1$s</string>
+    <string name="conversation_regenerate_title">Buat ulang · %1$s</string>
+    <string name="conversation_rewind_title">Rewind · %1$s</string>
+    <!-- Tool display names -->
+    <string name="ui_tool_display_terminal">Terminal</string>
+    <string name="ui_tool_display_load_skill">Muat Skill</string>
+    <string name="ui_tool_display_execute_python">Python</string>
+    <string name="ui_tool_display_create_custom_tool">Buat Alat Kustom</string>
+    <string name="ui_tool_display_launch_app">Luncurkan Aplikasi</string>
+    <string name="ui_tool_display_memory">Memori</string>
+    <string name="ui_tool_display_notify">Notifikasi</string>
+    <string name="ui_tool_display_open_uri">Buka URI</string>
+    <string name="ui_tool_display_read_custom_tool">Baca Alat Kustom</string>
+    <string name="ui_tool_display_find_installed_apps">Cari aplikasi terpasang</string>
+    <string name="ui_tool_display_screen_operation_accessibility">Operasi Layar</string>
+    <string name="ui_tool_display_screen_operation_shell">Operasi Layar</string>
+    <string name="ui_tool_display_screenshot">Tangkapan Layar</string>
+    <string name="ui_tool_display_view_image">Lihat Gambar</string>
+    <string name="dialog_cancel">Batal</string>
+    <string name="dialog_confirm_delete">Hapus</string>
+    <string name="ui_settings_section_general">Umum</string>
+    <string name="ui_settings_general">Pengaturan Umum</string>
+    <string name="ui_settings_general_summary">Bahasa dan perilaku saat mulai</string>
+    <string name="ui_settings_general_group_appearance">Tampilan &amp; Bahasa</string>
+    <string name="ui_settings_general_group_floating_notification">Mengambang &amp; Notifikasi</string>
+    <string name="ui_settings_general_group_conversation">Percakapan &amp; Interaksi</string>
+    <string name="ui_settings_general_group_runtime">Runtime &amp; Kontrol</string>
+    <string name="ui_settings_general_floating_ball">Bola Mengambang</string>
+    <string name="ui_settings_general_floating_ball_summary">Tampilkan status agen dan aksi cepat saat di latar belakang</string>
+    <string name="ui_settings_general_floating_ball_auto_expand">Perluas Bola Mengambang Otomatis</string>
+    <string name="ui_settings_general_floating_ball_auto_expand_summary">Perluas bola mengambang saat balasan selesai atau izin diperlukan</string>
+    <string name="ui_settings_general_resident_notification">Notifikasi Permanen</string>
+    <string name="ui_settings_general_resident_notification_summary">Tampilkan status langsung dan kontrol di laci notifikasi</string>
+    <string name="ui_settings_general_language">Bahasa</string>
+    <string name="ui_settings_general_language_follow_system">Ikuti sistem</string>
+    <string name="ui_settings_general_load_last_conversation">Muat percakapan terakhir saat mulai</string>
+    <string name="ui_settings_general_idle_timeout">Waktu tunggu idle</string>
+    <string name="ui_settings_general_idle_timeout_summary">Akhiri giliran saat server diam terlalu lama</string>
+    <string name="ui_settings_general_idle_timeout_off">Tanpa waktu tunggu</string>
+    <string name="ui_settings_general_retry_attempts">Percobaan ulang otomatis</string>
+    <string name="ui_settings_general_retry_summary">Percobaan ulang otomatis setelah permintaan gagal</string>
+    <string name="ui_settings_general_keep_screen_on">Biarkan layar menyala saat menjawab</string>
+    <string name="ui_settings_general_keep_screen_on_summary">Biarkan layar menyala saat agen merespons dan menjalankan alat</string>
+    <string name="ui_settings_general_always_show_message_actions">Selalu tampilkan aksi pesan</string>
+    <string name="ui_settings_saved_configuration_title">Konfigurasi tersimpan</string>
+    <string name="ui_settings_saved_configuration_delete_title">Hapus konfigurasi</string>
+    <string name="ui_settings_saved_configuration_delete_text">Konfigurasi ini akan dihapus dan tidak dapat dipulihkan.</string>
+    <string name="ui_settings_saved_configuration_edit">Edit</string>
+    <string name="ui_settings_configure_add">Tambah konfigurasi</string>
+    <string name="ui_settings_configure_name_label">Nama</string>
+    <string name="ui_settings_configure_name_placeholder">mis. DeepSeek utama</string>
+    <string name="ui_settings_configure_vision_label">Model Visi</string>
+    <string name="ui_settings_configure_protocol_label">Protokol</string>
+    <string name="ui_settings_configure_endpoint_mismatch_title">Perbarui endpoint</string>
+    <string name="ui_settings_configure_endpoint_mismatch_text_switch">Protokol berubah. Perbarui endpoint menjadi\n%1$s ?</string>
+    <string name="ui_settings_configure_endpoint_mismatch_text_save">Sebelum menyimpan, perbarui endpoint menjadi\n%1$s ?</string>
+    <string name="ui_settings_configure_endpoint_mismatch_confirm_update">Perbarui</string>
+    <string name="ui_settings_configure_endpoint_mismatch_cancel_keep">Pertahankan</string>
+    <string name="ui_settings_configure_endpoint_mismatch_cancel_save">Simpan apa adanya</string>
+    <string name="ui_settings_configure_protocol_hint">Setelah mengganti protokol, pastikan endpoint sesuai dengan protokol.</string>
+    <string name="ui_settings_configure_thinking_label">Upaya Berpikir</string>
+    <string name="ui_settings_configure_thinking_hint">Biarkan sebagai Default Penyedia untuk memakai perilaku default penyedia; turunkan sendiri jika penyedia menolak tingkat tinggi.</string>
+    <string name="ui_settings_configure_max_tokens_label">Token Maksimum</string>
+    <string name="ui_settings_configure_max_tokens_placeholder">Contoh: %1$d</string>
+    <string name="ui_settings_configure_max_tokens_hint">Token maksimum yang dapat dikeluarkan dalam satu permintaan. Biarkan kosong untuk memakai default; turunkan jika server melaporkan batas keluaran terlampaui.</string>
+    <string name="ui_settings_configure_error_max_tokens_invalid">Masukkan bilangan bulat minimal 256</string>
+
+    <string name="ui_settings_appearance">Tampilan</string>
+    <string name="ui_theme_mode_system">Ikuti sistem</string>
+    <string name="ui_theme_mode_light">Terang</string>
+    <string name="ui_theme_mode_dark">Gelap</string>
+    <string name="ui_theme_color_dynamic">Dinamis (dari wallpaper)</string>
+    <string name="ui_theme_color_rose">Mawar</string>
+    <string name="ui_theme_color_blossom">Kembang</string>
+    <string name="ui_theme_color_lavender">Lavender</string>
+    <string name="ui_theme_color_blue">Biru</string>
+    <string name="ui_theme_color_sky">Langit</string>
+    <string name="ui_theme_color_cyan">Sian</string>
+    <string name="ui_theme_color_mint">Mint</string>
+    <string name="ui_theme_color_green">Hijau</string>
+    <string name="ui_theme_color_lime">Hijau limau</string>
+    <string name="ui_theme_color_lemon">Lemon</string>
+    <string name="ui_theme_color_amber">Amber</string>
+    <string name="ui_theme_color_sunset">Jingga senja</string>
+
+    <!-- Resident Notification -->
+    <string name="agent_resident_title_idle">Agent · Siaga</string>
+    <string name="agent_resident_title_failed">Agent · Gagal</string>
+    <string name="agent_resident_title_interrupted">Agent · Berhenti</string>
+    <string name="agent_resident_title_thinking">Agent · Berpikir</string>
+    <string name="agent_resident_title_generating">Agent · Merespons</string>
+    <string name="agent_resident_title_tool_running">Agent · Menjalankan alat</string>
+    <string name="agent_resident_title_waiting_approval">Agent · Perlu izin</string>
+    <string name="agent_resident_title_stopping">Agent · Menghentikan</string>
+    <string name="agent_resident_action_stop">Hentikan</string>
+    <string name="agent_resident_action_approve">Izinkan</string>
+    <string name="agent_resident_action_decline">Tolak</string>
+</resources>
