@@ -33,6 +33,9 @@ import com.niki914.okia.tooling.ToolRegistry
 import com.niki914.xposed.api.util.ContextProvider
 import com.niki914.xposed.api.util.LockState
 import com.niki914.zafiro.api.model.FileRef
+import com.niki914.zafiro.api.text.FilesBlock
+import com.niki914.zafiro.api.text.TurnTextComposer
+import com.niki914.zafiro.chat.agentic.AndroidImageLoader
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import com.niki914.okia.transport.HttpRequest
