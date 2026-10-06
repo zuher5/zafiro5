@@ -12,9 +12,11 @@ sealed interface ProviderSpec {
     /** 新建配置时可选的预填模型；null 表示继续要求用户选择或手填。 */
     val initialModelId: String? get() = null
     val allowsCustomEndpointInNewConfig: Boolean
-
     /** 新建配置时预填的协议（LlmProtocol.wireId）。 */
     val defaultProtocol: String
+
+    /** true 时 API Key 可为空，用于 KiloCode free / bansos proxy 等无 key 网关。 */
+    val allowsEmptyApiKey: Boolean get() = false
 
     @get:DrawableRes
     val iconRes: Int
@@ -254,6 +256,7 @@ private data object OpenCodeFreeSpec : ProviderSpec {
     override val exampleModelId: String = "mimo-v2.5-free"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
+    override val allowsEmptyApiKey: Boolean = true
     override val iconRes: Int = R.drawable.opencode
     override val tintIcon: Boolean = true
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
@@ -268,6 +271,7 @@ private data object KiloFreeSpec : ProviderSpec {
     override val exampleModelId: String = "kilo-auto/free"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
+    override val allowsEmptyApiKey: Boolean = true
     override val iconRes: Int = R.drawable.kilo
     override val tintIcon: Boolean = true
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
@@ -282,6 +286,7 @@ private data object BansosProxySpec : ProviderSpec {
     override val exampleModelId: String = "mimo-v2.5-free"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
+    override val allowsEmptyApiKey: Boolean = true
     override val iconRes: Int = R.drawable.opencode
     override val tintIcon: Boolean = true
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
