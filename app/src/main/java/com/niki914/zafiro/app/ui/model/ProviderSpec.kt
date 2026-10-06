@@ -258,7 +258,7 @@ private data object OpenCodeFreeSpec : ProviderSpec {
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true
     override val iconRes: Int = R.drawable.opencode_free
-    override val tintIcon: Boolean = true
+    override val tintIcon: Boolean = false
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
         button = ProviderButtonTokens(),
     )
@@ -273,7 +273,7 @@ private data object KiloFreeSpec : ProviderSpec {
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true
     override val iconRes: Int = R.drawable.kilo
-    override val tintIcon: Boolean = true
+    override val tintIcon: Boolean = false
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
         button = ProviderButtonTokens(),
     )
