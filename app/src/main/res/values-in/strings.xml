@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App / Module -->
-    <string name="app_name">Zafiro5</string>
+    <string name="app_name">Zafira</string>
     <string name="xposed_desc">Hadirkan model Anda sendiri di asisten suara\n\nDidukung saat ini:\n\n- ColorOS Breeno\n- HyperOS XiaoAi</string>
 
     <!-- Onboarding -->
@@ -30,11 +30,11 @@
     <string name="ui_onboard_configure_error_load_failed">Gagal memuat konfigurasi: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Gagal menyimpan konfigurasi: %1$s</string>
     <string name="ui_onboard_done_headline">Selesai.</string>
-    <string name="ui_onboard_done_description">Penyiapan selesai. Anda bisa mulai menggunakan Zafiro5 sekarang atau menyesuaikannya nanti di Pengaturan.</string>
-    <string name="ui_onboard_done_enter_home">Buka Zafiro5</string>
+    <string name="ui_onboard_done_description">Penyiapan selesai. Anda bisa mulai menggunakan Zafira sekarang atau menyesuaikannya nanti di Pengaturan.</string>
+    <string name="ui_onboard_done_enter_home">Buka Zafira</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro5</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">Percakapan baru</string>
     <string name="ui_home_input_placeholder">Ketik pesan...</string>
     <string name="ui_tool_status_called">Dipanggil</string>
@@ -127,7 +127,7 @@
 
     <!-- Settings Home Items -->
     <string name="ui_settings_model_config">Konfigurasi Model</string>
-    <string name="ui_settings_model_config_summary">Sesuaikan cara Zafiro5 terhubung ke model Anda</string>
+    <string name="ui_settings_model_config_summary">Sesuaikan cara Zafira terhubung ke model Anda</string>
     <string name="ui_settings_memory">Memori</string>
     <string name="ui_settings_memory_summary">Kelola memori dan preferensi tersimpan</string>
     <string name="ui_settings_tools">Alat</string>
@@ -154,7 +154,7 @@
     <string name="ui_settings_mcp">MCP Server</string>
     <string name="ui_settings_mcp_summary">Hubungkan server dan alat MCP eksternal</string>
     <string name="ui_settings_takeover">Aturan Takeover</string>
-    <string name="ui_settings_takeover_summary">Arahkan permintaan yang cocok ke asisten bawaan atau Zafiro5</string>
+    <string name="ui_settings_takeover_summary">Arahkan permintaan yang cocok ke asisten bawaan atau Zafira</string>
     <string name="ui_settings_execution_rules">Aturan Eksekusi</string>
     <string name="ui_settings_execution_rules_summary">Tetapkan aturan keamanan untuk eksekusi Shell</string>
     <string name="ui_settings_storage">Penyimpanan</string>
@@ -244,12 +244,12 @@
     <string name="execution_rules_enabled_mode_disabled">Nonaktif</string>
     <string name="execution_rules_enabled_mode_confirm">Tanya saya</string>
     <string name="tool_permission_dialog_title">AI meminta menjalankan operasi</string>
-    <string name="tool_permission_request_intro">Alat Zafiro5 \"%1$s\" ingin menjalankan perintah berikut:</string>
+    <string name="tool_permission_request_intro">Alat Zafira \"%1$s\" ingin menjalankan perintah berikut:</string>
     <string name="tool_permission_matched_rule">Cocok dengan aturan \"%1$s\"</string>
     <string name="tool_permission_allow">Izinkan sekali</string>
     <string name="tool_permission_deny">Tolak</string>
     <string name="screen_control_consent_title">Permintaan izin kontrol layar</string>
-    <string name="screen_control_consent_body">Zafiro5 memerlukan izin berikut untuk mengontrol layar:\n1. Layanan aksesibilitas: membaca UI dan melakukan ketukan\n2. Tampil di atas aplikasi lain: menampilkan indikator pointer\n\nPrompt sistem atau halaman Pengaturan mungkin muncul berikutnya.</string>
+    <string name="screen_control_consent_body">Zafira memerlukan izin berikut untuk mengontrol layar:\n1. Layanan aksesibilitas: membaca UI dan melakukan ketukan\n2. Tampil di atas aplikasi lain: menampilkan indikator pointer\n\nPrompt sistem atau halaman Pengaturan mungkin muncul berikutnya.</string>
     <string name="screen_control_consent_agree">Setuju</string>
     <string name="screen_control_consent_deny">Tolak</string>
     <string name="execution_rules_field_patterns">Pola</string>
@@ -265,13 +265,13 @@
     <string name="takeover_empty_action_hint">Ketuk kanan atas untuk menambahkan aturan takeover pertama Anda.</string>
     <string name="takeover_loading">Memuat aturan takeover...</string>
     <string name="takeover_editor_title_create">Aturan Takeover Baru</string>
-    <string name="takeover_editor_description">Pilih permintaan mana yang masuk ke asisten bawaan dan mana yang tetap di Zafiro5.</string>
+    <string name="takeover_editor_description">Pilih permintaan mana yang masuk ke asisten bawaan dan mana yang tetap di Zafira.</string>
     <string name="takeover_field_name">Nama Aturan</string>
     <string name="takeover_field_name_hint">Contoh: Layanan asisten bawaan</string>
     <string name="takeover_field_enabled">Aktifkan Aturan</string>
     <string name="takeover_field_target">Responder Saat Cocok</string>
     <string name="takeover_target_native_assistant">Asisten Bawaan</string>
-    <string name="takeover_target_zafiro">Zafiro5</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">Aturan</string>
     <string name="takeover_field_patterns_hint">cuaca\n.*alarm.*\nbuka.*</string>
     <string name="takeover_field_patterns_description">Masukkan satu kata kunci atau ekspresi reguler per baris. Responder yang dipilih dipakai begitu ada aturan yang cocok.</string>
@@ -327,7 +327,7 @@
     <string name="custom_py_tool_delete_dialog_text">Yakin ingin menghapus alat \"%1$s\"? Tindakan ini tidak dapat dibatalkan.</string>
     <string name="custom_py_tool_save_failed">Gagal menyimpan: %1$s</string>
 
-    <string name="mcp_page_description">Konfigurasikan koneksi dan autentikasi untuk layanan MCP. Setelah disimpan, Zafiro5 akan otomatis menemukan alat yang tersedia saat runtime.</string>
+    <string name="mcp_page_description">Konfigurasikan koneksi dan autentikasi untuk layanan MCP. Setelah disimpan, Zafira akan otomatis menemukan alat yang tersedia saat runtime.</string>
     <string name="mcp_page_empty_description">Ketuk kanan atas untuk menambahkan server pertama Anda.</string>
     <string name="mcp_loading">Memuat layanan MCP tersimpan...</string>
     <string name="mcp_editor_title_create">Layanan MCP Baru</string>
@@ -487,4 +487,50 @@
     <string name="agent_resident_action_stop">Hentikan</string>
     <string name="agent_resident_action_approve">Izinkan</string>
     <string name="agent_resident_action_decline">Tolak</string>
+
+    <!-- v1.6.0 Upstream additions -->
+    <string name="ui_home_thinking_title">Berpikir</string>
+    <string name="ui_conversation_history_title">Riwayat</string>
+    <string name="ui_conversation_selection_count">%1$d dipilih</string>
+    <string name="ui_conversation_history_pinned_section">Disematkan</string>
+    <string name="ui_conversation_history_batch_delete_dialog_text">Hapus %1$d percakapan yang dipilih? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="ui_conversation_action_pin">Sematkan ke atas</string>
+    <string name="ui_conversation_action_unpin">Lepas sematan</string>
+    <string name="custom_py_tool_save_dialog_checking_title">Memeriksa Kode Alat</string>
+    <string name="custom_py_tool_save_dialog_checking_text">Pemeriksaan mengekstrak tanda tangan parameter main() dan mungkin perlu beberapa detik.\n\nAnda bisa membatalkan; tidak ada yang disimpan jika dibatalkan.</string>
+    <string name="custom_py_tool_save_dialog_success_title">Alat Tersimpan</string>
+    <string name="custom_py_tool_save_dialog_success_text">Tersimpan ke daftar alat Python kustom.\n\nAgent sekarang bisa memanggilnya saat diperlukan.</string>
+    <string name="custom_py_tool_save_dialog_code_failed_title">Pemeriksaan Kode Gagal</string>
+    <string name="custom_py_tool_save_dialog_code_failed_text">Kesalahan berasal dari kode alat itu sendiri.\n\nPerbaiki kode dan simpan kembali.</string>
+    <string name="custom_py_tool_save_dialog_internal_failed_title">Gagal Menyimpan</string>
+    <string name="custom_py_tool_save_dialog_internal_failed_text">Kesalahan berasal dari internal aplikasi, bukan dari kode alat.\n\nSilakan coba lagi, dan laporkan pesan ini jika terus berlanjut.</string>
+    <string name="custom_py_tool_save_dialog_action_cancel">Batal</string>
+    <string name="custom_py_tool_save_dialog_action_done">Selesai</string>
+    <string name="custom_py_tool_save_dialog_action_close">Tutup</string>
+
+    <!-- Onboarding Preferences -->
+    <string name="ui_onboard_done_advanced_entry">Izin &amp; aturan eksekusi</string>
+    <string name="ui_onboard_preferences_title">Izin &amp; aturan eksekusi</string>
+    <string name="ui_onboard_preferences_permissions_group">Izin</string>
+    <string name="ui_onboard_preferences_phone_use_title">Kontrol Ponsel</string>
+    <string name="ui_onboard_preferences_phone_use_desc">Izinkan Agent mengontrol ponsel; membutuhkan izin aksesibilitas dan overlay</string>
+    <string name="ui_onboard_preferences_floating_ball_title">Bola Melayang</string>
+    <string name="ui_onboard_preferences_floating_ball_desc">Tampilkan bola melayang di latar belakang untuk memantau status agent</string>
+    <string name="ui_onboard_preferences_notification_title">Notifikasi Menetap</string>
+    <string name="ui_onboard_preferences_notification_desc">Tampilkan status langsung agent di bilah notifikasi</string>
+    <string name="ui_onboard_preferences_file_title">Akses File</string>
+    <string name="ui_onboard_preferences_file_desc">Izinkan Agent membaca dan menulis file di luar sandbox</string>
+    <string name="ui_onboard_preferences_granted">Diizinkan</string>
+    <string name="ui_onboard_preferences_grant_action">Ketuk untuk mengizinkan</string>
+    <string name="ui_onboard_preferences_security_group">Aturan Eksekusi</string>
+    <string name="ui_onboard_preferences_security_hint">Perintah yang memerlukan konfirmasi sebelum dijalankan</string>
+    <string name="ui_onboard_preferences_rule_add_action">Tambah aturan</string>
+    <string name="ui_onboard_preferences_rule_add_title">Tambah aturan eksekusi</string>
+    <string name="ui_onboard_preferences_rule_add_hint">Menerima kata kunci atau regex, satu baris saja</string>
+    <string name="ui_onboard_preferences_rule_placeholder">Masukkan kata kunci atau regex</string>
+    <string name="ui_onboard_preferences_rule_add_confirm">Tambah</string>
+    <string name="ui_onboard_preferences_rule_delete">Hapus %1$s</string>
+    <string name="ui_onboard_preferences_action_grant_all">Izinkan Semua</string>
+    <string name="ui_onboard_preferences_action_skip">Lewati</string>
+    <string name="ui_onboard_preferences_toast_denied">Izin tidak diberikan</string>
 </resources>

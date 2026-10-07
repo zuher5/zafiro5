@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App / Module -->
-    <string name="app_name">Zafiro5</string>
+    <string name="app_name">Zafira</string>
     <string name="xposed_desc">音声アシスタントに独自のモデル機能を連携\n\n対応中:\n\n- ColorOS Breeno\n- HyperOS XiaoAi</string>
 
     <!-- Onboarding -->
@@ -30,11 +30,11 @@
     <string name="ui_onboard_configure_error_load_failed">設定の読み込みに失敗しました：%1$s</string>
     <string name="ui_onboard_configure_error_save_failed">設定の保存に失敗しました：%1$s</string>
     <string name="ui_onboard_done_headline">準備が完了しました</string>
-    <string name="ui_onboard_done_description">設定が完了しました。すぐに Zafiro5 を使用するか、後から設定で調整できます。</string>
-    <string name="ui_onboard_done_enter_home">Zafiro5 を開く</string>
+    <string name="ui_onboard_done_description">設定が完了しました。すぐに Zafira を使用するか、後から設定で調整できます。</string>
+    <string name="ui_onboard_done_enter_home">Zafira を開く</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro5</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">新しい会話</string>
     <string name="ui_home_input_placeholder">メッセージを入力...</string>
     <string name="ui_tool_status_called">呼び出し済み</string>
@@ -83,13 +83,17 @@
     <string name="ui_home_error_retry_exhausted_title">自動リトライがすべて失敗しました</string>
     <string name="ui_home_error_internal_title">内部エラー</string>
     <string name="ui_home_retrying_title">ネットワーク障害のため再試行中…</string>
+    <string name="ui_home_thinking_title">思考</string>
     <string name="ui_home_retrying_attempt">再試行 %1$d/%2$d</string>
     <string name="runtime_error_internal">内部エラー</string>
     <string name="ui_home_history_content_description">会話履歴</string>
+    <string name="ui_conversation_history_title">会話履歴</string>
+    <string name="ui_conversation_selection_count">%1$d 件選択中</string>
     <string name="ui_conversation_history_today">今日</string>
     <string name="ui_conversation_history_this_week">今週</string>
     <string name="ui_conversation_history_this_month">今月</string>
     <string name="ui_conversation_history_older">より前</string>
+    <string name="ui_conversation_history_pinned_section">固定した会話</string>
     <string name="ui_conversation_history_back_content_description">戻る</string>
     <string name="ui_conversation_history_loading">会話履歴を読み込み中...</string>
     <string name="ui_conversation_history_empty_title">会話履歴はありません</string>
@@ -98,11 +102,14 @@
     <string name="ui_conversation_history_untitled">無題の会話</string>
     <string name="ui_conversation_history_delete_dialog_title">会話の削除</string>
     <string name="ui_conversation_history_delete_dialog_text">この会話を削除してもよろしいですか？この操作は取り消せません。\n\n%1$s</string>
+    <string name="ui_conversation_history_batch_delete_dialog_text">選択した %1$d 件の会話を削除してもよろしいですか？この操作は取り消せません。</string>
     <string name="ui_conversation_history_delete_dialog_confirm">削除</string>
     <string name="ui_conversation_history_delete_dialog_cancel">キャンセル</string>
     <string name="ui_conversation_history_delete_error">会話の削除に失敗しました：%1$s</string>
     <string name="ui_conversation_action_load">読み込む</string>
     <string name="ui_conversation_action_fork">ここから分岐</string>
+    <string name="ui_conversation_action_pin">上部に固定</string>
+    <string name="ui_conversation_action_unpin">固定を解除</string>
     <string name="ui_conversation_action_rename">名前を変更</string>
     <string name="ui_conversation_action_delete">削除</string>
     <string name="ui_conversation_rename_dialog_title">会話名を変更</string>
@@ -127,7 +134,7 @@
 
     <!-- Settings Home Items -->
     <string name="ui_settings_model_config">モデル設定</string>
-    <string name="ui_settings_model_config_summary">Zafiro5 のモデル連携を調整</string>
+    <string name="ui_settings_model_config_summary">Zafira のモデル連携を調整</string>
     <string name="ui_settings_memory">メモリ</string>
     <string name="ui_settings_memory_summary">永続化された記憶と設定を管理</string>
     <string name="ui_settings_tools">ツール</string>
@@ -154,7 +161,7 @@
     <string name="ui_settings_mcp">MCP Server</string>
     <string name="ui_settings_mcp_summary">外部 MCP サーバーとツールを連携</string>
     <string name="ui_settings_takeover">制御ルール</string>
-    <string name="ui_settings_takeover_summary">入力に応じてネイティブアシスタントと Zafiro5 のどちらが応答するかを設定</string>
+    <string name="ui_settings_takeover_summary">入力に応じてネイティブアシスタントと Zafira のどちらが応答するかを設定</string>
     <string name="ui_settings_execution_rules">実行ルール</string>
     <string name="ui_settings_execution_rules_summary">Shell のセキュリティポリシーを設定</string>
     <string name="ui_settings_storage">ストレージ</string>
@@ -244,12 +251,12 @@
     <string name="execution_rules_enabled_mode_disabled">無効</string>
     <string name="execution_rules_enabled_mode_confirm">確認を求める</string>
     <string name="tool_permission_dialog_title">AI が操作の実行を要求しています</string>
-    <string name="tool_permission_request_intro">Zafiro5 のツール「%1$s」が次のコマンドの実行を要求しています：</string>
+    <string name="tool_permission_request_intro">Zafira のツール「%1$s」が次のコマンドの実行を要求しています：</string>
     <string name="tool_permission_matched_rule">一致したルール「%1$s」</string>
     <string name="tool_permission_allow">今回のみ許可</string>
     <string name="tool_permission_deny">拒否</string>
     <string name="screen_control_consent_title">画面操作権限のリクエスト</string>
-    <string name="screen_control_consent_body">Zafiro5 が画面を操作するには次の権限が必要です：\n1. ユーザー補助サービス：UI の読み取りとタップの実行\n2. 他のアプリの上に重ねて表示：ポインターインジケーターの表示\n\nこの後、システムの許可ダイアログや設定画面が表示される場合があります。</string>
+    <string name="screen_control_consent_body">Zafira が画面を操作するには次の権限が必要です：\n1. ユーザー補助サービス：UI の読み取りとタップの実行\n2. 他のアプリの上に重ねて表示：ポインターインジケーターの表示\n\nこの後、システムの許可ダイアログや設定画面が表示される場合があります。</string>
     <string name="screen_control_consent_agree">同意</string>
     <string name="screen_control_consent_deny">拒否</string>
     <string name="execution_rules_field_patterns">ルール</string>
@@ -265,13 +272,13 @@
     <string name="takeover_empty_action_hint">右上をタップして、最初の制御ルールを追加してください。</string>
     <string name="takeover_loading">制御ルールを読み込み中…</string>
     <string name="takeover_editor_title_create">新規制御ルール</string>
-    <string name="takeover_editor_description">ネイティブアシスタントに委任する質問と、Zafiro5 で処理する質問を設定します。</string>
+    <string name="takeover_editor_description">ネイティブアシスタントに委任する質問と、Zafira で処理する質問を設定します。</string>
     <string name="takeover_field_name">ルール名</string>
     <string name="takeover_field_name_hint">例：生活サービス</string>
     <string name="takeover_field_enabled">ルールを有効化</string>
     <string name="takeover_field_target">マッチ時の応答者</string>
     <string name="takeover_target_native_assistant">ネイティブアシスタント</string>
-    <string name="takeover_target_zafiro">Zafiro5</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">ルール</string>
     <string name="takeover_field_patterns_hint">天気\n.*アラーム.*\n.*を開く</string>
     <string name="takeover_field_patterns_description">1行につき1つのキーワードまたは正規表現を入力します。いずれかにマッチした場合、上記の応答方法を使用します。</string>
@@ -308,7 +315,7 @@
     <string name="custom_py_tool_page_empty_description">Agent に作成を依頼するか、右上をタップして新規追加してください。</string>
     <string name="custom_py_tool_loading">保存された カスタム Python ツールを読み込み中...</string>
     <string name="custom_py_tool_editor_title_create">新規 カスタム Python ツール</string>
-    <string name="custom_py_tool_editor_description">カスタム Python ツールを設定します。ツールの説明とパラメータシグネチャは、コード内の main() 関数の docstring と型ヒントから自動的に抽出されます。保存後、Agent は必要に応じてこのツールを呼び出せます。</string>
+    <string name="custom_py_tool_editor_description">main() 入口関数を定義します。\n\n引数の型ヒントが Agent に渡せる値、docstring がツールの説明になります。</string>
     <string name="custom_py_tool_field_name">ツール名</string>
     <string name="custom_py_tool_field_name_hint">例：py_web_search</string>
     <string name="custom_py_tool_field_enabled">ツールを有効化</string>
@@ -325,9 +332,20 @@
     <string name="custom_py_tool_error_delete_failed">カスタム Python ツールの削除に失敗しました：%1$s</string>
     <string name="custom_py_tool_delete_dialog_title">カスタム Python ツールの削除</string>
     <string name="custom_py_tool_delete_dialog_text">ツール「%1$s」を削除してもよろしいですか？この操作は取り消せません。</string>
+    <string name="custom_py_tool_save_dialog_checking_title">ツールコードを検証中</string>
+    <string name="custom_py_tool_save_dialog_checking_text">検証では main() の引数シグネチャを抽出します。数秒かかる場合があります。\n\nキャンセルできます。その場合、保存は行われません。</string>
+    <string name="custom_py_tool_save_dialog_success_title">ツールを保存しました</string>
+    <string name="custom_py_tool_save_dialog_success_text">カスタム Python ツールの一覧に保存しました。\n\nAgent が必要に応じて呼び出せるようになります。</string>
+    <string name="custom_py_tool_save_dialog_code_failed_title">コード検証に失敗しました</string>
+    <string name="custom_py_tool_save_dialog_code_failed_text">エラーはツールのコード側で発生しています。\n\nコードを修正して再保存してください。</string>
+    <string name="custom_py_tool_save_dialog_internal_failed_title">保存に失敗しました</string>
+    <string name="custom_py_tool_save_dialog_internal_failed_text">エラーはアプリ内部で発生しています。ツールのコードは関係ありません。\n\n再試行してください。繰り返す場合はこのエラーをご報告ください。</string>
+    <string name="custom_py_tool_save_dialog_action_cancel">キャンセル</string>
+    <string name="custom_py_tool_save_dialog_action_done">完了</string>
+    <string name="custom_py_tool_save_dialog_action_close">閉じる</string>
     <string name="custom_py_tool_save_failed">保存失敗：%1$s</string>
 
-    <string name="mcp_page_description">MCP サービスの接続方法と認証情報を設定します。保存後、Zafiro5 は実行時に利用可能なツールを自動検出します。</string>
+    <string name="mcp_page_description">MCP サービスの接続方法と認証情報を設定します。保存後、Zafira は実行時に利用可能なツールを自動検出します。</string>
     <string name="mcp_page_empty_description">右上をタップして、最初のサーバーを追加してください。</string>
     <string name="mcp_loading">保存された MCP サービスを読み込み中...</string>
     <string name="mcp_editor_title_create">新規 MCP サービス</string>
@@ -487,4 +505,30 @@
     <string name="agent_resident_action_stop">停止</string>
     <string name="agent_resident_action_approve">許可</string>
     <string name="agent_resident_action_decline">拒否</string>
+
+    <!-- Onboarding Preferences -->
+    <string name="ui_onboard_done_advanced_entry">権限と実行ルール</string>
+    <string name="ui_onboard_preferences_title">権限と実行ルール</string>
+    <string name="ui_onboard_preferences_permissions_group">権限</string>
+    <string name="ui_onboard_preferences_phone_use_title">Phone Use</string>
+    <string name="ui_onboard_preferences_phone_use_desc">Agent にスマートフォンの操作を許可します（ユーザー補助とオーバーレイの権限が必要）</string>
+    <string name="ui_onboard_preferences_floating_ball_title">フローティングボール</string>
+    <string name="ui_onboard_preferences_floating_ball_desc">バックグラウンド実行中にフローティングボールで Agent の状態を確認</string>
+    <string name="ui_onboard_preferences_notification_title">常駐通知</string>
+    <string name="ui_onboard_preferences_notification_desc">通知パネルに Agent のリアルタイム状態を表示</string>
+    <string name="ui_onboard_preferences_file_title">ファイルアクセス</string>
+    <string name="ui_onboard_preferences_file_desc">Agent にサンドボックス外のファイルの読み書きを許可</string>
+    <string name="ui_onboard_preferences_granted">許可済み</string>
+    <string name="ui_onboard_preferences_grant_action">タップして許可</string>
+    <string name="ui_onboard_preferences_security_group">実行ルール</string>
+    <string name="ui_onboard_preferences_security_hint">実行前に確認が必要なコマンド</string>
+    <string name="ui_onboard_preferences_rule_add_action">ルールを追加</string>
+    <string name="ui_onboard_preferences_rule_add_title">実行ルールを追加</string>
+    <string name="ui_onboard_preferences_rule_add_hint">キーワードまたは正規表現に対応、1 行のみ</string>
+    <string name="ui_onboard_preferences_rule_placeholder">キーワードまたは正規表現を入力</string>
+    <string name="ui_onboard_preferences_rule_add_confirm">追加</string>
+    <string name="ui_onboard_preferences_rule_delete">%1$s を削除</string>
+    <string name="ui_onboard_preferences_action_grant_all">一括許可</string>
+    <string name="ui_onboard_preferences_action_skip">スキップ</string>
+    <string name="ui_onboard_preferences_toast_denied">権限が許可されていません</string>
 </resources>

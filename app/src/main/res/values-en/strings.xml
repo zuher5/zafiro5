@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App / Module -->
-    <string name="app_name">Zafiro5</string>
+    <string name="app_name">Zafira</string>
     <string name="xposed_desc">Empower your voice assistant with your own models\n\nCurrently supported:\n\n- ColorOS Breeno\n- HyperOS XiaoAi</string>
 
     <!-- Onboarding -->
@@ -30,11 +30,11 @@
     <string name="ui_onboard_configure_error_load_failed">Failed to load configuration: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Failed to save configuration: %1$s</string>
     <string name="ui_onboard_done_headline">All set.</string>
-    <string name="ui_onboard_done_description">Setup is complete. You can start using Zafiro5 now or fine-tune it later in Settings.</string>
-    <string name="ui_onboard_done_enter_home">Open Zafiro5</string>
+    <string name="ui_onboard_done_description">Setup is complete. You can start using Zafira now or fine-tune it later in Settings.</string>
+    <string name="ui_onboard_done_enter_home">Open Zafira</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro5</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">New conversation</string>
     <string name="ui_home_input_placeholder">Type a message...</string>
     <string name="ui_tool_status_called">Called</string>
@@ -84,13 +84,17 @@
     <string name="ui_home_error_retry_exhausted_title">Automatic retries exhausted</string>
     <string name="ui_home_error_internal_title">Internal error</string>
     <string name="ui_home_retrying_title">Network hiccup, retrying…</string>
+    <string name="ui_home_thinking_title">Thinking</string>
     <string name="ui_home_retrying_attempt">Retrying %1$d/%2$d</string>
     <string name="runtime_error_internal">Internal error</string>
     <string name="ui_home_history_content_description">Conversation history</string>
+    <string name="ui_conversation_history_title">History</string>
+    <string name="ui_conversation_selection_count">%1$d selected</string>
     <string name="ui_conversation_history_today">Today</string>
     <string name="ui_conversation_history_this_week">This week</string>
     <string name="ui_conversation_history_this_month">This month</string>
     <string name="ui_conversation_history_older">Earlier</string>
+    <string name="ui_conversation_history_pinned_section">Pinned</string>
     <string name="ui_conversation_history_back_content_description">Back</string>
     <string name="ui_conversation_history_loading">Loading conversation history...</string>
     <string name="ui_conversation_history_empty_title">No conversation history yet</string>
@@ -99,11 +103,14 @@
     <string name="ui_conversation_history_untitled">Untitled conversation</string>
     <string name="ui_conversation_history_delete_dialog_title">Delete conversation</string>
     <string name="ui_conversation_history_delete_dialog_text">Delete this conversation? This cannot be undone.\n\n%1$s</string>
+    <string name="ui_conversation_history_batch_delete_dialog_text">Delete %1$d selected conversations? This cannot be undone.</string>
     <string name="ui_conversation_history_delete_dialog_confirm">Delete</string>
     <string name="ui_conversation_history_delete_dialog_cancel">Cancel</string>
     <string name="ui_conversation_history_delete_error">Failed to delete conversation: %1$s</string>
     <string name="ui_conversation_action_load">Load</string>
     <string name="ui_conversation_action_fork">Fork from here</string>
+    <string name="ui_conversation_action_pin">Pin to top</string>
+    <string name="ui_conversation_action_unpin">Unpin</string>
     <string name="ui_conversation_action_rename">Rename</string>
     <string name="ui_conversation_action_delete">Delete</string>
     <string name="ui_conversation_rename_dialog_title">Rename conversation</string>
@@ -128,7 +135,7 @@
 
     <!-- Settings Home Items -->
     <string name="ui_settings_model_config">Model Configuration</string>
-    <string name="ui_settings_model_config_summary">Adjust how Zafiro5 connects to your model</string>
+    <string name="ui_settings_model_config_summary">Adjust how Zafira connects to your model</string>
     <string name="ui_settings_memory">Memory</string>
     <string name="ui_settings_memory_summary">Manage saved memories and preferences</string>
     <string name="ui_settings_tools">Tools</string>
@@ -155,7 +162,7 @@
     <string name="ui_settings_mcp">MCP Server</string>
     <string name="ui_settings_mcp_summary">Connect external MCP servers and tools</string>
     <string name="ui_settings_takeover">Takeover Rules</string>
-    <string name="ui_settings_takeover_summary">Route matched requests to the native assistant or Zafiro5</string>
+    <string name="ui_settings_takeover_summary">Route matched requests to the native assistant or Zafira</string>
     <string name="ui_settings_execution_rules">Execution Rules</string>
     <string name="ui_settings_execution_rules_summary">Set safety rules for Shell execution</string>
     <string name="ui_settings_storage">Storage</string>
@@ -245,12 +252,12 @@
     <string name="execution_rules_enabled_mode_disabled">Disabled</string>
     <string name="execution_rules_enabled_mode_confirm">Ask me</string>
     <string name="tool_permission_dialog_title">AI requests to run an operation</string>
-    <string name="tool_permission_request_intro">Zafiro5 tool "%1$s" wants to run the following command:</string>
+    <string name="tool_permission_request_intro">Zafira tool "%1$s" wants to run the following command:</string>
     <string name="tool_permission_matched_rule">Matched rule "%1$s"</string>
     <string name="tool_permission_allow">Allow once</string>
     <string name="tool_permission_deny">Deny</string>
     <string name="screen_control_consent_title">Screen control permission request</string>
-    <string name="screen_control_consent_body">Zafiro5 needs these permissions to control the screen:\n1. Accessibility service: read the UI and perform taps\n2. Display over other apps: show the pointer indicator\n\nA system prompt or a Settings page may appear next.</string>
+    <string name="screen_control_consent_body">Zafira needs these permissions to control the screen:\n1. Accessibility service: read the UI and perform taps\n2. Display over other apps: show the pointer indicator\n\nA system prompt or a Settings page may appear next.</string>
     <string name="screen_control_consent_agree">Agree</string>
     <string name="screen_control_consent_deny">Deny</string>
     <string name="execution_rules_field_patterns">Patterns</string>
@@ -266,13 +273,13 @@
     <string name="takeover_empty_action_hint">Tap the top right to add your first takeover rule.</string>
     <string name="takeover_loading">Loading takeover rules...</string>
     <string name="takeover_editor_title_create">New Takeover Rule</string>
-    <string name="takeover_editor_description">Choose which requests go to the native assistant and which stay with Zafiro5.</string>
+    <string name="takeover_editor_description">Choose which requests go to the native assistant and which stay with Zafira.</string>
     <string name="takeover_field_name">Rule Name</string>
     <string name="takeover_field_name_hint">For example: Native assistant services</string>
     <string name="takeover_field_enabled">Enable Rule</string>
     <string name="takeover_field_target">Responder When Matched</string>
     <string name="takeover_target_native_assistant">Native Assistant</string>
-    <string name="takeover_target_zafiro">Zafiro5</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">Rules</string>
     <string name="takeover_field_patterns_hint">weather\n.*alarm.*\nopen.*</string>
     <string name="takeover_field_patterns_description">Enter one keyword or regular expression per line. The selected responder is used as soon as any rule matches.</string>
@@ -309,7 +316,7 @@
     <string name="custom_py_tool_page_empty_description">Let your Agent create one, or tap the top right to add a new tool.</string>
     <string name="custom_py_tool_loading">Loading saved Custom Python tools...</string>
     <string name="custom_py_tool_editor_title_create">New Python Tool</string>
-    <string name="custom_py_tool_editor_description">Configure your Python tool. The description and parameter schema are derived from the main() docstring and type annotations. After saving, the Agent can call it when needed.</string>
+    <string name="custom_py_tool_editor_description">Define a main() entry function.\n\nParameter type annotations decide what the agent can pass in, and the docstring becomes the tool description.</string>
     <string name="custom_py_tool_field_name">Tool Name</string>
     <string name="custom_py_tool_field_name_hint">For example: py_web_search</string>
     <string name="custom_py_tool_field_enabled">Enable Tool</string>
@@ -326,9 +333,20 @@
     <string name="custom_py_tool_error_delete_failed">Failed to delete Python tool: %1$s</string>
     <string name="custom_py_tool_delete_dialog_title">Delete Python Tool</string>
     <string name="custom_py_tool_delete_dialog_text">Are you sure you want to delete the tool \"%1$s\"? This action cannot be undone.</string>
+    <string name="custom_py_tool_save_dialog_checking_title">Checking Tool Code</string>
+    <string name="custom_py_tool_save_dialog_checking_text">The check extracts the main() parameter signature and may take a few seconds.\n\nYou can cancel; nothing is saved if you do.</string>
+    <string name="custom_py_tool_save_dialog_success_title">Tool Saved</string>
+    <string name="custom_py_tool_save_dialog_success_text">Saved to the custom Python tool list.\n\nThe agent can now call it when needed.</string>
+    <string name="custom_py_tool_save_dialog_code_failed_title">Code Check Failed</string>
+    <string name="custom_py_tool_save_dialog_code_failed_text">The error comes from the tool code itself.\n\nFix the code and save again.</string>
+    <string name="custom_py_tool_save_dialog_internal_failed_title">Save Failed</string>
+    <string name="custom_py_tool_save_dialog_internal_failed_text">The error comes from inside the app, not from the tool code.\n\nPlease retry, and report this message if it keeps happening.</string>
+    <string name="custom_py_tool_save_dialog_action_cancel">Cancel</string>
+    <string name="custom_py_tool_save_dialog_action_done">Done</string>
+    <string name="custom_py_tool_save_dialog_action_close">Close</string>
     <string name="custom_py_tool_save_failed">Failed to save: %1$s</string>
 
-    <string name="mcp_page_description">Configure connection and authentication for MCP services. After saving, Zafiro5 will automatically discover available tools at runtime.</string>
+    <string name="mcp_page_description">Configure connection and authentication for MCP services. After saving, Zafira will automatically discover available tools at runtime.</string>
     <string name="mcp_page_empty_description">Tap the top right to add your first server.</string>
     <string name="mcp_loading">Loading saved MCP services...</string>
     <string name="mcp_editor_title_create">New MCP Service</string>
@@ -488,4 +506,30 @@
     <string name="agent_resident_action_stop">Stop</string>
     <string name="agent_resident_action_approve">Allow</string>
     <string name="agent_resident_action_decline">Deny</string>
+
+    <!-- Onboarding Preferences -->
+    <string name="ui_onboard_done_advanced_entry">Permissions &amp; execution rules</string>
+    <string name="ui_onboard_preferences_title">Permissions &amp; execution rules</string>
+    <string name="ui_onboard_preferences_permissions_group">Permissions</string>
+    <string name="ui_onboard_preferences_phone_use_title">Phone Use</string>
+    <string name="ui_onboard_preferences_phone_use_desc">Let the Agent control your phone; requires accessibility and overlay permissions</string>
+    <string name="ui_onboard_preferences_floating_ball_title">Floating Ball</string>
+    <string name="ui_onboard_preferences_floating_ball_desc">Show the floating ball in background to follow agent status</string>
+    <string name="ui_onboard_preferences_notification_title">Resident Notification</string>
+    <string name="ui_onboard_preferences_notification_desc">Show live agent status in the notification drawer</string>
+    <string name="ui_onboard_preferences_file_title">File access</string>
+    <string name="ui_onboard_preferences_file_desc">Allow the Agent to read and write files outside the sandbox</string>
+    <string name="ui_onboard_preferences_granted">Granted</string>
+    <string name="ui_onboard_preferences_grant_action">Tap to grant</string>
+    <string name="ui_onboard_preferences_security_group">Execution rules</string>
+    <string name="ui_onboard_preferences_security_hint">Commands that need confirmation before running</string>
+    <string name="ui_onboard_preferences_rule_add_action">Add rule</string>
+    <string name="ui_onboard_preferences_rule_add_title">Add execution rule</string>
+    <string name="ui_onboard_preferences_rule_add_hint">Accepts a keyword or regex, one line only</string>
+    <string name="ui_onboard_preferences_rule_placeholder">Enter a keyword or regex</string>
+    <string name="ui_onboard_preferences_rule_add_confirm">Add</string>
+    <string name="ui_onboard_preferences_rule_delete">Delete %1$s</string>
+    <string name="ui_onboard_preferences_action_grant_all">Grant all</string>
+    <string name="ui_onboard_preferences_action_skip">Skip</string>
+    <string name="ui_onboard_preferences_toast_denied">Permission not granted</string>
 </resources>

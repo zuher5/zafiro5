@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App / Module -->
-    <string name="app_name">Zafiro5</string>
+    <string name="app_name">Zafira</string>
     <string name="xposed_desc">Conecte el asistente de voz a sus propios modelos\n\nCompatible con:\n\n- ColorOS Breeno\n- HyperOS XiaoAi</string>
 
     <!-- Onboarding -->
@@ -9,7 +9,7 @@
     <string name="ui_onboard_provider_pick_title">Seleccionar proveedor</string>
     <string name="ui_onboard_provider_pick_description">Comience a conectar sus modelos desde aquí.\nSeleccione un proveedor para continuar.</string>
     <string name="ui_onboard_configure_title">Configurar modelo</string>
-    <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafiro5.</string>
+    <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafira.</string>
     <string name="ui_onboard_configure_next">Siguiente</string>
     <string name="ui_onboard_configure_endpoint_override_title">Endpoint personalizado</string>
     <string name="ui_onboard_configure_endpoint_override_description_off">Usar endpoint predeterminado</string>
@@ -30,11 +30,11 @@
     <string name="ui_onboard_configure_error_load_failed">Error al cargar la configuración: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Error al guardar la configuración: %1$s</string>
     <string name="ui_onboard_done_headline">Todo listo.</string>
-    <string name="ui_onboard_done_description">Configuración completada. Puede empezar a usar Zafiro5 o ajustar la configuración más tarde.</string>
-    <string name="ui_onboard_done_enter_home">Ir a Zafiro5</string>
+    <string name="ui_onboard_done_description">Configuración completada. Puede empezar a usar Zafira o ajustar la configuración más tarde.</string>
+    <string name="ui_onboard_done_enter_home">Ir a Zafira</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro5</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">Nueva conversación</string>
     <string name="ui_home_input_placeholder">Escriba un mensaje...</string>
     <string name="ui_tool_status_called">Llamado</string>
@@ -84,13 +84,17 @@
     <string name="ui_home_error_retry_exhausted_title">Reintentos automáticos agotados</string>
     <string name="ui_home_error_internal_title">Error interno</string>
     <string name="ui_home_retrying_title">Problema de red, reintentando…</string>
+    <string name="ui_home_thinking_title">Pensando</string>
     <string name="ui_home_retrying_attempt">Reintento %1$d/%2$d</string>
     <string name="runtime_error_internal">Error interno</string>
     <string name="ui_home_history_content_description">Historial de conversaciones</string>
+    <string name="ui_conversation_history_title">Historial</string>
+    <string name="ui_conversation_selection_count">%1$d seleccionadas</string>
     <string name="ui_conversation_history_today">Hoy</string>
     <string name="ui_conversation_history_this_week">Esta semana</string>
     <string name="ui_conversation_history_this_month">Este mes</string>
     <string name="ui_conversation_history_older">Anterior</string>
+    <string name="ui_conversation_history_pinned_section">Fijadas</string>
     <string name="ui_conversation_history_back_content_description">Volver</string>
     <string name="ui_conversation_history_loading">Cargando historial...</string>
     <string name="ui_conversation_history_empty_title">Sin conversaciones</string>
@@ -99,11 +103,14 @@
     <string name="ui_conversation_history_untitled">Conversación sin título</string>
     <string name="ui_conversation_history_delete_dialog_title">Eliminar conversación</string>
     <string name="ui_conversation_history_delete_dialog_text">¿Está seguro de que desea eliminar esta conversación? Esta acción no se puede deshacer.\n\n%1$s</string>
+    <string name="ui_conversation_history_batch_delete_dialog_text">¿Está seguro de que desea eliminar las %1$d conversaciones seleccionadas? Esta acción no se puede deshacer.</string>
     <string name="ui_conversation_history_delete_dialog_confirm">Eliminar</string>
     <string name="ui_conversation_history_delete_dialog_cancel">Cancelar</string>
     <string name="ui_conversation_history_delete_error">Error al eliminar la conversación: %1$s</string>
     <string name="ui_conversation_action_load">Cargar</string>
     <string name="ui_conversation_action_fork">Bifurcar desde aquí</string>
+    <string name="ui_conversation_action_pin">Fijar arriba</string>
+    <string name="ui_conversation_action_unpin">Quitar fijado</string>
     <string name="ui_conversation_action_rename">Renombrar</string>
     <string name="ui_conversation_action_delete">Eliminar</string>
     <string name="ui_conversation_rename_dialog_title">Renombrar conversación</string>
@@ -155,7 +162,7 @@
     <string name="ui_settings_mcp">MCP Server</string>
     <string name="ui_settings_mcp_summary">Conectar servidores y herramientas MCP externos</string>
     <string name="ui_settings_takeover">Reglas de control</string>
-    <string name="ui_settings_takeover_summary">Configurar qué entradas procesa el asistente nativo o Zafiro5</string>
+    <string name="ui_settings_takeover_summary">Configurar qué entradas procesa el asistente nativo o Zafira</string>
     <string name="ui_settings_execution_rules">Reglas de ejecución</string>
     <string name="ui_settings_execution_rules_summary">Configurar la política de seguridad para comandos Shell</string>
     <string name="ui_settings_storage">Almacenamiento</string>
@@ -245,12 +252,12 @@
     <string name="execution_rules_enabled_mode_disabled">Desactivado</string>
     <string name="execution_rules_enabled_mode_confirm">Preguntarme</string>
     <string name="tool_permission_dialog_title">La IA solicita ejecutar una operación</string>
-    <string name="tool_permission_request_intro">La herramienta de Zafiro5 "%1$s" solicita ejecutar el siguiente comando:</string>
+    <string name="tool_permission_request_intro">La herramienta de Zafira "%1$s" solicita ejecutar el siguiente comando:</string>
     <string name="tool_permission_matched_rule">Regla alcanzada: "%1$s"</string>
     <string name="tool_permission_allow">Permitir una vez</string>
     <string name="tool_permission_deny">Denegar</string>
     <string name="screen_control_consent_title">Solicitud de permisos de control de pantalla</string>
-    <string name="screen_control_consent_body">Zafiro5 necesita estos permisos para controlar la pantalla:\n1. Servicio de accesibilidad: leer la interfaz y realizar toques\n2. Superponer sobre otras apps: mostrar el indicador de puntero\n\nA continuación puede aparecer un aviso del sistema o una página de ajustes.</string>
+    <string name="screen_control_consent_body">Zafira necesita estos permisos para controlar la pantalla:\n1. Servicio de accesibilidad: leer la interfaz y realizar toques\n2. Superponer sobre otras apps: mostrar el indicador de puntero\n\nA continuación puede aparecer un aviso del sistema o una página de ajustes.</string>
     <string name="screen_control_consent_agree">Aceptar</string>
     <string name="screen_control_consent_deny">Denegar</string>
     <string name="execution_rules_field_patterns">Reglas</string>
@@ -266,13 +273,13 @@
     <string name="takeover_empty_action_hint">Toque en la esquina superior derecha para añadir la primera regla de control.</string>
     <string name="takeover_loading">Cargando reglas de control...</string>
     <string name="takeover_editor_title_create">Nueva regla de control</string>
-    <string name="takeover_editor_description">Configure qué peticiones debe responder el asistente nativo y cuáles deben enviarse a Zafiro5.</string>
+    <string name="takeover_editor_description">Configure qué peticiones debe responder el asistente nativo y cuáles deben enviarse a Zafira.</string>
     <string name="takeover_field_name">Nombre de la regla</string>
     <string name="takeover_field_name_hint">Ejemplo: Servicios locales Breeno</string>
     <string name="takeover_field_enabled">Activar regla</string>
     <string name="takeover_field_target">Asistente al coincidir</string>
     <string name="takeover_target_native_assistant">Asistente nativo</string>
-    <string name="takeover_target_zafiro">Zafiro5</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">Reglas</string>
     <string name="takeover_field_patterns_hint">tiempo\n.*alarma.*\nabrir.*</string>
     <string name="takeover_field_patterns_description">Introduzca una palabra clave o expresión regular por línea. Si se detecta una coincidencia, se utilizará el asistente seleccionado arriba.</string>
@@ -309,7 +316,7 @@
     <string name="custom_py_tool_page_empty_description">Deje que el agente las cree por usted o toque el botón superior derecho para añadir una nueva.</string>
     <string name="custom_py_tool_loading">Cargando herramientas de Python guardadas...</string>
     <string name="custom_py_tool_editor_title_create">Añadir herramienta de Python</string>
-    <string name="custom_py_tool_editor_description">Configure su herramienta de Python. La descripción y la firma de parámetros se extraerán automáticamente de los docstrings y anotaciones de tipo de la función main(). Una vez guardada, el agente podrá llamarla según sea necesario.</string>
+    <string name="custom_py_tool_editor_description">Defina una función de entrada main().\n\nLas anotaciones de tipo de los parámetros determinan lo que el agente puede pasar y el docstring se convierte en la descripción de la herramienta.</string>
     <string name="custom_py_tool_field_name">Nombre de la herramienta</string>
     <string name="custom_py_tool_field_name_hint">Ejemplo: py_web_search</string>
     <string name="custom_py_tool_field_enabled">Activar herramienta</string>
@@ -326,9 +333,20 @@
     <string name="custom_py_tool_error_delete_failed">Error al eliminar la herramienta de Python: %1$s</string>
     <string name="custom_py_tool_delete_dialog_title">Eliminar herramienta de Python</string>
     <string name="custom_py_tool_delete_dialog_text">¿Está seguro de que desea eliminar la herramienta «%1$s»? Esta acción no se puede deshacer.</string>
+    <string name="custom_py_tool_save_dialog_checking_title">Verificando el código</string>
+    <string name="custom_py_tool_save_dialog_checking_text">La verificación extrae la firma de parámetros de main() y puede tardar unos segundos.\n\nPuede cancelarla; en ese caso no se guarda nada.</string>
+    <string name="custom_py_tool_save_dialog_success_title">Herramienta guardada</string>
+    <string name="custom_py_tool_save_dialog_success_text">Guardada en la lista de herramientas de Python.\n\nEl agente ya puede llamarla cuando la necesite.</string>
+    <string name="custom_py_tool_save_dialog_code_failed_title">La verificación del código falló</string>
+    <string name="custom_py_tool_save_dialog_code_failed_text">El error proviene del propio código de la herramienta.\n\nCorrija el código y vuelva a guardar.</string>
+    <string name="custom_py_tool_save_dialog_internal_failed_title">Error al guardar</string>
+    <string name="custom_py_tool_save_dialog_internal_failed_text">El error proviene del interior de la aplicación, no del código de la herramienta.\n\nReintente y, si persiste, infórmenos con este mensaje.</string>
+    <string name="custom_py_tool_save_dialog_action_cancel">Cancelar</string>
+    <string name="custom_py_tool_save_dialog_action_done">Listo</string>
+    <string name="custom_py_tool_save_dialog_action_close">Cerrar</string>
     <string name="custom_py_tool_save_failed">Error al guardar: %1$s</string>
 
-    <string name="mcp_page_description">Configure los métodos de conexión y autenticación para servicios MCP. Tras guardar, Zafiro5 descubrirá automáticamente las herramientas disponibles en tiempo de ejecución.</string>
+    <string name="mcp_page_description">Configure los métodos de conexión y autenticación para servicios MCP. Tras guardar, Zafira descubrirá automáticamente las herramientas disponibles en tiempo de ejecución.</string>
     <string name="mcp_page_empty_description">Toque en la esquina superior derecha para añadir su primer servidor.</string>
     <string name="mcp_loading">Cargando servidores MCP guardados...</string>
     <string name="mcp_editor_title_create">Añadir servicio MCP</string>
@@ -488,4 +506,30 @@
     <string name="agent_resident_action_stop">Detener</string>
     <string name="agent_resident_action_approve">Permitir</string>
     <string name="agent_resident_action_decline">Rechazar</string>
+
+    <!-- Onboarding Preferences -->
+    <string name="ui_onboard_done_advanced_entry">Permisos y reglas de ejecución</string>
+    <string name="ui_onboard_preferences_title">Permisos y reglas de ejecución</string>
+    <string name="ui_onboard_preferences_permissions_group">Permisos</string>
+    <string name="ui_onboard_preferences_phone_use_title">Phone Use</string>
+    <string name="ui_onboard_preferences_phone_use_desc">Permite que el agente controle tu teléfono; requiere permisos de accesibilidad y superposición</string>
+    <string name="ui_onboard_preferences_floating_ball_title">Bola flotante</string>
+    <string name="ui_onboard_preferences_floating_ball_desc">Mostrar la bola flotante en segundo plano para seguir el estado del agente</string>
+    <string name="ui_onboard_preferences_notification_title">Notificación residente</string>
+    <string name="ui_onboard_preferences_notification_desc">Mostrar el estado del agente en vivo en el panel de notificaciones</string>
+    <string name="ui_onboard_preferences_file_title">Acceso a archivos</string>
+    <string name="ui_onboard_preferences_file_desc">Permitir que el agente lea y escriba archivos fuera del sandbox</string>
+    <string name="ui_onboard_preferences_granted">Concedido</string>
+    <string name="ui_onboard_preferences_grant_action">Tocar para conceder</string>
+    <string name="ui_onboard_preferences_security_group">Reglas de ejecución</string>
+    <string name="ui_onboard_preferences_security_hint">Comandos que requieren confirmación antes de ejecutarse</string>
+    <string name="ui_onboard_preferences_rule_add_action">Añadir regla</string>
+    <string name="ui_onboard_preferences_rule_add_title">Añadir regla de ejecución</string>
+    <string name="ui_onboard_preferences_rule_add_hint">Acepta una palabra clave o expresión regular, solo una línea</string>
+    <string name="ui_onboard_preferences_rule_placeholder">Introduce una palabra clave o expresión regular</string>
+    <string name="ui_onboard_preferences_rule_add_confirm">Añadir</string>
+    <string name="ui_onboard_preferences_rule_delete">Eliminar %1$s</string>
+    <string name="ui_onboard_preferences_action_grant_all">Conceder todo</string>
+    <string name="ui_onboard_preferences_action_skip">Omitir</string>
+    <string name="ui_onboard_preferences_toast_denied">Permiso no concedido</string>
 </resources>

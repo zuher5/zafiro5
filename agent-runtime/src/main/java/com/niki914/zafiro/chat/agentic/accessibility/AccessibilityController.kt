@@ -236,9 +236,9 @@ object AccessibilityController {
             }
             return Result.failure(
                 RuntimeException(
-                    "Zafiro5 cannot fully control this device because required permissions were not granted. " +
+                    "Zafira cannot fully control this device because required permissions were not granted. " +
                             "Failed: ${failures.joinToString("; ")}. " +
-                            "Tell the user to open Settings, enable 'Zafiro5' under Accessibility, " +
+                            "Tell the user to open Settings, enable 'Zafira' under Accessibility, " +
                             "and allow 'Display over other apps'."
                 )
             )
@@ -263,8 +263,8 @@ object AccessibilityController {
         if (!ensureOne(Permission.ACCESSIBILITY, failures)) {
             return Result.failure(
                 RuntimeException(
-                    "The Zafiro5 accessibility service is not available (${failures.joinToString("; ")}). " +
-                            "Tell the user to enable 'Zafiro5' in Settings > Accessibility, then retry."
+                    "The Zafira accessibility service is not available (${failures.joinToString("; ")}). " +
+                            "Tell the user to enable 'Zafira' in Settings > Accessibility, then retry."
                 )
             )
         }

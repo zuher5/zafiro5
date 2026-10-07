@@ -255,7 +255,7 @@ object XIpcBridge {
     // --- Inlined notification posting (formerly XNotificationBridge) ---
 
     private const val CHANNEL_ID = "nexus_xservice_default_channel"
-    private const val CHANNEL_NAME = "Zafiro5"
+    private const val CHANNEL_NAME = "Zafira"
 
     private fun postLocalNotification(
         context: Context,

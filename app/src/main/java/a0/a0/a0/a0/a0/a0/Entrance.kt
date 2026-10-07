@@ -17,7 +17,7 @@ import com.niki914.zafiro.app.getInstalledPackageVersion
 import com.niki914.zafiro.mod.HookLocalSettings
 import com.niki914.zafiro.mod.feat.BaseConfigProvider
 import com.niki914.zafiro.mod.feat.hyper.XiaoaiChatHook
-import com.niki914.zafiro.mod.feat.oppo.BreenoChatHook
+import com.niki914.zafiro.mod.feat.oppo.BreenoHook
 import com.niki914.zafiro.repo.XIpcDomainSettingsStore
 import com.niki914.zafiro.repo.XRepo
 import com.niki914.zafiro.runtime.client.AgentRuntimeClient
@@ -82,8 +82,8 @@ class Entrance : IXposed() {
      * 按 package 找到 versions.json，选最近版本，再读对应 config.json。
      */
     private fun loadConfigFromRaw(context: Context, targetPkg: String): JsonObject? {
-        // 宿主进程的 resources 是宿主包的资源表，读不到 Zafiro5 的 raw 资源。
-        // 必须用 Zafiro5 自己的包上下文（createPackageContext）去读 R.raw.*。
+        // 宿主进程的 resources 是宿主包的资源表，读不到 Zafira 的 raw 资源。
+        // 必须用 Zafira 自己的包上下文（createPackageContext）去读 R.raw.*。
         val moduleContext = context.createPackageContext(BuildConfig.APPLICATION_ID, 0)
         val versionsRawId = versionsRawIdFor(targetPkg) ?: run {
             Logger.w(LOG_TAG, "no raw config for package=$targetPkg")
@@ -163,7 +163,7 @@ class Entrance : IXposed() {
         // 根据 targetPkg 进行映射和 Hook 路由
         val hostApp = HostApp.fromPackageName(params.packageName)
         val hookInstance: Hook? = when (hostApp) {
-            HostApp.Breeno -> BreenoChatHook(scope, client)
+            HostApp.Breeno -> BreenoHook(scope, client)
             HostApp.XiaoAi -> XiaoaiChatHook(scope, client)
             else -> null
         }

@@ -16,7 +16,7 @@ class LoadSkillBuiltin : TextResultBuiltinTool() {
     override val name: String = "load_skill"
 
     override val description: String =
-        "Load a Zafiro5 skill by id. Returns the skill's SKILL.md content; if it exceeds " +
+        "Load a Zafira skill by id. Returns the skill's SKILL.md content; if it exceeds " +
                 "the limit, the result ends with the absolute path to the file — use terminal " +
                 "to read the full content from there."
 
