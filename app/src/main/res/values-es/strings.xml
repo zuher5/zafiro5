@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App / Module -->
-    <string name="app_name">Zafiro</string>
+    <string name="app_name">Zafiro5</string>
     <string name="xposed_desc">Conecte el asistente de voz a sus propios modelos\n\nCompatible con:\n\n- ColorOS Breeno\n- HyperOS XiaoAi</string>
 
     <!-- Onboarding -->
@@ -9,7 +9,7 @@
     <string name="ui_onboard_provider_pick_title">Seleccionar proveedor</string>
     <string name="ui_onboard_provider_pick_description">Comience a conectar sus modelos desde aquí.\nSeleccione un proveedor para continuar.</string>
     <string name="ui_onboard_configure_title">Configurar modelo</string>
-    <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafiro.</string>
+    <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafiro5.</string>
     <string name="ui_onboard_configure_next">Siguiente</string>
     <string name="ui_onboard_configure_endpoint_override_title">Endpoint personalizado</string>
     <string name="ui_onboard_configure_endpoint_override_description_off">Usar endpoint predeterminado</string>
@@ -30,11 +30,11 @@
     <string name="ui_onboard_configure_error_load_failed">Error al cargar la configuración: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Error al guardar la configuración: %1$s</string>
     <string name="ui_onboard_done_headline">Todo listo.</string>
-    <string name="ui_onboard_done_description">Configuración completada. Puede empezar a usar Zafiro o ajustar la configuración más tarde.</string>
-    <string name="ui_onboard_done_enter_home">Ir a Zafiro</string>
+    <string name="ui_onboard_done_description">Configuración completada. Puede empezar a usar Zafiro5 o ajustar la configuración más tarde.</string>
+    <string name="ui_onboard_done_enter_home">Ir a Zafiro5</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro</string>
+    <string name="ui_home_title">Zafiro5</string>
     <string name="ui_home_menu_new_conversation">Nueva conversación</string>
     <string name="ui_home_input_placeholder">Escriba un mensaje...</string>
     <string name="ui_tool_status_called">Llamado</string>
@@ -155,7 +155,7 @@
     <string name="ui_settings_mcp">MCP Server</string>
     <string name="ui_settings_mcp_summary">Conectar servidores y herramientas MCP externos</string>
     <string name="ui_settings_takeover">Reglas de control</string>
-    <string name="ui_settings_takeover_summary">Configurar qué entradas procesa el asistente nativo o Zafiro</string>
+    <string name="ui_settings_takeover_summary">Configurar qué entradas procesa el asistente nativo o Zafiro5</string>
     <string name="ui_settings_execution_rules">Reglas de ejecución</string>
     <string name="ui_settings_execution_rules_summary">Configurar la política de seguridad para comandos Shell</string>
     <string name="ui_settings_storage">Almacenamiento</string>
@@ -245,12 +245,12 @@
     <string name="execution_rules_enabled_mode_disabled">Desactivado</string>
     <string name="execution_rules_enabled_mode_confirm">Preguntarme</string>
     <string name="tool_permission_dialog_title">La IA solicita ejecutar una operación</string>
-    <string name="tool_permission_request_intro">La herramienta de Zafiro "%1$s" solicita ejecutar el siguiente comando:</string>
+    <string name="tool_permission_request_intro">La herramienta de Zafiro5 "%1$s" solicita ejecutar el siguiente comando:</string>
     <string name="tool_permission_matched_rule">Regla alcanzada: "%1$s"</string>
     <string name="tool_permission_allow">Permitir una vez</string>
     <string name="tool_permission_deny">Denegar</string>
     <string name="screen_control_consent_title">Solicitud de permisos de control de pantalla</string>
-    <string name="screen_control_consent_body">Zafiro necesita estos permisos para controlar la pantalla:\n1. Servicio de accesibilidad: leer la interfaz y realizar toques\n2. Superponer sobre otras apps: mostrar el indicador de puntero\n\nA continuación puede aparecer un aviso del sistema o una página de ajustes.</string>
+    <string name="screen_control_consent_body">Zafiro5 necesita estos permisos para controlar la pantalla:\n1. Servicio de accesibilidad: leer la interfaz y realizar toques\n2. Superponer sobre otras apps: mostrar el indicador de puntero\n\nA continuación puede aparecer un aviso del sistema o una página de ajustes.</string>
     <string name="screen_control_consent_agree">Aceptar</string>
     <string name="screen_control_consent_deny">Denegar</string>
     <string name="execution_rules_field_patterns">Reglas</string>
@@ -266,13 +266,13 @@
     <string name="takeover_empty_action_hint">Toque en la esquina superior derecha para añadir la primera regla de control.</string>
     <string name="takeover_loading">Cargando reglas de control...</string>
     <string name="takeover_editor_title_create">Nueva regla de control</string>
-    <string name="takeover_editor_description">Configure qué peticiones debe responder el asistente nativo y cuáles deben enviarse a Zafiro.</string>
+    <string name="takeover_editor_description">Configure qué peticiones debe responder el asistente nativo y cuáles deben enviarse a Zafiro5.</string>
     <string name="takeover_field_name">Nombre de la regla</string>
     <string name="takeover_field_name_hint">Ejemplo: Servicios locales Breeno</string>
     <string name="takeover_field_enabled">Activar regla</string>
     <string name="takeover_field_target">Asistente al coincidir</string>
     <string name="takeover_target_native_assistant">Asistente nativo</string>
-    <string name="takeover_target_zafiro">Zafiro</string>
+    <string name="takeover_target_zafiro">Zafiro5</string>
     <string name="takeover_field_patterns">Reglas</string>
     <string name="takeover_field_patterns_hint">tiempo\n.*alarma.*\nabrir.*</string>
     <string name="takeover_field_patterns_description">Introduzca una palabra clave o expresión regular por línea. Si se detecta una coincidencia, se utilizará el asistente seleccionado arriba.</string>
@@ -328,7 +328,7 @@
     <string name="custom_py_tool_delete_dialog_text">¿Está seguro de que desea eliminar la herramienta «%1$s»? Esta acción no se puede deshacer.</string>
     <string name="custom_py_tool_save_failed">Error al guardar: %1$s</string>
 
-    <string name="mcp_page_description">Configure los métodos de conexión y autenticación para servicios MCP. Tras guardar, Zafiro descubrirá automáticamente las herramientas disponibles en tiempo de ejecución.</string>
+    <string name="mcp_page_description">Configure los métodos de conexión y autenticación para servicios MCP. Tras guardar, Zafiro5 descubrirá automáticamente las herramientas disponibles en tiempo de ejecución.</string>
     <string name="mcp_page_empty_description">Toque en la esquina superior derecha para añadir su primer servidor.</string>
     <string name="mcp_loading">Cargando servidores MCP guardados...</string>
     <string name="mcp_editor_title_create">Añadir servicio MCP</string>

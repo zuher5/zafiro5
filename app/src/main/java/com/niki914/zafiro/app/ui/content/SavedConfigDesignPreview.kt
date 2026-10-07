@@ -290,7 +290,7 @@ private fun ModelConfigRedesignPreview() {
                 SettingsGroupCard {
                     SettingExpandableTextItem(
                         title = "Prompt",
-                        value = "You are Zafiro, a helpful assistant.",
+                        value = "You are Zafiro5, a helpful assistant.",
                         onValueChange = {},
                         placeholder = "",
                         description = null,

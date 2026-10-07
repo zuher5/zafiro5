@@ -17,7 +17,7 @@ import com.niki914.zafiro.chat.ToolCallStatus
  * OKIA 终态以 send 返回值承载（TurnResult），事件流只承担中间过程；
  * 本映射只负责单条事件的投影，流结束语义由 LLMController 按返回值处理。
  * 工具事件映射为 T2 铺路：T1 无工具注册，事件不会出现，但映射逻辑完整。
- * 错误的 Zafiro 侧 code 映射留 T4（可重试维度，LlmErrorCode 暂不扩展）。
+ * 错误的 Zafiro5 侧 code 映射留 T4（可重试维度，LlmErrorCode 暂不扩展）。
  */
 object LlmStreamEventMapper {
     private const val LOG_TAG = "niki914_zafiro_LlmStreamEventMapper"

@@ -23,7 +23,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 
 /**
- * OKIA ToolExecutor 适配：把 Zafiro 本地工具（builtin + py）的执行接到
+ * OKIA ToolExecutor 适配：把 Zafiro5 本地工具（builtin + py）的执行接到
  * OKIA 工具循环。执行永不抛异常，总是产出 ToolCallOutcome（§5.5 契约）：
  * - 结果 JSON（BuiltinToolResult / CustomPyToolExecutor 输出）按 "ok" 字段拆解
  *   Success / Failure；文本协议结果（TextResultBuiltinTool）经

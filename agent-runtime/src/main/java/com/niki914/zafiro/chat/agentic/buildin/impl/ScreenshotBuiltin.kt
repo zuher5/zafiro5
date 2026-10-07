@@ -29,7 +29,7 @@ class ScreenshotBuiltin : BuiltinTool() {
     override val description: String = """
 Capture the entire device screen as an image so the model can see it.
 Use when the user asks about what is currently on screen, or to verify the visual result of an action.
-Requires Android 11+ and the Zafiro accessibility service; on older Android versions use the terminal
+Requires Android 11+ and the Zafiro5 accessibility service; on older Android versions use the terminal
 shell tool with a privileged shell instead. Returns an error code when unavailable or the capture failed.
 Returns an image reference (path, dimensions, size) on success.
     """.trimIndent()
@@ -58,8 +58,8 @@ Returns an image reference (path, dimensions, size) on success.
         AccessibilityController.ensureAccessibility().onFailure { error ->
             return BuiltinToolResult.failure(
                 code = "ACCESSIBILITY_UNAVAILABLE",
-                message = error.message ?: "Screen capture requires the Zafiro accessibility service.",
-                hint = "Tell the user to enable 'Zafiro' in Settings > Accessibility, then retry."
+                message = error.message ?: "Screen capture requires the Zafiro5 accessibility service.",
+                hint = "Tell the user to enable 'Zafiro5' in Settings > Accessibility, then retry."
             )
         }
 
