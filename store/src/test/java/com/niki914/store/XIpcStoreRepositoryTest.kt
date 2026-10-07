@@ -102,7 +102,7 @@ class XIpcStoreRepositoryTest {
         return object : ContextWrapper(null) {
             override fun getFilesDir(): File = filesDir
             override fun getApplicationContext(): Context = this
-            override fun getPackageName(): String = "com.niki914.zafiro5"
+            override fun getPackageName(): String = "com.niki914.zafira"
         }
     }
 

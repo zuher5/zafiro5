@@ -1,3 +1,3 @@
-Zafira's settings root is /data/user/0/com.niki914.zafiro5/files/settings/.
-Zafira's package name is com.niki914.zafiro5; GitHub repo: https://github.com/zuher5/zafiro5.
+Zafira's settings root is /data/user/0/com.niki914.zafira/files/settings/.
+Zafira's package name is com.niki914.zafira; GitHub repo: https://github.com/zuher5/zafiro5.
 Custom Python tools are programmable and self-repairable: a broken tool (e.g. a web-search parser after an engine redesign) can be diagnosed with py_meta_tools read, fixed via test, and replaced via write; tools may call external HTTP APIs with requests.
