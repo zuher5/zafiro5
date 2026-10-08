@@ -620,14 +620,15 @@ private fun ConversationHistoryItem(
                 }
 
                 if (conversation.lastMessagePreview.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = conversation.lastMessagePreview,
                         style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.5.sp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp),
                     )
                 }
             }
