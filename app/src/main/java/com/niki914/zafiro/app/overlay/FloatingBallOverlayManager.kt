@@ -298,8 +298,9 @@ object FloatingBallOverlayManager {
 
                     BaseTheme(
                         darkTheme = isDark,
-                        dynamicColor = themePrefs.seedColor == null,
+                        dynamicColor = !themePrefs.isCatppuccin && themePrefs.seedColor == null,
                         seedColor = seed,
+                        isCatppuccin = themePrefs.isCatppuccin,
                     ) {
                         FloatingBallCollapsedBall(
                             onClick = {
@@ -363,8 +364,9 @@ object FloatingBallOverlayManager {
 
                     BaseTheme(
                         darkTheme = isDark,
-                        dynamicColor = themePrefs.seedColor == null,
+                        dynamicColor = !themePrefs.isCatppuccin && themePrefs.seedColor == null,
                         seedColor = seed,
+                        isCatppuccin = themePrefs.isCatppuccin,
                     ) {
                         FloatingBallMorphCard(
                             state = uiState.ballState,
@@ -506,8 +508,9 @@ object FloatingBallOverlayManager {
 
                 BaseTheme(
                     darkTheme = isDark,
-                    dynamicColor = themePrefs.seedColor == null,
+                    dynamicColor = !themePrefs.isCatppuccin && themePrefs.seedColor == null,
                     seedColor = seed,
+                    isCatppuccin = themePrefs.isCatppuccin,
                 ) {
                     val uiState by vm.uiStateFlow.collectAsState()
                     FloatingBallDetailMorphCard(

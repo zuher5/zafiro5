@@ -480,6 +480,7 @@
     <string name="ui_theme_mode_light">ライト</string>
     <string name="ui_theme_mode_dark">ダーク</string>
     <string name="ui_theme_color_dynamic">ダイナミックカラー（壁紙から）</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">ローズ</string>
     <string name="ui_theme_color_blossom">桜</string>
     <string name="ui_theme_color_lavender">ラベンダー</string>

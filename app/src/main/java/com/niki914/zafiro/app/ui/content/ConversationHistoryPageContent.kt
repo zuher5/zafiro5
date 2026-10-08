@@ -560,7 +560,7 @@ private fun ConversationHistoryItem(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Top,
                 ) {
                     Text(
                         text = displayTitle,
@@ -569,15 +569,15 @@ private fun ConversationHistoryItem(
                             fontWeight = FontWeight.SemiBold,
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false),
+                        modifier = Modifier.weight(1f),
                     )
                     val timeColor = MaterialTheme.colorScheme.tertiary
                     if (originIcon != null || showPinBadge || relativeTime.isNotBlank()) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(start = 8.dp),
+                            modifier = Modifier.padding(start = 8.dp, top = 2.dp),
                         ) {
                             if (originIcon != null) {
                                 Icon(

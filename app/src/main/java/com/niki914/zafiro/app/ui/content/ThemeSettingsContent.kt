@@ -70,9 +70,18 @@ fun ThemeSettingsContent() {
                     SelectionOption(
                         id = "dynamic",
                         title = stringResource(R.string.ui_theme_color_dynamic),
-                        selected = prefs.seedColor == null,
+                        selected = !prefs.isCatppuccin && prefs.seedColor == null,
                         onClick = { scope.launch { ThemeController.setSeedColor(null) } },
                         leadingIconVector = Icons.Rounded.Palette,
+                    )
+                )
+                add(
+                    SelectionOption(
+                        id = "catppuccin",
+                        title = stringResource(R.string.ui_theme_color_catppuccin),
+                        leadingSwatchColor = Color(0xFFCBA6F7),
+                        selected = prefs.isCatppuccin,
+                        onClick = { scope.launch { ThemeController.setCatppuccin() } },
                     )
                 )
                 ThemeSeedColors.forEachIndexed { index, argb ->
@@ -81,7 +90,7 @@ fun ThemeSettingsContent() {
                             id = "seed-$argb",
                             title = stringResource(ThemeColorLabelRes[index]),
                             leadingSwatchColor = Color(argb),
-                            selected = prefs.seedColor == argb,
+                            selected = !prefs.isCatppuccin && prefs.seedColor == argb,
                             onClick = { scope.launch { ThemeController.setSeedColor(argb) } },
                         )
                     )

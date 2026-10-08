@@ -481,6 +481,7 @@
     <string name="ui_theme_mode_light">Light</string>
     <string name="ui_theme_mode_dark">Dark</string>
     <string name="ui_theme_color_dynamic">Dynamic (from wallpaper)</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">Rose</string>
     <string name="ui_theme_color_blossom">Blossom</string>
     <string name="ui_theme_color_lavender">Lavender</string>

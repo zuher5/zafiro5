@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -274,11 +275,11 @@ enum class UserBubblePosition {
     GroupLast,
 }
 
-/** 接缝侧小圆角（组内 User 气泡相接角与尾巴底角共用）。 */
-private val UserBubbleInnerCorner = 2.dp
+/** 接缝侧小圆角（组内 User 气泡相接角）。 */
+private val UserBubbleInnerCorner = 6.dp
 
-/** User 气泡普通角半径（与 UserMessageBubble 的 G2FieldShape 角一致）。 */
-internal val UserBubbleCornerRadius = 24.dp
+/** User 气泡普通角半径（G2 连续平滑椭圆大圆角）。 */
+internal val UserBubbleCornerRadius = 26.dp
 
 /** 紧凑态 composer 最小高度：12dp 容器垂直 padding × 2 + 48sp 按钮 footprint。 */
 internal val COMPACT_COMPOSER_MIN_HEIGHT = 72.dp
@@ -293,38 +294,32 @@ fun UserMessageBubble(
     position: UserBubblePosition = UserBubblePosition.Single,
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val bubbleBg = colorScheme.primary.copy(alpha = 0.18f)
-    // 接缝侧（右）小圆角与命令工具结果体分割侧一致（2dp）；带尾巴的角保持直角
+    val bubbleBg = colorScheme.primary.copy(alpha = 0.20f)
+    val shadowColor = colorScheme.primary.copy(alpha = 0.25f)
     val bubbleShape = when (position) {
-        UserBubblePosition.Single -> G2FieldShape(
-            topStart = 24.dp,
-            topEnd = 24.dp,
-            bottomEnd = 0.dp,
-            bottomStart = 24.dp,
-        )
+        UserBubblePosition.Single -> G2BubbleShape(UserBubbleCornerRadius)
 
         UserBubblePosition.GroupFirst -> G2FieldShape(
-            topStart = 24.dp,
-            topEnd = 24.dp,
+            topStart = UserBubbleCornerRadius,
+            topEnd = UserBubbleCornerRadius,
             bottomEnd = UserBubbleInnerCorner,
-            bottomStart = 24.dp,
+            bottomStart = UserBubbleCornerRadius,
         )
 
         UserBubblePosition.GroupMid -> G2FieldShape(
-            topStart = 24.dp,
+            topStart = UserBubbleCornerRadius,
             topEnd = UserBubbleInnerCorner,
             bottomEnd = UserBubbleInnerCorner,
-            bottomStart = 24.dp,
+            bottomStart = UserBubbleCornerRadius,
         )
 
         UserBubblePosition.GroupLast -> G2FieldShape(
-            topStart = 24.dp,
+            topStart = UserBubbleCornerRadius,
             topEnd = UserBubbleInnerCorner,
-            bottomEnd = 0.dp,
-            bottomStart = 24.dp,
+            bottomEnd = UserBubbleCornerRadius,
+            bottomStart = UserBubbleCornerRadius,
         )
     }
-    val hasTail = position == UserBubblePosition.Single || position == UserBubblePosition.GroupLast
 
     BoxWithConstraints(
         modifier = modifier.fillMaxWidth(),
@@ -332,11 +327,17 @@ fun UserMessageBubble(
     ) {
         Box(
             modifier = Modifier
-                .widthIn(max = maxWidth * 0.82f)
-                .then(if (hasTail) Modifier.drawBehind { drawUserBubbleTail(bubbleBg) } else Modifier)
+                .widthIn(max = maxWidth * 0.88f)
+                .shadow(
+                    elevation = 4.dp,
+                    shape = bubbleShape,
+                    clip = false,
+                    ambientColor = shadowColor,
+                    spotColor = shadowColor,
+                )
                 .clip(bubbleShape)
                 .background(bubbleBg, bubbleShape)
-                .padding(horizontal = 18.dp, vertical = 12.dp),
+                .padding(horizontal = 20.dp, vertical = 13.dp),
             contentAlignment = Alignment.CenterEnd,
         ) {
             SelectionContainer {
@@ -349,30 +350,6 @@ fun UserMessageBubble(
             }
         }
     }
-}
-
-/**
- * 右下角尾巴：沿气泡右缘向上突的小竖条。右上角为 1/4 圆角（普通圆角），
- * 右下角与接缝一致的 2dp 小圆角，顶边平直、左缘贴气泡右缘、底缘贴气泡底边，
- * 不叠入主体（避免半透明背景两次绘制产生色差）。
- */
-private fun DrawScope.drawUserBubbleTail(color: Color) {
-    val w = size.width
-    val h = size.height
-    val tw = 5.dp.toPx()                  // 尾巴宽度
-    val th = 8.dp.toPx()                 // 尾巴高度（沿右缘向上突）
-    val rTop = 4.dp.toPx()                // 右上 1/4 圆角半径
-    val rBot = UserBubbleInnerCorner.toPx() // 右下小圆角，与接缝一致
-    val path = Path().apply {
-        moveTo(w, h)                             // 气泡右下角
-        lineTo(w + tw - rBot, h)                 // 底边
-        quadraticTo(w + tw, h, w + tw, h - rBot) // 右下 1/4 圆角
-        lineTo(w + tw, h - th + rTop)            // 右缘向上
-        quadraticTo(w + tw, h - th, w + tw - rTop, h - th) // 右上 1/4 圆角
-        lineTo(w, h - th)                        // 平直顶边
-        close()                                  // 沿气泡右缘回到底角
-    }
-    drawPath(path, color)
 }
 
 @Composable

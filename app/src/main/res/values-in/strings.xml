@@ -462,6 +462,7 @@
     <string name="ui_theme_mode_light">Terang</string>
     <string name="ui_theme_mode_dark">Gelap</string>
     <string name="ui_theme_color_dynamic">Dinamis (dari wallpaper)</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">Mawar</string>
     <string name="ui_theme_color_blossom">Kembang</string>
     <string name="ui_theme_color_lavender">Lavender</string>

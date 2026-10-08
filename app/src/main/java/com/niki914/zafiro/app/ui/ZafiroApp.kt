@@ -241,8 +241,9 @@ fun ZafiroApp(
     Box(modifier = Modifier.fillMaxSize()) {
         BaseTheme(
             darkTheme = isDarkTheme,
-            dynamicColor = themePrefs.seedColor == null,
+            dynamicColor = !themePrefs.isCatppuccin && themePrefs.seedColor == null,
             seedColor = seedColor,
+            isCatppuccin = themePrefs.isCatppuccin,
         ) {
             LiquidScreen(
                 state = screenState,

@@ -481,6 +481,7 @@
     <string name="ui_theme_mode_light">Claro</string>
     <string name="ui_theme_mode_dark">Oscuro</string>
     <string name="ui_theme_color_dynamic">Dinámico (del fondo)</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">Rosa</string>
     <string name="ui_theme_color_blossom">Flor</string>
     <string name="ui_theme_color_lavender">Lavanda</string>

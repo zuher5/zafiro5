@@ -465,6 +465,7 @@
     <string name="ui_theme_mode_light">淺色</string>
     <string name="ui_theme_mode_dark">深色</string>
     <string name="ui_theme_color_dynamic">動態色（桌布取色）</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">玫瑰粉</string>
     <string name="ui_theme_color_blossom">櫻花粉</string>
     <string name="ui_theme_color_lavender">薰衣草紫</string>

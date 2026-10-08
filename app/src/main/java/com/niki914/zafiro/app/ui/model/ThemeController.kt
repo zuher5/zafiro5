@@ -26,6 +26,7 @@ data class ThemePrefs(
     val mode: ThemeMode = ThemeMode.Dark,
     /** ARGB int；null = 壁纸动态色。 */
     val seedColor: Int? = 0xFF52DBC9.toInt(),
+    val isCatppuccin: Boolean = false,
 ) {
     fun resolveDarkTheme(systemDark: Boolean): Boolean = when (mode) {
         ThemeMode.System -> systemDark
@@ -47,10 +48,12 @@ object ThemeController {
 
     suspend fun load() {
         runCatching {
+            val rawSeed = XRepo.themeSeedColor()
+            val isCatppuccin = rawSeed.equals("catppuccin", ignoreCase = true)
             prefs = ThemePrefs(
                 mode = ThemeMode.fromStorageKey(XRepo.themeMode()),
-                seedColor = XRepo.themeSeedColor().takeIf { it.isNotBlank() }?.toLongOrNull(16)
-                    ?.toInt(),
+                seedColor = if (isCatppuccin) null else rawSeed.takeIf { it.isNotBlank() }?.toLongOrNull(16)?.toInt(),
+                isCatppuccin = isCatppuccin,
             )
         }.onFailure {
             Logger.w("niki914_zafiro_ThemeController", "load failed ${it.message}")
@@ -68,8 +71,19 @@ object ThemeController {
             }
     }
 
+    suspend fun setCatppuccin() {
+        prefs = prefs.copy(isCatppuccin = true, seedColor = null)
+        runCatching { XRepo.setThemeSeedColor("catppuccin") }
+            .onFailure {
+                Logger.w(
+                    "niki914_zafiro_ThemeController",
+                    "persist catppuccin failed ${it.message}"
+                )
+            }
+    }
+
     suspend fun setSeedColor(argb: Int?) {
-        prefs = prefs.copy(seedColor = argb)
+        prefs = prefs.copy(isCatppuccin = false, seedColor = argb)
         val hex = argb?.let { "%08X".format(it) } ?: ""
         runCatching { XRepo.setThemeSeedColor(hex) }
             .onFailure {

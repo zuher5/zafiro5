@@ -18,6 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.materialkolor.rememberDynamicColorScheme
+import com.niki914.uikit.base.theme.CatppuccinLatteColorScheme
+import com.niki914.uikit.base.theme.CatppuccinMochaColorScheme
 import com.niki914.uikit.base.theme.DarkColorScheme
 import com.niki914.uikit.base.theme.LightColorScheme
 import com.niki914.uikit.base.theme.Typography
@@ -32,10 +34,14 @@ fun BaseTheme(
     dynamicColor: Boolean = true, // 启用动态颜色
     /** 非空时从种子色生成 Material 色板，忽略 dynamicColor。 */
     seedColor: Color? = null,
+    /** 是否启用 Catppuccin 主题（深色 Mocha，浅色 Latte）。 */
+    isCatppuccin: Boolean = false,
     content: @Composable () -> Unit, // 实际要应用主题的 Composable 内容
 ) {
     // 根据条件选择颜色方案
     val colorScheme = when {
+        isCatppuccin -> if (darkTheme) CatppuccinMochaColorScheme else CatppuccinLatteColorScheme
+
         // 种子色优先：用户主动选定的主题颜色
         seedColor != null ->
             rememberDynamicColorScheme(seedColor = seedColor, isDark = darkTheme, isAmoled = false)

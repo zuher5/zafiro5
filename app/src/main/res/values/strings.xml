@@ -480,6 +480,7 @@
     <string name="ui_theme_mode_light">浅色</string>
     <string name="ui_theme_mode_dark">深色</string>
     <string name="ui_theme_color_dynamic">动态色（壁纸取色）</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">玫瑰粉</string>
     <string name="ui_theme_color_blossom">樱花粉</string>
     <string name="ui_theme_color_lavender">薰衣草紫</string>
