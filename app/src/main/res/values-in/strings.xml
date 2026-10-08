@@ -37,6 +37,13 @@
     <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">Percakapan baru</string>
     <string name="ui_home_input_placeholder">Ketik pesan...</string>
+    <string name="ui_home_empty_greeting">Ada yang bisa saya bantu?</string>
+    <string name="ui_home_empty_hint">Ketuk saran untuk mulai</string>
+    <string name="ui_home_empty_suggestion_device">Periksa info perangkat</string>
+    <string name="ui_home_empty_suggestion_summarize">Ringkas sebuah file</string>
+    <string name="ui_home_empty_suggestion_code">Tuliskan kode</string>
+    <string name="ui_home_empty_suggestion_automate">Otomatiskan tugas berulang</string>
+    <string name="ui_home_tap_hint">Tips: ketuk pesan untuk menyalin, membuat ulang, atau membuat percabangan</string>
     <string name="ui_tool_status_called">Dipanggil</string>
     <string name="ui_tool_status_running">Berjalan</string>
     <string name="ui_tool_status_success">Berhasil</string>

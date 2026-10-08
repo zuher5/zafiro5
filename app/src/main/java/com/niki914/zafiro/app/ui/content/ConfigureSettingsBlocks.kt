@@ -147,8 +147,8 @@ internal fun ConfigureConnectionSettingsBlock(
                 placeholder = stringResource(R.string.ui_onboard_configure_endpoint_placeholder),
                 description = uiState.endpointErrorResId?.let { stringResource(it) },
                 enabled = endpointEditable && !uiState.isSaving,
-                minLines = 3,
-                maxLines = 6,
+                minLines = 1,
+                maxLines = 1,
             )
             if (policy.showEndpointOverrideToggle) {
                 SettingsItemDivider()

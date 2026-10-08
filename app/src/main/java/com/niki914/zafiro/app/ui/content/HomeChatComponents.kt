@@ -352,6 +352,64 @@ fun UserMessageBubble(
     }
 }
 
+/**
+ * Home 空态：无对话时的引导区。只出现于首次进场，提供问候 + 可点的建议短语。
+ * 点击建议仅填充输入框，不自动发送——发送行为仍由用户掌控。
+ */
+@Composable
+fun HomeEmptyState(
+    onSuggestionClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val suggestions = listOf(
+        R.string.ui_home_empty_suggestion_device,
+        R.string.ui_home_empty_suggestion_summarize,
+        R.string.ui_home_empty_suggestion_code,
+        R.string.ui_home_empty_suggestion_automate,
+    )
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.ui_home_empty_greeting),
+            style = MaterialTheme.typography.titleLarge,
+            color = colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(R.string.ui_home_empty_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            suggestions.forEach { resId ->
+                val label = stringResource(resId)
+                Box(
+                    modifier = Modifier
+                        .clip(G2CardShape(20.dp))
+                        .background(colorScheme.surfaceContainerHigh)
+                        .clickable { onSuggestionClick(label) }
+                        .padding(horizontal = 14.dp, vertical = 9.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun AssistantErrorBlock(
     message: String?,

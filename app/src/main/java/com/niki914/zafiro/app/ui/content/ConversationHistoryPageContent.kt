@@ -356,7 +356,7 @@ private fun ConversationHistoryListContent(
                     ) {
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             section.conversations.forEach { conversation ->
                                 val dismissState = rememberSwipeToDismissBoxState(
@@ -445,7 +445,7 @@ private fun SwipeBackground(
         SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error
         SwipeToDismissBoxValue.Settled -> Color.Transparent
     }
-    val cardShape = remember { G2CardShape(20.dp) }
+    val cardShape = remember { G2CardShape(28.dp) }
 
     Box(
         modifier = modifier
@@ -500,7 +500,7 @@ private fun ConversationHistoryItem(
     val showPinBadge = isPinned && !inPinnedSection
     val relativeTime = formatRelativeTime(conversation.updatedAt, currentTimeMillis)
 
-    val cardShape = remember { G2CardShape(20.dp) }
+    val cardShape = remember { G2CardShape(28.dp) }
     // 选中态 = 描边 + 0.98 微缩，与 bukit 的 item 多选同构；置顶段的底色不动，靠描边区分选中。
     val selectionProgress by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
@@ -516,10 +516,10 @@ private fun ConversationHistoryItem(
         label = "conversationItemSelectionScale",
         visibilityThreshold = 0.0001f,
     )
-    val pinnedBackground = if (inPinnedSection) {
-        Modifier.background(MaterialTheme.colorScheme.secondaryContainer, cardShape)
+    val containerColor = if (inPinnedSection) {
+        MaterialTheme.colorScheme.secondaryContainer
     } else {
-        Modifier
+        MaterialTheme.colorScheme.surfaceContainer
     }
     val selectionBorder = if (selectionProgress > 0f) {
         Modifier.border(
@@ -539,8 +539,15 @@ private fun ConversationHistoryItem(
                 scaleX = selectionScale
                 scaleY = selectionScale
             }
+            .shadow(
+                elevation = 2.dp,
+                shape = cardShape,
+                clip = false,
+                ambientColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                spotColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+            )
             .clip(cardShape)
-            .then(pinnedBackground)
+            .background(containerColor, cardShape)
             .then(selectionBorder),
     ) {
         SettingsItemSurface(
@@ -549,18 +556,18 @@ private fun ConversationHistoryItem(
             shape = cardShape,
             highlightPulseKey = activeConversationId?.takeIf { it == conversation.id },
             highlightPulseDurationMillis = 500,
-            minHeight = 0.dp,
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+            minHeight = 64.dp,
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.Center,
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = displayTitle,
@@ -577,7 +584,7 @@ private fun ConversationHistoryItem(
                     if (originIcon != null || showPinBadge || relativeTime.isNotBlank()) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(start = 8.dp, top = 2.dp),
+                            modifier = Modifier.padding(start = 8.dp),
                         ) {
                             if (originIcon != null) {
                                 Icon(
@@ -613,6 +620,7 @@ private fun ConversationHistoryItem(
                 }
 
                 if (conversation.lastMessagePreview.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = conversation.lastMessagePreview,
                         style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.5.sp),

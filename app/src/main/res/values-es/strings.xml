@@ -37,6 +37,13 @@
     <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">Nueva conversación</string>
     <string name="ui_home_input_placeholder">Escriba un mensaje...</string>
+    <string name="ui_home_empty_greeting">¿En qué puedo ayudarte?</string>
+    <string name="ui_home_empty_hint">Toca una sugerencia para empezar</string>
+    <string name="ui_home_empty_suggestion_device">Ver información del dispositivo</string>
+    <string name="ui_home_empty_suggestion_summarize">Resumir un archivo</string>
+    <string name="ui_home_empty_suggestion_code">Escribir código</string>
+    <string name="ui_home_empty_suggestion_automate">Automatizar una tarea repetitiva</string>
+    <string name="ui_home_tap_hint">Consejo: toca un mensaje para copiar, regenerar o bifurcar</string>
     <string name="ui_tool_status_called">Llamado</string>
     <string name="ui_tool_status_running">Ejecutando</string>
     <string name="ui_tool_status_success">Completado</string>

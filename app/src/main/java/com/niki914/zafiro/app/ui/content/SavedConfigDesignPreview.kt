@@ -222,8 +222,8 @@ private fun ModelConfigRedesignPreview() {
                     onValueChange = {},
                     placeholder = "https://",
                     enabled = overrideEnabled,
-                    minLines = 3,
-                    maxLines = 6,
+                    minLines = 1,
+                    maxLines = 1,
                     expanded = endpointOpen,
                     onExpandedChange = { endpointOpen = it },
                 )

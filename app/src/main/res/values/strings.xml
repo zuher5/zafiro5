@@ -37,6 +37,13 @@
     <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">新对话</string>
     <string name="ui_home_input_placeholder">输入消息...</string>
+    <string name="ui_home_empty_greeting">有什么我可以帮你？</string>
+    <string name="ui_home_empty_hint">点一下建议，直接开始</string>
+    <string name="ui_home_empty_suggestion_device">查看设备信息</string>
+    <string name="ui_home_empty_suggestion_summarize">总结一个文件</string>
+    <string name="ui_home_empty_suggestion_code">写一段代码</string>
+    <string name="ui_home_empty_suggestion_automate">自动化一个重复任务</string>
+    <string name="ui_home_tap_hint">提示：点击消息可复制、重新生成或分叉</string>
     <string name="ui_tool_status_called">已调用</string>
     <string name="ui_tool_status_running">执行中</string>
     <string name="ui_tool_status_success">成功</string>

@@ -37,6 +37,13 @@
     <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">新しい会話</string>
     <string name="ui_home_input_placeholder">メッセージを入力...</string>
+    <string name="ui_home_empty_greeting">何かお手伝いしましょうか？</string>
+    <string name="ui_home_empty_hint">提案をタップして始めましょう</string>
+    <string name="ui_home_empty_suggestion_device">端末情報を確認</string>
+    <string name="ui_home_empty_suggestion_summarize">ファイルを要約</string>
+    <string name="ui_home_empty_suggestion_code">コードを書く</string>
+    <string name="ui_home_empty_suggestion_automate">繰り返しの作業を自動化</string>
+    <string name="ui_home_tap_hint">ヒント：メッセージをタップするとコピー・再生成・分岐ができます</string>
     <string name="ui_tool_status_called">呼び出し済み</string>
     <string name="ui_tool_status_running">実行中</string>
     <string name="ui_tool_status_success">成功</string>
