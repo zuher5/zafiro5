@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App / Module -->
-    <string name="app_name">Zafiro</string>
+    <string name="app_name">Zafira</string>
     <string name="xposed_desc">音声アシスタントに独自のモデル機能を連携\n\n対応中:\n\n- ColorOS Breeno\n- HyperOS XiaoAi</string>
 
     <!-- Onboarding -->
@@ -30,11 +30,11 @@
     <string name="ui_onboard_configure_error_load_failed">設定の読み込みに失敗しました：%1$s</string>
     <string name="ui_onboard_configure_error_save_failed">設定の保存に失敗しました：%1$s</string>
     <string name="ui_onboard_done_headline">準備が完了しました</string>
-    <string name="ui_onboard_done_description">設定が完了しました。すぐに Zafiro を使用するか、後から設定で調整できます。</string>
-    <string name="ui_onboard_done_enter_home">Zafiro を開く</string>
+    <string name="ui_onboard_done_description">設定が完了しました。すぐに Zafira を使用するか、後から設定で調整できます。</string>
+    <string name="ui_onboard_done_enter_home">Zafira を開く</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">新しい会話</string>
     <string name="ui_home_input_placeholder">メッセージを入力...</string>
     <string name="ui_tool_status_called">呼び出し済み</string>
@@ -135,7 +135,7 @@
 
     <!-- Settings Home Items -->
     <string name="ui_settings_model_config">モデル設定</string>
-    <string name="ui_settings_model_config_summary">Zafiro のモデル連携を調整</string>
+    <string name="ui_settings_model_config_summary">Zafira のモデル連携を調整</string>
     <string name="ui_settings_memory">メモリ</string>
     <string name="ui_settings_memory_summary">永続化された記憶と設定を管理</string>
     <string name="ui_settings_tools">ツール</string>
@@ -162,7 +162,7 @@
     <string name="ui_settings_mcp">MCP</string>
     <string name="ui_settings_mcp_summary">外部 MCP とツールを連携</string>
     <string name="ui_settings_takeover">制御ルール</string>
-    <string name="ui_settings_takeover_summary">入力に応じてネイティブアシスタントと Zafiro のどちらが応答するかを設定</string>
+    <string name="ui_settings_takeover_summary">入力に応じてネイティブアシスタントと Zafira のどちらが応答するかを設定</string>
     <string name="ui_settings_execution_rules">実行ルール</string>
     <string name="ui_settings_execution_rules_summary">Shell のセキュリティポリシーを設定</string>
     <string name="ui_settings_storage">ストレージ</string>
@@ -210,7 +210,7 @@
     <string name="prompt_editor_description">システムプロンプトを編集します。保存された変更は次回の会話から反映されます。</string>
     <string name="prompt_error_load_failed">プロンプトの読み込みに失敗しました。戻って再試行してください。</string>
     <string name="ui_settings_configure_proxy_label">プロキシ</string>
-    <string name="ui_settings_configure_proxy_placeholder">例：http://127.0.0.1:7890</string>
+    <string name="ui_settings_configure_proxy_placeholder">例：http://127.0.0.1:7890 または relay+https://relay.example.app</string>
     <string name="ui_settings_configure_error_required">必須項目を入力してください</string>
     <string name="ui_settings_configure_error_name_duplicate">この設定名は既に存在します。別の名前を試してください</string>
     <string name="ui_settings_configure_error_proxy_invalid">プロキシアドレスが有効な URI ではありません</string>
@@ -225,7 +225,6 @@
     <string name="memory_field_content">内容を入力</string>
     <string name="memory_field_content_hint">例：ユーザーの誕生日は X 月 Y 日</string>
     <string name="memory_save_action">メモリを保存</string>
-    <string name="memory_cancel_action">キャンセル</string>
     <string name="memory_delete_dialog_title">メモリの削除</string>
     <string name="memory_delete_dialog_text">このメモリを削除してもよろしいですか？\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">削除</string>
@@ -252,12 +251,12 @@
     <string name="execution_rules_enabled_mode_disabled">無効</string>
     <string name="execution_rules_enabled_mode_confirm">確認を求める</string>
     <string name="tool_permission_dialog_title">AI が操作の実行を要求しています</string>
-    <string name="tool_permission_request_intro">Zafiro のツール「%1$s」が次のコマンドの実行を要求しています：</string>
+    <string name="tool_permission_request_intro">Zafira のツール「%1$s」が次のコマンドの実行を要求しています：</string>
     <string name="tool_permission_matched_rule">一致したルール「%1$s」</string>
     <string name="tool_permission_allow">今回のみ許可</string>
     <string name="tool_permission_deny">拒否</string>
     <string name="screen_control_consent_title">画面操作権限のリクエスト</string>
-    <string name="screen_control_consent_body">Zafiro が画面を操作するには次の権限が必要です：\n1. ユーザー補助サービス：UI の読み取りとタップの実行\n2. 他のアプリの上に重ねて表示：ポインターインジケーターの表示\n\nこの後、システムの許可ダイアログや設定画面が表示される場合があります。</string>
+    <string name="screen_control_consent_body">Zafira が画面を操作するには次の権限が必要です：\n1. ユーザー補助サービス：UI の読み取りとタップの実行\n2. 他のアプリの上に重ねて表示：ポインターインジケーターの表示\n\nこの後、システムの許可ダイアログや設定画面が表示される場合があります。</string>
     <string name="screen_control_consent_agree">同意</string>
     <string name="screen_control_consent_deny">拒否</string>
     <string name="execution_rules_field_patterns">ルール</string>
@@ -273,13 +272,13 @@
     <string name="takeover_empty_action_hint">右上をタップして、最初の制御ルールを追加してください。</string>
     <string name="takeover_loading">制御ルールを読み込み中…</string>
     <string name="takeover_editor_title_create">新規制御ルール</string>
-    <string name="takeover_editor_description">ネイティブアシスタントに委任する質問と、Zafiro で処理する質問を設定します。</string>
+    <string name="takeover_editor_description">ネイティブアシスタントに委任する質問と、Zafira で処理する質問を設定します。</string>
     <string name="takeover_field_name">ルール名</string>
     <string name="takeover_field_name_hint">例：生活サービス</string>
     <string name="takeover_field_enabled">ルールを有効化</string>
     <string name="takeover_field_target">マッチ時の応答者</string>
     <string name="takeover_target_native_assistant">ネイティブアシスタント</string>
-    <string name="takeover_target_zafiro">Zafiro</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">ルール</string>
     <string name="takeover_field_patterns_hint">天気\n.*アラーム.*\n.*を開く</string>
     <string name="takeover_field_patterns_description">1行につき1つのキーワードまたは正規表現を入力します。いずれかにマッチした場合、上記の応答方法を使用します。</string>
@@ -346,7 +345,7 @@
     <string name="custom_py_tool_save_dialog_action_close">閉じる</string>
     <string name="custom_py_tool_save_failed">保存失敗：%1$s</string>
 
-    <string name="mcp_page_description">MCP の接続方法と認証情報を設定します。保存後、Zafiro は実行時に利用可能なツールを自動検出します。</string>
+    <string name="mcp_page_description">MCP の接続方法と認証情報を設定します。保存後、Zafira は実行時に利用可能なツールを自動検出します。</string>
     <string name="mcp_page_empty_description">右上をタップして、最初の MCP サーバーを追加してください。</string>
     <string name="mcp_loading">保存された MCP サーバーを読み込み中...</string>
     <string name="mcp_editor_title_create">MCP サーバーを追加</string>
@@ -457,7 +456,6 @@
     <string name="ui_settings_general_retry_attempts">自動リトライ回数</string>
     <string name="ui_settings_general_retry_summary">リクエスト失敗後の自動リトライ</string>
     <string name="ui_settings_general_keep_screen_on">回答中は画面をオンに保つ</string>
-    <string name="ui_settings_general_keep_screen_on_summary">エージェントの応答とツール実行中は画面をオフにしません</string>
     <string name="ui_settings_general_always_show_message_actions">メッセージ操作を常に表示</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">音声アシスタント専用セッション</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">有効にすると音声アシスタントの会話が独立し、メイン画面の履歴に影響しません</string>
@@ -546,12 +544,12 @@
 
     <!-- MCP Service Settings -->
     <string name="ui_settings_mcp_service">MCP サービス</string>
-    <string name="ui_settings_mcp_service_summary">Zafiro のツールを MCP 経由で外部エージェントに公開</string>
+    <string name="ui_settings_mcp_service_summary">Zafira のツールを MCP 経由で外部エージェントに公開</string>
     <string name="mcp_service_section_service">サービス</string>
     <string name="mcp_service_section_connection">接続とセキュリティ</string>
     <string name="mcp_service_section_tools">公開ツール</string>
     <string name="mcp_service_enable_title">MCP サービスを有効化</string>
-    <string name="mcp_service_enable_summary">外部エージェントが MCP 経由で Zafiro のツールにアクセスすることを許可</string>
+    <string name="mcp_service_enable_summary">外部エージェントが MCP 経由で Zafira のツールにアクセスすることを許可</string>
     <string name="mcp_service_status_title">状態</string>
     <string name="mcp_service_status_running">実行中</string>
     <string name="mcp_service_status_stopped">停止</string>
@@ -576,7 +574,7 @@
     <!-- Text Actions -->
     <string name="text_actions_sheet_title">アクションを選択</string>
     <string name="text_actions_sheet_empty">アクションが設定されていません。「設定 → テキストアクション」で追加できます。</string>
-    <string name="text_action_menu_label">Zafiro に質問</string>
+    <string name="text_action_menu_label">Zafira に質問</string>
     <string name="ui_settings_actions">テキストアクション</string>
     <string name="ui_settings_actions_summary">選択テキストに対するアクションを設定</string>
     <string name="text_action_page_description">他のアプリで選択したテキストに対して実行するアクションです。</string>
@@ -587,7 +585,7 @@
     <string name="text_action_field_name">名前</string>
     <string name="text_action_field_name_hint">例：翻訳</string>
     <string name="text_action_field_prompt">プロンプト</string>
-    <string name="text_action_field_prompt_hint">選択したテキストに対して Zafiro に実行させる指示</string>
+    <string name="text_action_field_prompt_hint">選択したテキストに対して Zafira に実行させる指示</string>
     <string name="text_action_field_enabled">有効</string>
     <string name="text_action_field_screenshot">スクリーンショットを添付</string>
     <string name="text_action_field_screenshot_description">画面をキャプチャして会話に画像として添付します</string>

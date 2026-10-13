@@ -16,6 +16,9 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 # --------------------------------------------------------------------------
 # 策略：改这里就能改行为
 # --------------------------------------------------------------------------
@@ -294,7 +297,7 @@ def parse_diff(diff_text: str) -> dict[str, list[int]]:
 
 def git(root: str, *args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        ["git", "-C", root, *args], text=True, capture_output=True, check=False
+        ["git", "-C", root, *args], text=True, encoding="utf-8", errors="replace", capture_output=True, check=False
     )
 
 

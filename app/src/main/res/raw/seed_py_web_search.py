@@ -1,5 +1,6 @@
-# Seed tool: multi-engine web search (all / baidu / sogou / ddg).
+# Seed tool: multi-engine web search (auto / tavily / all / baidu / sogou / ddg).
 # ponytail: baidu/sogou 返回跳转链接不展开；解析选择器随站点改版会失效，Agent 可自更新本脚本。
+# auto = Tavily 优先，无 key 或失败时退回 upstream 的 baidu+sogou+ddg 合并。
 import json
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
@@ -7,13 +8,33 @@ from concurrent.futures import ThreadPoolExecutor
 import requests
 from bs4 import BeautifulSoup
 
+# Tavily API key（结构化 AI 搜索）。留空则完全退回 upstream 的多引擎路径。
+_TAVILY_API_KEY = "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"
+
 _UA_ANDROID = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36"
 _UA_DESKTOP = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
+_UPSTREAM_ENGINES = ("baidu", "sogou", "ddg")
 
-def main(query: str, engine: str = "all", max_results: int = 8):
-    '''Search the web. engine: "all" (default, merges Baidu + Sogou + DuckDuckGo), "baidu", "sogou" or "ddg". Returns a list of {title, url, snippet}.'''
-    engines = ("baidu", "sogou", "ddg") if engine == "all" else (engine,)
+
+def main(query: str, engine: str = "auto", max_results: int = 8):
+    '''Search the web. engine: "auto" (default, Tavily then Baidu+Sogou+DuckDuckGo), "all" (merge every engine), "tavily", "baidu", "sogou" or "ddg". Returns a list of {title, url, snippet}.'''
+    if engine == "auto":
+        if _TAVILY_API_KEY:
+            try:
+                results = _search_tavily(query, max_results)
+                if results:
+                    print(json.dumps(results, ensure_ascii=False))
+                    return
+            except Exception:
+                pass  # Tavily 挂了不该让整次搜索失败，静默退回多引擎
+        engine = "all"
+
+    if engine == "tavily":
+        print(json.dumps(_search_tavily(query, max_results), ensure_ascii=False))
+        return
+
+    engines = _UPSTREAM_ENGINES if engine == "all" else (engine,)
     with ThreadPoolExecutor(max_workers=len(engines)) as pool:
         futures = [pool.submit(_search, e, query, max_results) for e in engines]
         # ddg 在无代理网络会超时，给短 timeout 快速失败，不拖慢整体
@@ -24,6 +45,31 @@ def main(query: str, engine: str = "all", max_results: int = 8):
             except Exception:
                 fetched.append([])
     print(json.dumps(_merge(fetched, max_results), ensure_ascii=False))
+
+
+def _search_tavily(query: str, max_results: int):
+    if not _TAVILY_API_KEY:
+        raise RuntimeError("Tavily API key is not configured")
+    resp = requests.post(
+        "https://api.tavily.com/search",
+        json={
+            "api_key": _TAVILY_API_KEY,
+            "query": query,
+            "max_results": max_results,
+            "search_depth": "basic",
+        },
+        timeout=15,
+    )
+    resp.raise_for_status()
+    results = []
+    for item in resp.json().get("results", []):
+        title = item.get("title", "").strip()
+        url = item.get("url", "").strip()
+        if title and url:
+            results.append({"title": title, "url": url, "snippet": item.get("content", "").strip()})
+            if len(results) >= max_results:
+                break
+    return results
 
 
 def _search(engine: str, query: str, max_results: int):

@@ -13,11 +13,16 @@ import com.niki914.okia.message.Message
 import com.niki914.okia.message.ToolCallOutcome
 import com.niki914.okia.protocol.AnthropicMessagesProtocol
 import com.niki914.okia.protocol.ChatProtocol
+import com.niki914.okia.protocol.Compat
 import com.niki914.okia.protocol.GoogleOpenAiCompat
 import com.niki914.okia.protocol.OpenAIChatCompletionCompat
 import com.niki914.okia.protocol.OpenAIChatCompletionProtocol
 import com.niki914.okia.protocol.OpenAIResponsesProtocol
+import com.niki914.okia.protocol.ProtocolEvent
+import com.niki914.okia.protocol.RequestSnapshot
 import com.niki914.okia.tooling.ToolRegistry
+import com.niki914.okia.transport.HttpRequest
+import com.niki914.okia.transport.SseLine
 import com.niki914.zafiro.chat.agentic.AndroidImageLoader
 import com.niki914.zafiro.chat.agentic.python.PyRuntime
 import com.niki914.zafiro.chat.agentic.shell.SessionRegistry
@@ -28,10 +33,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 
 /** 孤儿工具调用兜底文案：只说结果缺失与疑似异常中断，不断言进程被杀。 */
 private const val TOOL_RESULT_MISSING =
@@ -56,6 +63,8 @@ internal class OkiaSessionAssembler(
     var activeSession: Okia? = null
     var sessionProtocol: LlmProtocol? = null
         private set
+    var sessionOpenCodeFree: Boolean? = null
+        private set
 
     private val conversationForwardScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val conversationFlow = MutableStateFlow<Conversation?>(null)
@@ -72,6 +81,7 @@ internal class OkiaSessionAssembler(
         kotlinx.coroutines.runBlocking { activeSession?.close() }
         activeSession = null
         sessionProtocol = null
+        sessionOpenCodeFree = null
         sessionForwardJob?.cancel()
         sessionForwardJob = null
         conversationFlow.value = null
@@ -86,14 +96,22 @@ internal class OkiaSessionAssembler(
         restore: SessionSnapshot? = null,
         forceNew: Boolean = false,
     ): Okia {
-        if (!forceNew && restore == null) {
-            activeSession?.takeIf { sessionProtocol == protocol }?.let { return it }
+        val effectiveEndpoint = config.endpoint.ifBlank {
+            protocolDefaultEndpointFallback(protocol ?: LlmProtocol.Default)
         }
-        val carried = restore ?: activeSession?.takeIf { sessionProtocol != protocol }?.export()
+        val isOpenCodeFree = isOpenCodeFreeEndpoint(effectiveEndpoint)
+        if (!forceNew && restore == null) {
+            activeSession?.takeIf { sessionProtocol == protocol && sessionOpenCodeFree == isOpenCodeFree }
+                ?.let { return it }
+        }
+        val carried = restore ?: activeSession?.takeIf {
+            sessionProtocol != protocol || sessionOpenCodeFree != isOpenCodeFree
+        }?.export()
         activeSession?.close()
         return openSession(protocol ?: LlmProtocol.Default, config, carried).also {
             activeSession = it
             sessionProtocol = protocol
+            sessionOpenCodeFree = isOpenCodeFree
             forwardConversation(it)
         }
     }
@@ -115,6 +133,7 @@ internal class OkiaSessionAssembler(
         activeSession?.close()
         activeSession = null
         sessionProtocol = null
+        sessionOpenCodeFree = null
         sessionForwardJob?.cancel()
         sessionForwardJob = null
         conversationFlow.value = null
@@ -137,7 +156,9 @@ internal class OkiaSessionAssembler(
         config: ResolvedLlmConfig,
     ): Okia {
         val endpoint = config.endpoint.ifBlank { protocolDefaultEndpointFallback(protocol) }
-        val wireProtocol = wireProtocolFor(protocol)
+        val baseProtocol = wireProtocolFor(protocol)
+        val isOpenCodeFree = isOpenCodeFreeEndpoint(endpoint)
+        val wireProtocol = if (isOpenCodeFree) OpenCodeFreeProtocol(baseProtocol) else baseProtocol
         val saver = ensureImageSaver()
         return Okia.open(wireProtocol, restore) {
             this.endpoint = endpoint
@@ -154,7 +175,30 @@ internal class OkiaSessionAssembler(
             supportsImages = imageLoader != null && config.supportsImages
             thinkingLevel = config.thinkingLevel
             proxy = config.proxy
+            if (isOpenCodeFree) {
+                headers = OpenCodeFreeSupport.headers()
+            }
         }
+    }
+
+    private fun isOpenCodeFreeEndpoint(endpoint: String): Boolean =
+        endpoint.contains("opencode.ai/zen", ignoreCase = true)
+
+    private class OpenCodeFreeProtocol(private val base: ChatProtocol) : ChatProtocol {
+        override val id: String get() = base.id
+        override val defaultEndpoint: String? get() = base.defaultEndpoint
+        override fun withCodec(codec: Json): ChatProtocol = base.withCodec(codec)
+        override fun useApiKey(apiKey: String): Map<String, String> = emptyMap()
+        override suspend fun buildRequest(snapshot: RequestSnapshot, history: List<Message>): HttpRequest {
+            val request = base.buildRequest(snapshot, history)
+            val body = request.body ?: return request
+            val transformed = OpenCodeFreeSupport.transform(Json.parseToJsonElement(body) as JsonObject)
+            return request.copy(body = transformed.toString())
+        }
+        override fun parseStream(rawSseLines: Flow<SseLine>): Flow<ProtocolEvent> = base.parseStream(rawSseLines)
+        override fun encodeToolResult(call: ContentBlock.ToolCall, outcome: ToolCallOutcome): Message =
+            base.encodeToolResult(call, outcome)
+        override val compat: Compat get() = base.compat
     }
 
     internal fun isImageSupported(configSupportsImages: Boolean): Boolean {

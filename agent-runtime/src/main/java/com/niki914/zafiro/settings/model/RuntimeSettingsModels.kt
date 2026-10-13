@@ -173,7 +173,7 @@ data class RuntimeToolValidation(
 )
 
 /**
- * Zafiro 把自己作为 MCP 服务对外暴露的配置。
+ * Zafira 把自己作为 MCP 服务对外暴露的配置。
  * 默认关闭服务，且仅在白名单内的安全工具默认开放；高危工具（terminal/python）默认关闭。
  */
 data class RuntimeMcpServiceConfig(

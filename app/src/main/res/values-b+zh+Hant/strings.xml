@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App / Module -->
-    <string name="app_name">Zafiro</string>
+    <string name="app_name">Zafira</string>
     <string name="xposed_desc">讓語音助理接入你自己的模型能力\n\n現已支援：\n\n- ColorOS 小布助手\n- HyperOS 小愛同學</string>
 
     <!-- Onboarding -->
@@ -30,11 +30,11 @@
     <string name="ui_onboard_configure_error_load_failed">讀取設定失敗：%1$s</string>
     <string name="ui_onboard_configure_error_save_failed">儲存設定失敗：%1$s</string>
     <string name="ui_onboard_done_headline">設定完成。</string>
-    <string name="ui_onboard_done_description">設定已完成，你可以立即開始使用 Zafiro，或稍後再到設定繼續調整。</string>
-    <string name="ui_onboard_done_enter_home">進入 Zafiro</string>
+    <string name="ui_onboard_done_description">設定已完成，你可以立即開始使用 Zafira，或稍後再到設定繼續調整。</string>
+    <string name="ui_onboard_done_enter_home">進入 Zafira</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">新對話</string>
     <string name="ui_home_input_placeholder">輸入訊息…</string>
     <string name="ui_tool_status_called">已調用</string>
@@ -135,7 +135,7 @@
 
     <!-- Settings Home Items -->
     <string name="ui_settings_model_config">模型設定</string>
-    <string name="ui_settings_model_config_summary">調整 Zafiro 的模型連接設定</string>
+    <string name="ui_settings_model_config_summary">調整 Zafira 的模型連接設定</string>
     <string name="ui_settings_memory">記憶</string>
     <string name="ui_settings_memory_summary">管理持久化的記憶與偏好設定</string>
     <string name="ui_settings_tools">工具</string>
@@ -162,7 +162,7 @@
     <string name="ui_settings_mcp">MCP</string>
     <string name="ui_settings_mcp_summary">連接外部 MCP 與工具</string>
     <string name="ui_settings_takeover">接管規則</string>
-    <string name="ui_settings_takeover_summary">設定哪些輸入交給原生助理或 Zafiro</string>
+    <string name="ui_settings_takeover_summary">設定哪些輸入交給原生助理或 Zafira</string>
     <string name="ui_settings_execution_rules">執行規則</string>
     <string name="ui_settings_execution_rules_summary">設定 Shell 的安全策略</string>
     <string name="ui_settings_storage">儲存空間</string>
@@ -210,7 +210,7 @@
     <string name="prompt_editor_description">編輯 System Prompt。儲存後，變更會在下一次對話時生效。</string>
     <string name="prompt_error_load_failed">讀取提示詞失敗，請返回重試。</string>
     <string name="ui_settings_configure_proxy_label">代理</string>
-    <string name="ui_settings_configure_proxy_placeholder">例如：http://127.0.0.1:7890</string>
+    <string name="ui_settings_configure_proxy_placeholder">例如：http://127.0.0.1:7890 或 relay+https://relay.example.app</string>
     <string name="ui_settings_configure_error_required">必填欄位不能為空</string>
     <string name="ui_settings_configure_error_name_duplicate">配置名稱已存在，請更換後重試</string>
     <string name="ui_settings_configure_error_proxy_invalid">代理位址不是有效的 URI</string>
@@ -225,7 +225,6 @@
     <string name="memory_field_content">內容</string>
     <string name="memory_field_content_hint">例如：使用者的生日是 X 月 Y 日</string>
     <string name="memory_save_action">儲存記憶</string>
-    <string name="memory_cancel_action">取消</string>
     <string name="memory_delete_dialog_title">刪除記憶</string>
     <string name="memory_delete_dialog_text">確定要刪除這條記憶嗎？\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">刪除</string>
@@ -252,12 +251,12 @@
     <string name="execution_rules_enabled_mode_disabled">停用</string>
     <string name="execution_rules_enabled_mode_confirm">詢問我</string>
     <string name="tool_permission_dialog_title">AI 請求執行操作</string>
-    <string name="tool_permission_request_intro">Zafiro 的工具「%1$s」請求執行以下命令：</string>
+    <string name="tool_permission_request_intro">Zafira 的工具「%1$s」請求執行以下命令：</string>
     <string name="tool_permission_matched_rule">命中規則「%1$s」</string>
     <string name="tool_permission_allow">允許本次</string>
     <string name="tool_permission_deny">拒絕</string>
     <string name="screen_control_consent_title">螢幕控制權限申請</string>
-    <string name="screen_control_consent_body">Zafiro 需要以下權限才能控制螢幕：\n1. 無障礙服務：讀取介面、執行點按\n2. 顯示在其他應用程式上層：顯示指標指示器\n\n接下來可能會彈出系統授權框或跳轉到設定頁。</string>
+    <string name="screen_control_consent_body">Zafira 需要以下權限才能控制螢幕：\n1. 無障礙服務：讀取介面、執行點按\n2. 顯示在其他應用程式上層：顯示指標指示器\n\n接下來可能會彈出系統授權框或跳轉到設定頁。</string>
     <string name="screen_control_consent_agree">同意</string>
     <string name="screen_control_consent_deny">拒絕</string>
     <string name="execution_rules_field_patterns">比對規則</string>
@@ -273,13 +272,13 @@
     <string name="takeover_empty_action_hint">點擊右上角以新增第一條接管規則。</string>
     <string name="takeover_loading">正在讀取接管規則…</string>
     <string name="takeover_editor_title_create">新增接管規則</string>
-    <string name="takeover_editor_description">設定哪些問題交給原生助理，哪些繼續交給 Zafiro。</string>
+    <string name="takeover_editor_description">設定哪些問題交給原生助理，哪些繼續交給 Zafira。</string>
     <string name="takeover_field_name">規則名稱</string>
     <string name="takeover_field_name_hint">例如：小布生活服務</string>
     <string name="takeover_field_enabled">啟用規則</string>
     <string name="takeover_field_target">命中時由誰接管</string>
     <string name="takeover_target_native_assistant">原生助理</string>
-    <string name="takeover_target_zafiro">Zafiro</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">規則</string>
     <string name="takeover_field_patterns_hint">天氣\n.*鬧鐘.*\n開啟.*</string>
     <string name="takeover_field_patterns_description">每行輸入一個關鍵字或正則表達式，只要符合其中一項，便會使用上方的接管方式。</string>
@@ -346,7 +345,7 @@
     <string name="custom_py_tool_save_dialog_action_close">關閉</string>
     <string name="custom_py_tool_save_failed">儲存失敗：%1$s</string>
 
-    <string name="mcp_page_description">設定 MCP 的連線方式與驗證資訊。儲存後，Zafiro 會在執行時自動發現可用工具。</string>
+    <string name="mcp_page_description">設定 MCP 的連線方式與驗證資訊。儲存後，Zafira 會在執行時自動發現可用工具。</string>
     <string name="mcp_page_empty_description">點擊右上角以新增第一個 MCP 伺服器。</string>
     <string name="mcp_loading">正在讀取已儲存的 MCP 伺服器…</string>
     <string name="mcp_editor_title_create">新增 MCP 伺服器</string>
@@ -420,7 +419,6 @@
     <string name="ui_settings_general_retry_attempts">自動重試次數</string>
     <string name="ui_settings_general_retry_summary">請求失敗後的自動重試</string>
     <string name="ui_settings_general_keep_screen_on">回應期間保持螢幕常亮</string>
-    <string name="ui_settings_general_keep_screen_on_summary">回應與工具執行期間保持螢幕常亮</string>
     <string name="ui_settings_general_always_show_message_actions">總是顯示訊息操作</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">語音助理獨享一個對話</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">開啟後語音助理對話不影響主畫面歷史；關閉則與主畫面共用當前對話</string>
@@ -531,12 +529,12 @@
 
     <!-- MCP Service Settings -->
     <string name="ui_settings_mcp_service">MCP 服務</string>
-    <string name="ui_settings_mcp_service_summary">把 Zafiro 的工具暴露給外部 Agent</string>
+    <string name="ui_settings_mcp_service_summary">把 Zafira 的工具暴露給外部 Agent</string>
     <string name="mcp_service_section_service">服務</string>
     <string name="mcp_service_section_connection">連線與認證</string>
     <string name="mcp_service_section_tools">暴露的工具</string>
     <string name="mcp_service_enable_title">啟用 MCP 服務</string>
-    <string name="mcp_service_enable_summary">允許外部 Agent 透過 MCP 存取 Zafiro 的工具</string>
+    <string name="mcp_service_enable_summary">允許外部 Agent 透過 MCP 存取 Zafira 的工具</string>
     <string name="mcp_service_status_title">執行狀態</string>
     <string name="mcp_service_status_running">執行中</string>
     <string name="mcp_service_status_stopped">已停止</string>
@@ -561,7 +559,7 @@
     <!-- Text Actions -->
     <string name="text_actions_sheet_title">選擇動作</string>
     <string name="text_actions_sheet_empty">尚未設定動作。可在「設定 → 文字動作」中新增。</string>
-    <string name="text_action_menu_label">詢問 Zafiro</string>
+    <string name="text_action_menu_label">詢問 Zafira</string>
     <string name="ui_settings_actions">文字動作</string>
     <string name="ui_settings_actions_summary">設定選取文字時觸發的快捷動作</string>
     <string name="text_action_page_description">在其他應用程式中選取文字時，可快速喚起此處設定的動作。</string>
@@ -572,7 +570,7 @@
     <string name="text_action_field_name">名稱</string>
     <string name="text_action_field_name_hint">例如：翻譯</string>
     <string name="text_action_field_prompt">提示詞</string>
-    <string name="text_action_field_prompt_hint">Zafiro 接收選取文字後需要執行的指令</string>
+    <string name="text_action_field_prompt_hint">Zafira 接收選取文字後需要執行的指令</string>
     <string name="text_action_field_enabled">啟用</string>
     <string name="text_action_field_screenshot">附加螢幕截圖</string>
     <string name="text_action_field_screenshot_description">觸發時擷取當前螢幕並作為圖片附件傳入對話</string>

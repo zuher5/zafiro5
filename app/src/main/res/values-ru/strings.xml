@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Zafiro</string>
+    <string name="app_name">Zafira</string>
     <string name="xposed_desc">Подключите свою модель к голосовому помощнику\n\nСейчас поддерживаются:\n\n- ColorOS Breeno\n- HyperOS XiaoAi</string>
     <string name="ui_onboard_startup_demo_button">Начать</string>
     <string name="ui_onboard_provider_pick_title">Выберите провайдера</string>
@@ -27,9 +27,9 @@
     <string name="ui_onboard_configure_error_load_failed">Не удалось загрузить настройки: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Не удалось сохранить настройки: %1$s</string>
     <string name="ui_onboard_done_headline">Всё готово.</string>
-    <string name="ui_onboard_done_description">Настройка завершена. Можно начинать работать с Zafiro или донастроить его позже в настройках.</string>
-    <string name="ui_onboard_done_enter_home">Открыть Zafiro</string>
-    <string name="ui_home_title">Zafiro</string>
+    <string name="ui_onboard_done_description">Настройка завершена. Можно начинать работать с Zafira или донастроить его позже в настройках.</string>
+    <string name="ui_onboard_done_enter_home">Открыть Zafira</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">Новый диалог</string>
     <string name="ui_home_input_placeholder">Введите сообщение…</string>
     <string name="ui_tool_status_called">Вызван</string>
@@ -127,7 +127,7 @@
     <string name="ui_settings_section_rules">Правила</string>
     <string name="ui_settings_section_app">Приложение</string>
     <string name="ui_settings_model_config">Настройки модели</string>
-    <string name="ui_settings_model_config_summary">Как Zafiro подключается к вашей модели</string>
+    <string name="ui_settings_model_config_summary">Как Zafira подключается к вашей модели</string>
     <string name="ui_settings_memory">Память</string>
     <string name="ui_settings_memory_summary">Сохранённые факты и предпочтения</string>
     <string name="ui_settings_tools">Инструменты</string>
@@ -154,7 +154,7 @@
     <string name="ui_settings_mcp">MCP</string>
     <string name="ui_settings_mcp_summary">Подключение внешних MCP и инструментов</string>
     <string name="ui_settings_takeover">Правила перехвата</string>
-    <string name="ui_settings_takeover_summary">Куда направлять совпавшие запросы — штатному ассистенту или Zafiro</string>
+    <string name="ui_settings_takeover_summary">Куда направлять совпавшие запросы — штатному ассистенту или Zafira</string>
     <string name="ui_settings_execution_rules">Правила выполнения</string>
     <string name="ui_settings_execution_rules_summary">Правила безопасности для выполнения команд</string>
     <string name="ui_settings_storage">Хранилище</string>
@@ -210,7 +210,6 @@
     <string name="memory_field_content">Содержание</string>
     <string name="memory_field_content_hint">Например: день рождения пользователя — X месяца, Y числа</string>
     <string name="memory_save_action">Сохранить запись</string>
-    <string name="memory_cancel_action">Отмена</string>
     <string name="memory_delete_dialog_title">Удалить запись</string>
     <string name="memory_delete_dialog_text">Удалить эту запись памяти?\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">Удалить</string>
@@ -235,12 +234,12 @@
     <string name="execution_rules_enabled_mode_disabled">Выключено</string>
     <string name="execution_rules_enabled_mode_confirm">Спрашивать меня</string>
     <string name="tool_permission_dialog_title">ИИ запрашивает выполнение операции</string>
-    <string name="tool_permission_request_intro">Инструмент Zafiro «%1$s» хочет выполнить команду:</string>
+    <string name="tool_permission_request_intro">Инструмент Zafira «%1$s» хочет выполнить команду:</string>
     <string name="tool_permission_matched_rule">Сработало правило «%1$s»</string>
     <string name="tool_permission_allow">Разрешить один раз</string>
     <string name="tool_permission_deny">Запретить</string>
     <string name="screen_control_consent_title">Запрос разрешения на управление экраном</string>
-    <string name="screen_control_consent_body">Для управления экраном Zafiro нужны разрешения:\n1. Служба специальных возможностей: чтение интерфейса и нажатия\n2. Показ поверх других приложений: указатель на экране\n\nСледующим шагом появится системный запрос или страница настроек.</string>
+    <string name="screen_control_consent_body">Для управления экраном Zafira нужны разрешения:\n1. Служба специальных возможностей: чтение интерфейса и нажатия\n2. Показ поверх других приложений: указатель на экране\n\nСледующим шагом появится системный запрос или страница настроек.</string>
     <string name="screen_control_consent_agree">Согласен</string>
     <string name="screen_control_consent_deny">Запретить</string>
     <string name="execution_rules_field_patterns">Шаблоны</string>
@@ -254,13 +253,13 @@
     <string name="takeover_empty_action_hint">Нажмите на значок справа сверху, чтобы добавить первое правило перехвата.</string>
     <string name="takeover_loading">Загрузка правил перехвата…</string>
     <string name="takeover_editor_title_create">Новое правило перехвата</string>
-    <string name="takeover_editor_description">Выберите, какие запросы уходят штатному ассистенту, а какие остаются у Zafiro.</string>
+    <string name="takeover_editor_description">Выберите, какие запросы уходят штатному ассистенту, а какие остаются у Zafira.</string>
     <string name="takeover_field_name">Название правила</string>
     <string name="takeover_field_name_hint">Например: Сервисы штатного ассистента</string>
     <string name="takeover_field_enabled">Включить правило</string>
     <string name="takeover_field_target">Кто отвечает при совпадении</string>
     <string name="takeover_target_native_assistant">Штатный ассистент</string>
-    <string name="takeover_target_zafiro">Zafiro</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">Правила</string>
     <string name="takeover_field_patterns_hint">погода\n.*будильник.*\nоткрой.*</string>
     <string name="takeover_field_patterns_description">Вводите по одному ключевому слову или регулярному выражению в строке. Как только правило совпадёт, отвечает выбранный получатель.</string>
@@ -322,7 +321,7 @@
     <string name="custom_py_tool_save_dialog_action_done">Готово</string>
     <string name="custom_py_tool_save_dialog_action_close">Закрыть</string>
     <string name="custom_py_tool_save_failed">Не удалось сохранить: %1$s</string>
-    <string name="mcp_page_description">Настройка подключения и авторизации для MCP. После сохранения Zafiro сам найдёт доступные инструменты.</string>
+    <string name="mcp_page_description">Настройка подключения и авторизации для MCP. После сохранения Zafira сам найдёт доступные инструменты.</string>
     <string name="mcp_page_empty_description">Нажмите на значок справа сверху, чтобы добавить первый сервер MCP.</string>
     <string name="mcp_loading">Загрузка сохранённых серверов MCP…</string>
     <string name="mcp_editor_title_create">Новый сервер MCP</string>
@@ -416,7 +415,6 @@
     <string name="ui_settings_general_retry_attempts">Автоповторы</string>
     <string name="ui_settings_general_retry_summary">Автоматические повторы после неудачного запроса</string>
     <string name="ui_settings_general_keep_screen_on">Не гасить экран во время ответа</string>
-    <string name="ui_settings_general_keep_screen_on_summary">Не гасить экран, пока агент отвечает и выполняет инструменты</string>
     <string name="ui_settings_general_always_show_message_actions">Всегда показывать действия с сообщением</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">Выделенная сессия голосового ассистента</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">Изолировать диалоги голосового ассистента от истории основного чата</string>
@@ -500,12 +498,12 @@
 
     <!-- MCP Service Settings -->
     <string name="ui_settings_mcp_service">Сервис MCP</string>
-    <string name="ui_settings_mcp_service_summary">Предоставление инструментов Zafiro внешним агентам через MCP</string>
+    <string name="ui_settings_mcp_service_summary">Предоставление инструментов Zafira внешним агентам через MCP</string>
     <string name="mcp_service_section_service">Служба</string>
     <string name="mcp_service_section_connection">Подключение и безопасность</string>
     <string name="mcp_service_section_tools">Доступные инструменты</string>
     <string name="mcp_service_enable_title">Включить сервис MCP</string>
-    <string name="mcp_service_enable_summary">Разрешить внешним агентам доступ к инструментам Zafiro через MCP</string>
+    <string name="mcp_service_enable_summary">Разрешить внешним агентам доступ к инструментам Zafira через MCP</string>
     <string name="mcp_service_status_title">Состояние</string>
     <string name="mcp_service_status_running">Запущен</string>
     <string name="mcp_service_status_stopped">Остановлен</string>
@@ -530,7 +528,7 @@
     <!-- Text Actions -->
     <string name="text_actions_sheet_title">Выберите действие</string>
     <string name="text_actions_sheet_empty">Действия не настроены. Добавьте в меню «Настройки → Действия с текстом».</string>
-    <string name="text_action_menu_label">Спросить у Zafiro</string>
+    <string name="text_action_menu_label">Спросить у Zafira</string>
     <string name="ui_settings_actions">Действия с текстом</string>
     <string name="ui_settings_actions_summary">Настройка действий для выделенного текста</string>
     <string name="text_action_page_description">Действия выполняются над текстом, выделенным в других приложениях.</string>
@@ -541,7 +539,7 @@
     <string name="text_action_field_name">Название</string>
     <string name="text_action_field_name_hint">Например: Перевести</string>
     <string name="text_action_field_prompt">Промпт</string>
-    <string name="text_action_field_prompt_hint">Что Zafiro должен сделать с выделенным текстом</string>
+    <string name="text_action_field_prompt_hint">Что Zafira должен сделать с выделенным текстом</string>
     <string name="text_action_field_enabled">Включено</string>
     <string name="text_action_field_screenshot">Прикрепить снимок экрана</string>
     <string name="text_action_field_screenshot_description">Сделать снимок экрана и прикрепить его к диалогу</string>
