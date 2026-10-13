@@ -9,7 +9,7 @@
     <string name="ui_onboard_provider_pick_title">Seleccionar proveedor</string>
     <string name="ui_onboard_provider_pick_description">Comience a conectar sus modelos desde aquí.\nSeleccione un proveedor para continuar.</string>
     <string name="ui_onboard_configure_title">Configurar modelo</string>
-    <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafira.</string>
+    <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafiro.</string>
     <string name="ui_onboard_configure_next">Siguiente</string>
     <string name="ui_onboard_configure_endpoint_override_title">Endpoint personalizado</string>
     <string name="ui_onboard_configure_endpoint_override_description_off">Usar endpoint predeterminado</string>
@@ -30,11 +30,11 @@
     <string name="ui_onboard_configure_error_load_failed">Error al cargar la configuración: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Error al guardar la configuración: %1$s</string>
     <string name="ui_onboard_done_headline">Todo listo.</string>
-    <string name="ui_onboard_done_description">Configuración completada. Puede empezar a usar Zafira o ajustar la configuración más tarde.</string>
-    <string name="ui_onboard_done_enter_home">Ir a Zafira</string>
+    <string name="ui_onboard_done_description">Configuración completada. Puede empezar a usar Zafiro o ajustar la configuración más tarde.</string>
+    <string name="ui_onboard_done_enter_home">Ir a Zafiro</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafira</string>
+    <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">Nueva conversación</string>
     <string name="ui_home_input_placeholder">Escriba un mensaje...</string>
     <string name="ui_tool_status_called">Llamado</string>
@@ -163,7 +163,7 @@
     <string name="ui_settings_mcp">MCP</string>
     <string name="ui_settings_mcp_summary">Conectar MCP y herramientas externas</string>
     <string name="ui_settings_takeover">Reglas de control</string>
-    <string name="ui_settings_takeover_summary">Configurar qué entradas procesa el asistente nativo o Zafira</string>
+    <string name="ui_settings_takeover_summary">Configurar qué entradas procesa el asistente nativo o Zafiro</string>
     <string name="ui_settings_execution_rules">Reglas de ejecución</string>
     <string name="ui_settings_execution_rules_summary">Configurar la política de seguridad para comandos Shell</string>
     <string name="ui_settings_storage">Almacenamiento</string>
@@ -211,7 +211,7 @@
     <string name="prompt_editor_description">Edita el System Prompt. Los cambios se aplicarán en la siguiente conversación tras guardar.</string>
     <string name="prompt_error_load_failed">No se pudo cargar el prompt. Vuelve atrás e inténtalo de nuevo.</string>
     <string name="ui_settings_configure_proxy_label">Proxy</string>
-    <string name="ui_settings_configure_proxy_placeholder">Ejemplo: http://127.0.0.1:7890 o relay+https://relay.example.app</string>
+    <string name="ui_settings_configure_proxy_placeholder">Ejemplo: http://127.0.0.1:7890</string>
     <string name="ui_settings_configure_error_required">Los campos obligatorios no pueden estar vacíos</string>
     <string name="ui_settings_configure_error_name_duplicate">El nombre de la configuración ya existe. Elija otro nombre.</string>
     <string name="ui_settings_configure_error_proxy_invalid">La dirección del proxy no es un URI válido</string>
@@ -226,6 +226,7 @@
     <string name="memory_field_content">Contenido</string>
     <string name="memory_field_content_hint">Ejemplo: El cumpleaños del usuario es el 15 de octubre</string>
     <string name="memory_save_action">Guardar memoria</string>
+    <string name="memory_cancel_action">Cancelar</string>
     <string name="memory_delete_dialog_title">Eliminar memoria</string>
     <string name="memory_delete_dialog_text">¿Está seguro de que desea eliminar esta memoria?\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">Eliminar</string>
@@ -252,12 +253,12 @@
     <string name="execution_rules_enabled_mode_disabled">Desactivado</string>
     <string name="execution_rules_enabled_mode_confirm">Preguntarme</string>
     <string name="tool_permission_dialog_title">La IA solicita ejecutar una operación</string>
-    <string name="tool_permission_request_intro">La herramienta de Zafira "%1$s" solicita ejecutar el siguiente comando:</string>
+    <string name="tool_permission_request_intro">La herramienta de Zafiro "%1$s" solicita ejecutar el siguiente comando:</string>
     <string name="tool_permission_matched_rule">Regla alcanzada: "%1$s"</string>
     <string name="tool_permission_allow">Permitir una vez</string>
     <string name="tool_permission_deny">Denegar</string>
     <string name="screen_control_consent_title">Solicitud de permisos de control de pantalla</string>
-    <string name="screen_control_consent_body">Zafira necesita estos permisos para controlar la pantalla:\n1. Servicio de accesibilidad: leer la interfaz y realizar toques\n2. Superponer sobre otras apps: mostrar el indicador de puntero\n\nA continuación puede aparecer un aviso del sistema o una página de ajustes.</string>
+    <string name="screen_control_consent_body">Zafiro necesita estos permisos para controlar la pantalla:\n1. Servicio de accesibilidad: leer la interfaz y realizar toques\n2. Superponer sobre otras apps: mostrar el indicador de puntero\n\nA continuación puede aparecer un aviso del sistema o una página de ajustes.</string>
     <string name="screen_control_consent_agree">Aceptar</string>
     <string name="screen_control_consent_deny">Denegar</string>
     <string name="execution_rules_field_patterns">Reglas</string>
@@ -273,13 +274,13 @@
     <string name="takeover_empty_action_hint">Toque en la esquina superior derecha para añadir la primera regla de control.</string>
     <string name="takeover_loading">Cargando reglas de control...</string>
     <string name="takeover_editor_title_create">Nueva regla de control</string>
-    <string name="takeover_editor_description">Configure qué peticiones debe responder el asistente nativo y cuáles deben enviarse a Zafira.</string>
+    <string name="takeover_editor_description">Configure qué peticiones debe responder el asistente nativo y cuáles deben enviarse a Zafiro.</string>
     <string name="takeover_field_name">Nombre de la regla</string>
     <string name="takeover_field_name_hint">Ejemplo: Servicios locales Breeno</string>
     <string name="takeover_field_enabled">Activar regla</string>
     <string name="takeover_field_target">Asistente al coincidir</string>
     <string name="takeover_target_native_assistant">Asistente nativo</string>
-    <string name="takeover_target_zafiro">Zafira</string>
+    <string name="takeover_target_zafiro">Zafiro</string>
     <string name="takeover_field_patterns">Reglas</string>
     <string name="takeover_field_patterns_hint">tiempo\n.*alarma.*\nabrir.*</string>
     <string name="takeover_field_patterns_description">Introduzca una palabra clave o expresión regular por línea. Si se detecta una coincidencia, se utilizará el asistente seleccionado arriba.</string>
@@ -346,7 +347,7 @@
     <string name="custom_py_tool_save_dialog_action_close">Cerrar</string>
     <string name="custom_py_tool_save_failed">Error al guardar: %1$s</string>
 
-    <string name="mcp_page_description">Configure los métodos de conexión y autenticación para MCP. Tras guardar, Zafira descubrirá automáticamente las herramientas disponibles en tiempo de ejecución.</string>
+    <string name="mcp_page_description">Configure los métodos de conexión y autenticación para MCP. Tras guardar, Zafiro descubrirá automáticamente las herramientas disponibles en tiempo de ejecución.</string>
     <string name="mcp_page_empty_description">Toque en la esquina superior derecha para añadir su primer servidor MCP.</string>
     <string name="mcp_loading">Cargando servidores MCP guardados...</string>
     <string name="mcp_editor_title_create">Añadir servidor MCP</string>
@@ -457,6 +458,7 @@
     <string name="ui_settings_general_retry_attempts">Reintentos automáticos</string>
     <string name="ui_settings_general_retry_summary">Reintentos automáticos tras un error de solicitud</string>
     <string name="ui_settings_general_keep_screen_on">Mantener la pantalla encendida al responder</string>
+    <string name="ui_settings_general_keep_screen_on_summary">Mantener la pantalla encendida mientras el agente responde y ejecuta herramientas</string>
     <string name="ui_settings_general_always_show_message_actions">Mostrar siempre las acciones de los mensajes</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">Sesión dedicada del asistente de voz</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">Mantener aisladas las conversaciones del asistente de voz del historial principal</string>
@@ -545,12 +547,12 @@
 
     <!-- MCP Service Settings -->
     <string name="ui_settings_mcp_service">Servicio MCP</string>
-    <string name="ui_settings_mcp_service_summary">Exponer herramientas de Zafira a agentes externos mediante MCP</string>
+    <string name="ui_settings_mcp_service_summary">Exponer herramientas de Zafiro a agentes externos mediante MCP</string>
     <string name="mcp_service_section_service">Servicio</string>
     <string name="mcp_service_section_connection">Conexión y seguridad</string>
     <string name="mcp_service_section_tools">Herramientas expuestas</string>
     <string name="mcp_service_enable_title">Habilitar servicio MCP</string>
-    <string name="mcp_service_enable_summary">Permitir que agentes externos accedan a las herramientas de Zafira mediante MCP</string>
+    <string name="mcp_service_enable_summary">Permitir que agentes externos accedan a las herramientas de Zafiro mediante MCP</string>
     <string name="mcp_service_status_title">Estado</string>
     <string name="mcp_service_status_running">En ejecución</string>
     <string name="mcp_service_status_stopped">Detenido</string>
@@ -575,7 +577,7 @@
     <!-- Text Actions -->
     <string name="text_actions_sheet_title">Seleccionar acción</string>
     <string name="text_actions_sheet_empty">No hay acciones configuradas. Añada una en Ajustes -> Acciones de texto.</string>
-    <string name="text_action_menu_label">Preguntar a Zafira</string>
+    <string name="text_action_menu_label">Preguntar a Zafiro</string>
     <string name="ui_settings_actions">Acciones de texto</string>
     <string name="ui_settings_actions_summary">Configurar acciones para el texto seleccionado</string>
     <string name="text_action_page_description">Las acciones se ejecutan sobre el texto seleccionado en otras apps.</string>
@@ -586,7 +588,7 @@
     <string name="text_action_field_name">Nombre</string>
     <string name="text_action_field_name_hint">Por ejemplo: Traducir</string>
     <string name="text_action_field_prompt">Prompt</string>
-    <string name="text_action_field_prompt_hint">Qué debe hacer Zafira con el texto seleccionado</string>
+    <string name="text_action_field_prompt_hint">Qué debe hacer Zafiro con el texto seleccionado</string>
     <string name="text_action_field_enabled">Habilitado</string>
     <string name="text_action_field_screenshot">Adjuntar captura de pantalla</string>
     <string name="text_action_field_screenshot_description">Capturar la pantalla y adjuntarla a la conversación</string>
@@ -601,4 +603,9 @@
     <string name="text_action_error_save_failed">Error al guardar la acción.</string>
     <string name="text_action_error_delete_failed">Error al eliminar la acción.</string>
     <string name="crash_startup_copied_toast">Traza de pila copiada. Envíala al desarrollador.</string>
+    <!-- Widget -->
+    <string name="widget_search_bar_title">Búsqueda rápida</string>
+    <string name="widget_search_hint">Preguntar a Zafira…</string>
+    <string name="widget_action_run_desc">Nuevo chat</string>
+    <string name="widget_search_bar_desc">Widget de búsqueda y acción rápida</string>
 </resources>

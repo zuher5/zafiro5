@@ -81,7 +81,9 @@ class MainActivity : AppCompatActivity() {
     private fun handleIncomingIntent(intent: Intent?) {
         val targetConversationId =
             intent?.getStringExtra(ApplicationService.EXTRA_TARGET_CONVERSATION_ID)
-        findService<ApplicationService>()?.handleNavigationIntent(targetConversationId)
+        val focusComposer =
+            intent?.getBooleanExtra(ApplicationService.EXTRA_FOCUS_COMPOSER, false) ?: false
+        findService<ApplicationService>()?.handleNavigationIntent(targetConversationId, focusComposer)
     }
 
     override fun onResume() {

@@ -70,6 +70,10 @@ class ApplicationServiceImpl(
     override val conversationSwitchRequests: Flow<String> =
         _conversationSwitchRequests.receiveAsFlow()
 
+    private val _focusComposerRequests = Channel<Unit>(Channel.CONFLATED)
+    override val focusComposerRequests: Flow<Unit> =
+        _focusComposerRequests.receiveAsFlow()
+
     @Volatile
     private var homeChatActive: Boolean = false
 
@@ -90,7 +94,7 @@ class ApplicationServiceImpl(
         application.startActivity(intent)
     }
 
-    override fun handleNavigationIntent(targetConversationId: String?) {
+    override fun handleNavigationIntent(targetConversationId: String?, focusComposer: Boolean) {
         if (!targetConversationId.isNullOrBlank()) {
             val isFore = getActivity() != null
             val shouldSwitch = homeChatActive || !isFore
@@ -103,6 +107,9 @@ class ApplicationServiceImpl(
                     "navigation intent: on secondary page, foregrounding without switching"
                 )
             }
+        }
+        if (focusComposer) {
+            _focusComposerRequests.trySend(Unit)
         }
     }
 

@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import com.niki914.zafiro.settings.model.RuntimeLlmConfig as LlmConfig
 
 /**
- * Zafira 的遗留 LLM 回合调度门面。
+ * Zafiro 的遗留 LLM 回合调度门面。
  *
  * 实体能力已全部下沉至可多实例化的 [AgentSessionEngine]。
  * 本门面仅代理默认实例，随 M10 演进逐步淘汰。

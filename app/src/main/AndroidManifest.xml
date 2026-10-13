@@ -122,6 +122,19 @@
             </intent-filter>
         </activity-alias>
 
+        <!-- Home Screen Search Widget -->
+        <receiver
+            android:name="com.niki914.zafiro.app.widget.ZafiraSearchWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_search_bar_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_search_bar_info" />
+        </receiver>
+
         <service
             android:name="com.niki914.zafiro.mod.feat.ZafiroAccessibilityService"
             android:exported="true"

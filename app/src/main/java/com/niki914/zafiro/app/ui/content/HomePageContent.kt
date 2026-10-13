@@ -297,6 +297,11 @@ fun HomePageContent(
     }
     LaunchedEffect(selectedConversationId) {
         val id = selectedConversationId?.takeIf { it.isNotBlank() } ?: return@LaunchedEffect
+        if (id == ApplicationService.CONVERSATION_ID_NEW) {
+            latestViewModel.sendIntent(HomeChatIntent.NewConversation)
+            latestOnConversationSelectionConsumed(id)
+            return@LaunchedEffect
+        }
         latestViewModel.sendIntent(HomeChatIntent.LoadConversation(id))
         latestOnConversationSelectionConsumed(id)
         TurnNotificationManager.cancelNotification(id)
@@ -459,6 +464,19 @@ fun HomePageContent(
                 }
             }
             composerAutoFocusDone = true
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        findService<ApplicationService>()?.focusComposerRequests?.collect {
+            repeat(AUTO_FOCUS_MAX_ATTEMPTS) {
+                delay(AUTO_FOCUS_RETRY_INTERVAL_MILLIS)
+                val focused = runCatching { composerFocusRequester.requestFocus() }.isSuccess
+                if (focused) {
+                    keyboardController?.show()
+                    return@repeat
+                }
+            }
         }
     }
 
