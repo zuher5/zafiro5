@@ -40,23 +40,23 @@ data class ProviderButtonTokens(
 )
 
 object ProviderSpecs {
-    val default: ProviderSpec = DeepSeekSpec
+    val default: ProviderSpec = OpenCodeFreeSpec
 
     val all: List<ProviderSpec> = listOf(
-        AnthropicSpec,
+        OpenCodeFreeSpec,
+        KiloFreeSpec,
+        OpenCodePIProxySpec,
         OpenAiSpec,
+        AnthropicSpec,
         OpenRouterSpec,
-        DeepSeekSpec,
         GoogleSpec,
+        DeepSeekSpec,
+        OpenCodeSpec,
+        CommandCodeSpec,
         KimiSpec,
         BailianSpec,
         SiliconFlowSpec,
         VolcengineCodingPlanSpec,
-        OpenCodeSpec,
-        CommandCodeSpec,
-        KiloFreeSpec,
-        OpenCodeFreeSpec,
-        OpenCodePIProxySpec,
     )
 
     fun find(providerId: String?): ProviderSpec {

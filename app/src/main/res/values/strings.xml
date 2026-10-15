@@ -607,4 +607,29 @@
     <string name="widget_search_hint">向 Zafira 提问…</string>
     <string name="widget_action_run_desc">新对话</string>
     <string name="widget_search_bar_desc">桌面搜索与快速操作微件</string>
+
+    <!-- Automation Command Center -->
+    <string name="automation_center_title">Automation Center</string>
+    <string name="automation_center_subtitle">Device control permissions and quick actions</string>
+    <string name="automation_health_title">System Permissions</string>
+    <string name="automation_perm_accessibility_title">Accessibility</string>
+    <string name="automation_perm_accessibility_desc">Inspect UI elements, click, and swipe</string>
+    <string name="automation_perm_overlay_title">Screen Overlay</string>
+    <string name="automation_perm_overlay_desc">Display pointer touch indicator and floating pill</string>
+    <string name="automation_perm_shell_title">Elevated Shell</string>
+    <string name="automation_perm_shell_desc">Execute privileged system commands via Shizuku or Root</string>
+    <string name="automation_status_active">Active</string>
+    <string name="automation_status_enable">Enable</string>
+    <string name="automation_status_ready">Ready</string>
+    <string name="automation_status_check">Check</string>
+    <string name="automation_actions_title">Quick Actions</string>
+    <string name="automation_action_screen_title">Inspect Screen</string>
+    <string name="automation_action_screen_desc">Capture display and describe current UI elements</string>
+    <string name="automation_action_screen_prompt">Inspect the current screen and describe what is visible.</string>
+    <string name="automation_action_search_title">Search Web</string>
+    <string name="automation_action_search_desc">Search the web with Tavily and summarize key facts</string>
+    <string name="automation_action_search_prompt">Search the web for the latest updates on </string>
+    <string name="automation_action_device_title">Device Automation</string>
+    <string name="automation_action_device_desc">Execute multi-step interactions across installed apps</string>
+    <string name="automation_action_device_prompt">Open the Settings app and check the battery status.</string>
 </resources>

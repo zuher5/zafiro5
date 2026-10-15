@@ -23,8 +23,8 @@ android {
         applicationId = "com.niki914.zafira"
         minSdk = 26
         targetSdk = 34
-        versionName = "1.7.0"
-        versionCode = 15
+        versionName = "1.8.0"
+        versionCode = 16
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {

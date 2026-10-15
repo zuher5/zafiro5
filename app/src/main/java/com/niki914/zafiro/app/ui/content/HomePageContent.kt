@@ -889,6 +889,20 @@ private fun HomePageContentBody(
                 bottom = bottomClearance,
             ),
         ) {
+            if (uiState.turns.isEmpty()) {
+                item(key = "automation_command_center") {
+                    AutomationCommandCenter(
+                        onSelectPrompt = { prompt ->
+                            onInputChange(prompt)
+                            composerFocusRequester.requestFocus()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, bottom = 16.dp),
+                    )
+                }
+            }
+
             itemsIndexed(
                 items = uiState.turns,
                 key = { _, turn -> turn.id },
