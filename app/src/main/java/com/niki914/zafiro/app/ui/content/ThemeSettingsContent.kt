@@ -219,9 +219,6 @@ fun ThemeSettingsContent(
                 },
                 isDarkTheme = isDarkTheme,
             )
-                },
-                isDarkTheme = isDarkTheme,
-            )
         },
         onAction = { action ->
             if (action is SettingsRowAction.Navigate) {

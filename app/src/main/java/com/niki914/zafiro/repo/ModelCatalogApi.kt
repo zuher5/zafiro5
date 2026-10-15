@@ -12,7 +12,6 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import com.niki914.zafiro.chat.OpenCodeFreeSupport
-import com.niki914.zafiro.settings.model.LlmProtocol
 import kotlinx.serialization.json.longOrNull
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
