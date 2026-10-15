@@ -104,10 +104,5 @@ private fun settingsSections(): List<SettingsSectionDefinition> {
 }
 
 private fun defaultHiddenSettingsGroups(): Set<ZafiroSettingsGroup> {
-    return setOf(
-        ZafiroSettingsGroup.Takeover,
-        ZafiroSettingsGroup.Mcp,
-        ZafiroSettingsGroup.McpService,
-        ZafiroSettingsGroup.Actions,
-    )
+    return emptySet()
 }

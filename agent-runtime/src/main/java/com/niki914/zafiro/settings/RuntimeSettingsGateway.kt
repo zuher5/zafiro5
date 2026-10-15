@@ -52,4 +52,10 @@ interface RuntimeSettingsGateway {
     ): RuntimeToolValidation?
 
     suspend fun listExecutionRules(): List<RuntimeExecutionRule>
+
+    /**
+     * 屏幕控制知情门是否自动放行。
+     * 默认 false = 保持每次询问；宿主路径不实现即维持原行为。
+     */
+    suspend fun isScreenControlAutoApproved(): Boolean = false
 }

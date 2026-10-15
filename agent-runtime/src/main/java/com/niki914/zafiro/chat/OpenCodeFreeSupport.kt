@@ -1,4 +1,4 @@
-﻿package com.niki914.zafiro.chat
+package com.niki914.zafiro.chat
 
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * Ported from pi-bansos: upstream gate requires real OpenCode client
  * headers and a request body matching the OpenCode tool fingerprint.
- * Missing any one ΓåÆ 403 FreeTierError.
+ * Missing any one → 403 FreeTierError.
  */
 object OpenCodeFreeSupport {
     private val random = SecureRandom()
@@ -34,7 +34,7 @@ object OpenCodeFreeSupport {
     private val projectId = randomHex(20)
     private val sessionId = generateSessionId().also { require(sessionRegex.matches(it)) }
 
-    // Live UA resolution ΓÇö offline-safe, never blocks.
+    // Live UA resolution — offline-safe, never blocks.
     // Precedence: env override > in-process live version > disk cache > pinned.
     // The gate has rejected stale UA versions before; auto-refresh keeps us off that cliff.
     private val uaClient = OkHttpClient.Builder()
@@ -67,7 +67,7 @@ object OpenCodeFreeSupport {
 
     fun transform(body: JsonObject): JsonObject {
         val mutable = body.toMutableMap()
-        // Gate: stream=false ΓåÆ 403 even with valid UA/session/tools.
+        // Gate: stream=false → 403 even with valid UA/session/tools.
         mutable["stream"] = JsonPrimitive(true)
         val model = (body["model"] as? JsonPrimitive)?.content.orEmpty()
         if (responsesModels.contains(model) || model.contains("muse-spark")) {
@@ -130,7 +130,7 @@ object OpenCodeFreeSupport {
                     }
                 }
             } catch (_: Exception) {
-                // offline / npm unreachable ΓÇö pinned fallback keeps working
+                // offline / npm unreachable — pinned fallback keeps working
             }
         }.apply { isDaemon = true }.start()
     }
@@ -194,7 +194,7 @@ object OpenCodeFreeSupport {
         ))
     }
 
-    // One stable session per process ΓÇö shape must match sessionRegex.
+    // One stable session per process — shape must match sessionRegex.
     private fun generateSessionId(timestamp: Long = System.currentTimeMillis()): String {
         val current = (timestamp shl 12) + 1
         return "ses_${timeHexFrom(current.inv())}${unstableRandom()}"

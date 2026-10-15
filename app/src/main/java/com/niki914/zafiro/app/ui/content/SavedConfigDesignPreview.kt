@@ -222,8 +222,8 @@ private fun ModelConfigRedesignPreview() {
                     onValueChange = {},
                     placeholder = "https://",
                     enabled = overrideEnabled,
-                    minLines = 3,
-                    maxLines = 6,
+                    minLines = 1,
+                    maxLines = 1,
                     expanded = endpointOpen,
                     onExpandedChange = { endpointOpen = it },
                 )
@@ -290,7 +290,7 @@ private fun ModelConfigRedesignPreview() {
                 SettingsGroupCard {
                     SettingExpandableTextItem(
                         title = "Prompt",
-                        value = "You are Zafiro, a helpful assistant.",
+                        value = "You are Zafira, a helpful assistant.",
                         onValueChange = {},
                         placeholder = "",
                         description = null,

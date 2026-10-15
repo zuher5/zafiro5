@@ -30,13 +30,15 @@
     <string name="ui_onboard_configure_error_load_failed">读取配置失败：%1$s</string>
     <string name="ui_onboard_configure_error_save_failed">保存配置失败：%1$s</string>
     <string name="ui_onboard_done_headline">大功告成。</string>
-    <string name="ui_onboard_done_description">配置已完成，你可以开始使用 Zafiro，或稍后在设置中继续调整。</string>
-    <string name="ui_onboard_done_enter_home">进入 Zafiro</string>
+    <string name="ui_onboard_done_description">设置完成。现在打开 Zafira，或稍后在设置里微调。</string>
+    <string name="ui_onboard_done_enter_home">进入 Zafira</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">新对话</string>
     <string name="ui_home_input_placeholder">输入消息...</string>
+    <string name="ui_home_empty_greeting">有什么我可以帮你？</string>
+    <string name="ui_home_tap_hint">提示：点击消息可复制、重新生成或分叉</string>
     <string name="ui_tool_status_called">已调用</string>
     <string name="ui_tool_status_running">执行中</string>
     <string name="ui_tool_status_success">成功</string>
@@ -135,7 +137,7 @@
 
     <!-- Settings Home Items -->
     <string name="ui_settings_model_config">模型配置</string>
-    <string name="ui_settings_model_config_summary">调整 Zafiro 的模型接入</string>
+    <string name="ui_settings_model_config_summary">调整 Zafira 的模型接入</string>
     <string name="ui_settings_memory">记忆</string>
     <string name="ui_settings_memory_summary">管理持久化的记忆与偏好</string>
     <string name="ui_settings_tools">工具</string>
@@ -162,7 +164,7 @@
     <string name="ui_settings_mcp">MCP</string>
     <string name="ui_settings_mcp_summary">接入外部 MCP 与工具</string>
     <string name="ui_settings_takeover">接管规则</string>
-    <string name="ui_settings_takeover_summary">设置哪些输入交给原生助手或 Zafiro</string>
+    <string name="ui_settings_takeover_summary">设置哪些输入交给原生助手或 Zafira</string>
     <string name="ui_settings_execution_rules">执行规则</string>
     <string name="ui_settings_execution_rules_summary">设置 Shell 的安全策略</string>
     <string name="ui_settings_storage">存储空间</string>
@@ -178,7 +180,7 @@
     <string name="ui_settings_about_feedback_bug">Bug 反馈</string>
     <string name="ui_settings_about_version">版本号</string>
 
-    <string name="ui_settings_storage_description">查看各类缓存占用的空间，点击某一项可清理。清理不会影响配置、记忆与对话记录。</string>
+    <string name="ui_settings_storage_description">各项缓存占用。点按即可清理；不会影响设置与对话。</string>
     <string name="ui_settings_storage_tool_output">工具输出缓存</string>
     <string name="ui_settings_storage_tool_output_summary">超长工具输出的截断导出</string>
     <string name="ui_settings_storage_image_cache">图片缓存</string>
@@ -217,7 +219,7 @@
     <string name="ui_settings_mcp_config">MCP 配置</string>
 
     <!-- Memory Module -->
-    <string name="memory_page_description">管理记忆，你可以通过左右滑动来删除、点击来编辑单条记忆。添加后，Agent 会记得这些内容，即使是新的对话。</string>
+    <string name="memory_page_description">Agent 在新对话中仍会记住的长期信息。左滑删除，点按编辑。</string>
     <string name="memory_page_empty_description">当前没有保存的记忆。点击右上方添加第一条记忆。</string>
     <string name="memory_loading">正在读取记忆...</string>
     <string name="memory_editor_title_create">新增记忆</string>
@@ -237,13 +239,13 @@
     <string name="memory_error_delete_failed">删除记忆失败：%1$s</string>
 
     <!-- Execution Rules Module -->
-    <string name="execution_rules_page_description">添加执行规则，以提高命令执行的安全性。除了脚本以外，应用所有的命令执行都会受策略管控。</string>
+    <string name="execution_rules_page_description">为 Shell 与工具执行设置安全规则。</string>
     <string name="execution_rules_empty_action_hint">点击右上方，添加第一条执行规则。</string>
     <string name="execution_rules_loading">正在读取执行规则…</string>
     <string name="execution_rules_editor_title_create">新增执行规则</string>
     <string name="execution_rules_delete_dialog_title">删除执行规则</string>
     <string name="execution_rules_delete_dialog_text">确定要删除执行规则「%1$s」吗？此操作不可撤销。</string>
-    <string name="execution_rules_editor_description">添加执行规则，以提高命令执行的安全性。除了脚本以外，应用所有的命令执行都会受策略管控。</string>
+    <string name="execution_rules_editor_description">规则会在 Shell 与工具命令执行前被检查。</string>
     <string name="execution_rules_field_name">策略名称</string>
     <string name="execution_rules_field_name_hint">例如：危险删改</string>
     <string name="execution_rules_field_enabled_mode">生效时机</string>
@@ -252,12 +254,12 @@
     <string name="execution_rules_enabled_mode_disabled">不生效</string>
     <string name="execution_rules_enabled_mode_confirm">询问我</string>
     <string name="tool_permission_dialog_title">AI 请求执行操作</string>
-    <string name="tool_permission_request_intro">Zafiro 的工具「%1$s」请求执行以下命令：</string>
+    <string name="tool_permission_request_intro">Zafira 的工具「%1$s」请求执行以下命令：</string>
     <string name="tool_permission_matched_rule">命中规则「%1$s」</string>
     <string name="tool_permission_allow">允许本次</string>
     <string name="tool_permission_deny">拒绝</string>
     <string name="screen_control_consent_title">屏幕控制权限申请</string>
-    <string name="screen_control_consent_body">Zafiro 需要以下权限才能控制屏幕：\n1. 无障碍服务：读取界面、执行点按\n2. 显示在其他应用上层：显示指针指示器\n\n接下来可能会弹出系统授权框或跳转到设置页。</string>
+    <string name="screen_control_consent_body">Zafira 需要无障碍与悬浮窗权限才能控制屏幕。接下来可能会弹出系统提示或跳转设置页。</string>
     <string name="screen_control_consent_agree">同意</string>
     <string name="screen_control_consent_deny">拒绝</string>
     <string name="execution_rules_field_patterns">规则</string>
@@ -273,13 +275,13 @@
     <string name="takeover_empty_action_hint">点击右上方，添加第一条接管规则。</string>
     <string name="takeover_loading">正在读取接管规则…</string>
     <string name="takeover_editor_title_create">新增接管规则</string>
-    <string name="takeover_editor_description">设置哪些问题交给原生助手，哪些继续交给 Zafiro。</string>
+    <string name="takeover_editor_description">设置哪些问题交给原生助手，哪些继续交给 Zafira。</string>
     <string name="takeover_field_name">规则名称</string>
     <string name="takeover_field_name_hint">例如：小布生活服务</string>
     <string name="takeover_field_enabled">启用规则</string>
     <string name="takeover_field_target">命中时让谁接管</string>
     <string name="takeover_target_native_assistant">原生助手</string>
-    <string name="takeover_target_zafiro">Zafiro</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">规则</string>
     <string name="takeover_field_patterns_hint">天气\n.*闹钟.*\n打开.*</string>
     <string name="takeover_field_patterns_description">每行输入一个关键字或正则表达式，命中任意一条时，使用上方的接管方式。</string>
@@ -346,7 +348,7 @@
     <string name="custom_py_tool_save_dialog_action_close">关闭</string>
     <string name="custom_py_tool_save_failed">保存失败：%1$s</string>
 
-    <string name="mcp_page_description">配置 MCP 的连接方式与鉴权信息。保存后，Zafiro 会在运行时自动发现可用工具。</string>
+    <string name="mcp_page_description">配置 MCP 的连接方式与鉴权信息。保存后，Zafira 会在运行时自动发现可用工具。</string>
     <string name="mcp_page_empty_description">点击右上方，添加你的第一个 MCP 服务器。</string>
     <string name="mcp_loading">正在读取已保存的 MCP 服务器…</string>
     <string name="mcp_editor_title_create">新增 MCP 服务器</string>
@@ -464,6 +466,8 @@
     <string name="ui_settings_general_retry_summary">请求失败后的自动重试</string>
     <string name="ui_settings_general_keep_screen_on">回答期间保持屏幕常亮</string>
     <string name="ui_settings_general_keep_screen_on_summary">回答与工具执行期间保持屏幕常亮</string>
+    <string name="ui_settings_general_screen_control_auto_approve">自动允许屏幕控制</string>
+    <string name="ui_settings_general_screen_control_auto_approve_summary">跳过 Agent 读取或点击屏幕前的确认。</string>
     <string name="ui_settings_general_always_show_message_actions">总是显示消息操作</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">语音助手独享一个会话</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">开启后语音助手对话不影响主界面历史；关闭则与主界面共用当前对话</string>
@@ -478,20 +482,21 @@
     <string name="ui_settings_configure_protocol_label">协议</string>
     <string name="ui_settings_configure_protocol_hint">切换协议后，请确认端点与协议匹配。</string>
     <string name="ui_settings_configure_thinking_label">思考强度</string>
-    <string name="ui_settings_configure_thinking_hint">留空（Provider Default）时使用 Provider 默认行为；过高时若 Provider 拒绝请自行调低。</string>
+    <string name="ui_settings_configure_thinking_hint">保持「Provider Default」，或在被服务商拒绝时调低。</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">例如：200000 或 200k</string>
-    <string name="ui_settings_configure_max_tokens_hint">单次请求最多输出多少 token。留空时优先使用云端值，否则用默认值；服务端报输出长度超限时调小。支持 k/m/b 后缀（如 128k）。</string>
+    <string name="ui_settings_configure_max_tokens_hint">单次请求的最大输出 token，支持 k/m/b 后缀。留空则使用服务商默认值。</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">请填写有效数值（支持 k/m/b 后缀），不小于 256</string>
     <string name="ui_settings_configure_context_window_label">上下文窗口</string>
     <string name="ui_settings_configure_context_window_placeholder">例如：1000000 或 1M</string>
-    <string name="ui_settings_configure_context_window_hint">该模型的上下文窗口大小，影响上下文用量的显示比例。留空时优先使用云端值，否则用默认值。</string>
+    <string name="ui_settings_configure_context_window_hint">模型上下文窗口，用于用量环。留空则使用服务商默认值。</string>
     <string name="ui_settings_configure_error_context_window_invalid">请填写有效数值（支持 k/m/b 后缀），不小于 1000</string>
 
     <string name="ui_theme_mode_system">跟随系统</string>
     <string name="ui_theme_mode_light">浅色</string>
     <string name="ui_theme_mode_dark">深色</string>
     <string name="ui_theme_color_dynamic">动态色（壁纸取色）</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">玫瑰粉</string>
     <string name="ui_theme_color_blossom">樱花粉</string>
     <string name="ui_theme_color_lavender">薰衣草紫</string>
@@ -602,34 +607,4 @@
     <string name="text_action_error_save_failed">保存动作失败。</string>
     <string name="text_action_error_delete_failed">删除动作失败。</string>
     <string name="crash_startup_copied_toast">堆栈信息已复制，请提交给开发者</string>
-    <!-- Widget -->
-    <string name="widget_search_bar_title">快捷搜索</string>
-    <string name="widget_search_hint">向 Zafira 提问…</string>
-    <string name="widget_action_run_desc">新对话</string>
-    <string name="widget_search_bar_desc">桌面搜索与快速操作微件</string>
-
-    <!-- Automation Command Center -->
-    <string name="automation_center_title">Automation Center</string>
-    <string name="automation_center_subtitle">Device control permissions and quick actions</string>
-    <string name="automation_health_title">System Permissions</string>
-    <string name="automation_perm_accessibility_title">Accessibility</string>
-    <string name="automation_perm_accessibility_desc">Inspect UI elements, click, and swipe</string>
-    <string name="automation_perm_overlay_title">Screen Overlay</string>
-    <string name="automation_perm_overlay_desc">Display pointer touch indicator and floating pill</string>
-    <string name="automation_perm_shell_title">Elevated Shell</string>
-    <string name="automation_perm_shell_desc">Execute privileged system commands via Shizuku or Root</string>
-    <string name="automation_status_active">Active</string>
-    <string name="automation_status_enable">Enable</string>
-    <string name="automation_status_ready">Ready</string>
-    <string name="automation_status_check">Check</string>
-    <string name="automation_actions_title">Quick Actions</string>
-    <string name="automation_action_screen_title">Inspect Screen</string>
-    <string name="automation_action_screen_desc">Capture display and describe current UI elements</string>
-    <string name="automation_action_screen_prompt">Inspect the current screen and describe what is visible.</string>
-    <string name="automation_action_search_title">Search Web</string>
-    <string name="automation_action_search_desc">Search the web with Tavily and summarize key facts</string>
-    <string name="automation_action_search_prompt">Search the web for the latest updates on </string>
-    <string name="automation_action_device_title">Device Automation</string>
-    <string name="automation_action_device_desc">Execute multi-step interactions across installed apps</string>
-    <string name="automation_action_device_prompt">Open the Settings app and check the battery status.</string>
 </resources>

@@ -81,10 +81,11 @@ fun LiquidTopBar(
     val buttonDuration = 280
     val titleDuration = 320
 
-    // 遮挡因子动画：当外部浮层（如右上角 Popover）展开时淡出，收起时淡入
+    // 遮挡因子动画：当外部浮层（如右上角 Popover）展开时淡出，收起时淡入。
+    // 必须早于 Popover 的 240ms 展开动画收尾，否则标题会与变实心的面板短暂重叠。
     val occludedAlpha by animateFloatAsState(
         targetValue = if (isOccluded) 0f else 1f,
-        animationSpec = tween(durationMillis = 200, easing = LinearOutSlowInEasing),
+        animationSpec = tween(durationMillis = 160, easing = LinearOutSlowInEasing),
         label = "topBarOccludedAlpha",
     )
 

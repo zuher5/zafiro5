@@ -103,6 +103,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -297,11 +298,6 @@ fun HomePageContent(
     }
     LaunchedEffect(selectedConversationId) {
         val id = selectedConversationId?.takeIf { it.isNotBlank() } ?: return@LaunchedEffect
-        if (id == ApplicationService.CONVERSATION_ID_NEW) {
-            latestViewModel.sendIntent(HomeChatIntent.NewConversation)
-            latestOnConversationSelectionConsumed(id)
-            return@LaunchedEffect
-        }
         latestViewModel.sendIntent(HomeChatIntent.LoadConversation(id))
         latestOnConversationSelectionConsumed(id)
         TurnNotificationManager.cancelNotification(id)
@@ -464,19 +460,6 @@ fun HomePageContent(
                 }
             }
             composerAutoFocusDone = true
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        findService<ApplicationService>()?.focusComposerRequests?.collect {
-            repeat(AUTO_FOCUS_MAX_ATTEMPTS) {
-                delay(AUTO_FOCUS_RETRY_INTERVAL_MILLIS)
-                val focused = runCatching { composerFocusRequester.requestFocus() }.isSuccess
-                if (focused) {
-                    keyboardController?.show()
-                    return@repeat
-                }
-            }
         }
     }
 
@@ -816,6 +799,18 @@ private fun HomePageContentBody(
     val bottomClearance = composerBottomPadding + composerHeight.value + composerGap
     val density = LocalDensity.current
 
+    // 可发现性提示（默认 OnTap 模式）：首个回合显示「点击消息执行操作」提示；
+    // 任何内容点击或发送后即消失，换会话后重新出现（remember 以会话 id 为键）。
+    var tapHintDismissed by remember(uiState.currentConversationId) { mutableStateOf(false) }
+    val handleContentTap: () -> Unit = {
+        onContentTap()
+        tapHintDismissed = true
+    }
+    val handleSend: () -> Unit = {
+        tapHintDismissed = true
+        onSendClick()
+    }
+
     // 附件入口：加号 → 选项单（Photos / Camera / File / Folder）。
     val context = LocalContext.current
     var attachSheetVisible by remember { mutableStateOf(false) }
@@ -880,7 +875,7 @@ private fun HomePageContentBody(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
-                    onClick = onContentTap,
+                    onClick = handleContentTap,
                 ),
             contentPadding = PaddingValues(
                 start = 20.dp,
@@ -889,20 +884,6 @@ private fun HomePageContentBody(
                 bottom = bottomClearance,
             ),
         ) {
-            if (uiState.turns.isEmpty()) {
-                item(key = "automation_command_center") {
-                    AutomationCommandCenter(
-                        onSelectPrompt = { prompt ->
-                            onInputChange(prompt)
-                            composerFocusRequester.requestFocus()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp, bottom = 16.dp),
-                    )
-                }
-            }
-
             itemsIndexed(
                 items = uiState.turns,
                 key = { _, turn -> turn.id },
@@ -928,7 +909,8 @@ private fun HomePageContentBody(
                     userGroupTailTurnId = tailTurn.id,
                     userGroupTappable = tailTurn.blocks.isNotEmpty() || tailIndex == uiState.turns.lastIndex,
                     userGroupText = userGroupText(uiState.turns, index),
-                    onContentTap = onContentTap,
+                    onContentTap = handleContentTap,
+                    showTapHint = index == 0 && !tapHintDismissed && actionsDisplay == MessageActionsDisplay.OnTap,
                     onReGenerate = onReGenerate,
                     onFork = onFork,
                     onRewind = onRewind,
@@ -978,7 +960,7 @@ private fun HomePageContentBody(
         LiquidChatComposer(
             value = uiState.input,
             onValueChange = onInputChange,
-            onSendClick = onSendClick,
+            onSendClick = handleSend,
             onStopClick = onStopClick,
             isGenerating = uiState.isGenerating,
             contextProgress = uiState.contextProgress,
@@ -1034,6 +1016,20 @@ private fun HomePageContentBody(
                     modifier = Modifier.size(18.dp),
                 )
             }
+        }
+
+        // 空态引导：无对话且未在加载时，覆盖消息区（不占列表项，首条消息到达即消失）。
+        if (uiState.turns.isEmpty() && !uiState.isLoadingConversation) {
+            HomeEmptyState(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .padding(
+                        start = 20.dp,
+                        end = 20.dp,
+                        bottom = bottomClearance * 0.5f,
+                    ),
+            )
         }
 
         if (uiState.isLoadingConversation) {
@@ -1252,6 +1248,7 @@ private fun HomeChatTurnItem(
     expandedActionSource: ActionSource?,
     activeThinkingKey: String? = null,
     onToggleActionRow: (Long, ActionSource) -> Unit,
+    showTapHint: Boolean = false,
     isGenerating: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -1300,6 +1297,19 @@ private fun HomeChatTurnItem(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(BlockSpacing),
     ) {
+        // 可发现性提示（首个回合顶部，OnTap 模式）：说明消息可点击执行操作，
+        // 任何内容点击或发送后由上层置位消失，换会话后重新出现
+        if (showTapHint) {
+            Text(
+                text = stringResource(R.string.ui_home_tap_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = BlockSpacing),
+            )
+        }
         // 附件行：图片与文件同一行（同尺寸同形状），镜像 UserMessageBubble 的
         // 对齐方式——BoxWithConstraints 右对齐，Row 贴内容宽、max 同 bubble（0.82f）；
         // 外层与卡片同圆角 clip——边缘卡被裁时仍呈圆角。多附件时初始 scroll=0 优先展示左边的，整行靠右。

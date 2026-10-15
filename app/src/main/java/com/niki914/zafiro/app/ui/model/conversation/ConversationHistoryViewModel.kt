@@ -233,10 +233,13 @@ class ConversationHistoryViewModel internal constructor(
 
     private suspend fun delete(id: String) {
         updateState { copy(deleteErrorMessage = null) }
+        // 删库不依赖 effect 送达：活动会话同样在这里落库。原来只发 effect 就 return，
+        // 一旦 effect 随 collector 一起没了（页面未组合/已销毁），整条删除静默消失且不重载，
+        // 表现为「最顶上那条怎么都删不掉，重开应用才恢复」。
+        // effect 降级为对宿主的通知（agent 丢弃会话），丢了不影响列表正确性。
         runCatching { dependencies.destroyAgent(id) }
         if (id == currentState.activeConversationId) {
             sendEffect(ConversationHistoryEffect.DeleteActiveConversation(id))
-            return
         }
         runCatching { dependencies.deleteConversation(id) }.fold(
             onSuccess = { afterDelete(id) },

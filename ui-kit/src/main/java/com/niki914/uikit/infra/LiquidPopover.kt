@@ -346,11 +346,14 @@ internal fun LiquidPopoverSurface(
                 val contentAlpha =
                     if (progress > 0.25f) ((progress - 0.25f) / 0.75f).coerceIn(0f, 1f) else 0f
 
-                // 默认颜色与 ActionBarButton 保持 100% 一致（透明白/灰色），支持自定义传入
-                val resolvedSurfaceColor = containerColor ?: (
+                // 折叠态与 ActionBarButton 同色（磨砂半透明），展开态实心盖住后方内容。
+                // 两层：底层 surface 不透明度随 progress 升到 1（消除透光导致的明暗斑块），
+                // 上层保留磨砂 tint 以维持与按钮同源的观感。
+                val frostColor = containerColor ?: (
                         if (isDarkTheme) Color(0xFFAFAFAF).copy(alpha = 0.15f)
                         else Color.White.copy(alpha = 0.22f)
                         )
+                val opaqueBase = MaterialTheme.colorScheme.surface
 
                 Box(
                     modifier = Modifier
@@ -387,7 +390,8 @@ internal fun LiquidPopoverSurface(
                                 )
                             },
                             onDrawSurface = {
-                                drawRect(resolvedSurfaceColor)
+                                drawRect(opaqueBase.copy(alpha = progress))
+                                drawRect(frostColor)
                             },
                         )
                         .clip(panelShape)

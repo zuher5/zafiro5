@@ -164,4 +164,7 @@ class XRepoRuntimeGateway(
     override suspend fun listExecutionRules(): List<RuntimeExecutionRule> {
         return repo.executionRules.list()
     }
+
+    override suspend fun isScreenControlAutoApproved(): Boolean =
+        repo.screenControlAutoApproved()
 }

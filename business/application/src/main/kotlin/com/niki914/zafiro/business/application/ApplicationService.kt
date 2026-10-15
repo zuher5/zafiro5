@@ -70,19 +70,13 @@ interface ApplicationService {
     /**
      * 处理进入应用时的导航意图（由 MainActivity onCreate / onNewIntent 统一调用）。
      */
-    fun handleNavigationIntent(targetConversationId: String?, focusComposer: Boolean = false) {}
+    fun handleNavigationIntent(targetConversationId: String?) {}
 
     /**
      * 观察会话切换请求（仅当在主对话页触发时发射）。HomePage / ZafiroApp 监听此 flow 执行切会话。
      * 每个元素只投递给一个收集者一次；Activity 重建不会收到已消费的旧目标。
      */
     val conversationSwitchRequests: kotlinx.coroutines.flow.Flow<String>
-        get() = kotlinx.coroutines.flow.emptyFlow()
-
-    /**
-     * 观察输入框抢焦点请求（Widget 快速搜索等场景拉起时发射）。
-     */
-    val focusComposerRequests: kotlinx.coroutines.flow.Flow<Unit>
         get() = kotlinx.coroutines.flow.emptyFlow()
 
     /** 装配方法（仅 MainActivity 调）：预注册的 launcher 在 STARTED 前装进来。 */
@@ -93,7 +87,5 @@ interface ApplicationService {
 
     companion object {
         const val EXTRA_TARGET_CONVERSATION_ID = "com.niki914.zafiro.extra.TARGET_CONVERSATION_ID"
-        const val EXTRA_FOCUS_COMPOSER = "com.niki914.zafiro.extra.FOCUS_COMPOSER"
-        const val CONVERSATION_ID_NEW = "__new__"
     }
 }

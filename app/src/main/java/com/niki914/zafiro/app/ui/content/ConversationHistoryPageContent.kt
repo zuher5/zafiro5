@@ -34,9 +34,14 @@ import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,8 +54,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -132,6 +139,12 @@ internal fun ConversationHistoryPageContent(
             onConversationToggleSelection = onConversationToggleSelection,
             onConversationLongClick = { conversation ->
                 sheetConversation = conversation
+            },
+            onConversationSwipeRename = { conversation ->
+                renamingConversation = conversation
+            },
+            onConversationSwipeDelete = { conversation ->
+                deleteConfirmation = conversation
             },
             modifier = modifier,
         )
@@ -261,6 +274,7 @@ internal fun ConversationHistoryPageContent(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ConversationHistoryListContent(
     conversations: List<ConversationSummary>,
@@ -273,6 +287,8 @@ private fun ConversationHistoryListContent(
     onConversationClick: (String) -> Unit,
     onConversationToggleSelection: (String) -> Unit,
     onConversationLongClick: (ConversationSummary) -> Unit,
+    onConversationSwipeRename: (ConversationSummary) -> Unit,
+    onConversationSwipeDelete: (ConversationSummary) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val deleteErrorPrefix = deleteErrorMessage?.let {
@@ -320,7 +336,7 @@ private fun ConversationHistoryListContent(
             end = 16.dp,
             bottom = liquidScreenBottomPadding(),
         ),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         sections.forEach { section ->
             val expanded = section.bucket !in collapsedBuckets
@@ -355,10 +371,40 @@ private fun ConversationHistoryListContent(
                     ) {
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             section.conversations.forEach { conversation ->
+                                // key：删除后列表按 updated_at 重排，同一位置的会话会换人。
+                                // 不加 key 时 dismissState 按位置复用，半滑未归位的状态
+                                // 会被另一条会话继承，看起来就是那条再也滑不动。
                                 key(conversation.id) {
+                                val dismissState = rememberSwipeToDismissBoxState(
+                                    confirmValueChange = { targetValue ->
+                                        when (targetValue) {
+                                            SwipeToDismissBoxValue.StartToEnd -> {
+                                                onConversationSwipeRename(conversation)
+                                                false
+                                            }
+                                            SwipeToDismissBoxValue.EndToStart -> {
+                                                onConversationSwipeDelete(conversation)
+                                                false
+                                            }
+                                            // Settled 必须回 true 放行 snap-back，
+                                            // 返回 false 会否决回弹，行卡在半滑状态。
+                                            SwipeToDismissBoxValue.Settled -> true
+                                        }
+                                    }
+                                )
+
+                                SwipeToDismissBox(
+                                    state = dismissState,
+                                    enableDismissFromStartToEnd = !selecting,
+                                    enableDismissFromEndToStart = !selecting,
+                                    backgroundContent = {
+                                        SwipeBackground(dismissState = dismissState)
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
                                     ConversationHistoryItem(
                                         conversation = conversation,
                                         isPinned = conversation.id in pinnedIds,
@@ -385,6 +431,7 @@ private fun ConversationHistoryListContent(
                                         modifier = Modifier.fillMaxWidth(),
                                     )
                                 }
+                                }
                             }
                         }
                     }
@@ -396,6 +443,48 @@ private fun ConversationHistoryListContent(
             item {
                 ConversationHistoryInlineErrorText(error = deleteErrorPrefix)
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeBackground(
+    dismissState: SwipeToDismissBoxState,
+    modifier: Modifier = Modifier,
+) {
+    val direction = dismissState.dismissDirection
+    val alignment = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+        SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+        SwipeToDismissBoxValue.Settled -> Alignment.Center
+    }
+    val icon = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Edit
+        SwipeToDismissBoxValue.EndToStart -> Icons.Default.Delete
+        SwipeToDismissBoxValue.Settled -> null
+    }
+    val tint = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
+        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error
+        SwipeToDismissBoxValue.Settled -> Color.Transparent
+    }
+    val cardShape = remember { G2CardShape(28.dp) }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .clip(cardShape)
+            .background(tint.copy(alpha = 0.16f))
+            .padding(horizontal = 20.dp),
+        contentAlignment = alignment,
+    ) {
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = tint,
+            )
         }
     }
 }
@@ -452,7 +541,7 @@ private fun ConversationHistoryItem(
         transitionPulseKey ?: if (initialPulsed) "initial_${conversation.id}" else null
     }
 
-    val cardShape = remember { G2CardShape(20.dp) }
+    val cardShape = remember { G2CardShape(28.dp) }
     // 选中态 = 描边 + 0.98 微缩，与 bukit 的 item 多选同构；置顶段的底色不动，靠描边区分选中。
     val selectionProgress by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
@@ -468,10 +557,10 @@ private fun ConversationHistoryItem(
         label = "conversationItemSelectionScale",
         visibilityThreshold = 0.0001f,
     )
-    val pinnedBackground = if (inPinnedSection) {
-        Modifier.background(MaterialTheme.colorScheme.secondaryContainer, cardShape)
+    val containerColor = if (inPinnedSection) {
+        MaterialTheme.colorScheme.secondaryContainer
     } else {
-        Modifier
+        MaterialTheme.colorScheme.surfaceContainer
     }
     val selectionBorder = if (selectionProgress > 0f) {
         Modifier.border(
@@ -491,8 +580,15 @@ private fun ConversationHistoryItem(
                 scaleX = selectionScale
                 scaleY = selectionScale
             }
+            .shadow(
+                elevation = 2.dp,
+                shape = cardShape,
+                clip = false,
+                ambientColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                spotColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+            )
             .clip(cardShape)
-            .then(pinnedBackground)
+            .background(containerColor, cardShape)
             .then(selectionBorder),
     ) {
         SettingsItemSurface(
@@ -501,13 +597,13 @@ private fun ConversationHistoryItem(
             shape = cardShape,
             highlightPulseKey = pulseKey,
             highlightPulseDurationMillis = 500,
-            minHeight = 0.dp,
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+            minHeight = 64.dp,
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.Center,
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -516,11 +612,14 @@ private fun ConversationHistoryItem(
                 ) {
                     Text(
                         text = displayTitle,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 16.5.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
                         color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false),
+                        modifier = Modifier.weight(1f),
                     )
                     val timeColor = MaterialTheme.colorScheme.tertiary
                     val showRunIndicator = runState != ConversationRunState.Idle
@@ -583,11 +682,13 @@ private fun ConversationHistoryItem(
                 if (conversation.lastMessagePreview.isNotBlank()) {
                     Text(
                         text = conversation.lastMessagePreview,
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.5.sp),
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.5.sp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp),
                     )
                 }
             }

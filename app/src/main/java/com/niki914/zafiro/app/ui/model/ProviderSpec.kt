@@ -42,6 +42,7 @@ data class ProviderButtonTokens(
 object ProviderSpecs {
     val default: ProviderSpec = OpenCodeFreeSpec
 
+    // 免费档排在最前：这是 fork 存在的理由，付费档退到后面。
     val all: List<ProviderSpec> = listOf(
         OpenCodeFreeSpec,
         KiloFreeSpec,

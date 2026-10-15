@@ -95,6 +95,7 @@ object XRepo {
         residentNotificationEnabledField.flow.value = false
         turnNotificationEnabledField.flow.value = false
         floatingBallAutoExpandField.flow.value = true
+        screenControlAutoApprovedField.flow.value = false
         mcpService.resetForTest()
         llmConfigs.resetForTest()
     }
@@ -481,6 +482,23 @@ object XRepo {
     suspend fun setMarkdownScale(value: Float) = markdownScaleField.set(value)
 
     /**
+     * 屏幕控制知情门自动放行开关的进程内热更新通道。
+     * AccessibilityController 在 ensureService 里经 gateway 读，默认 false = 保持每次询问。
+     */
+    private val screenControlAutoApprovedField = ReactiveAppStateField(
+        default = false,
+        select = { screenControlAutoApproved },
+        update = { copy(screenControlAutoApproved = it) },
+    )
+    val screenControlAutoApprovedSetting: MutableStateFlow<Boolean>
+        get() = screenControlAutoApprovedField.flow
+
+    suspend fun screenControlAutoApproved(): Boolean = screenControlAutoApprovedField.get()
+
+    suspend fun setScreenControlAutoApproved(value: Boolean) =
+        screenControlAutoApprovedField.set(value)
+
+    /**
      * 回填型设置 flow 的统一冷启动回填：flow 初值是猜的默认值，必须有人调一次
      * 读盘才能对齐真值。MainActivity.onCreate 同步调用。
      * 响应式字段构造时已自注册到 hydrateSteps，新增无需手动登记。
@@ -534,7 +552,7 @@ object XRepo {
     }
 
     private val SCHEMA_WEB_SEARCH =
-        """{"type":"object","properties":{"query":{"type":"string"},"engine":{"type":"string","enum":["all","baidu","sogou","ddg"],"description":"search engine; \"all\" (default) merges Baidu + Sogou + DuckDuckGo"},"max_results":{"type":"integer","description":"default: 8"}},"required":["query"]}"""
+        """{"type":"object","properties":{"query":{"type":"string"},"engine":{"type":"string","description":"default: 'auto' (Tavily -> DDG -> Sogou fallback), or 'tavily', 'sogou', 'ddg', 'all'"},"max_results":{"type":"integer","description":"default: 8"}},"required":["query"]}"""
 
     // Seed custom py tools 全量列表：新增 seed 时在此追加，
     // seedPyTools() 每次启动补齐缺失，老用户升级后自动获得新工具。
@@ -550,7 +568,7 @@ object XRepo {
     // Seed custom py tools: code lives in res/raw，此处只负责组装。
     private fun seedWebSearchTool(context: Context) = CustomPyTool(
         name = "py_web_search",
-        description = "Search the web (default: multi-engine merge of Baidu + Sogou + DuckDuckGo; or engine=baidu/sogou/ddg). Returns a list of {title, url, snippet}.",
+        description = "Search the web via Tavily AI, DuckDuckGo, or Sogou. Returns a list of {title, url, snippet}. Reports an error object when search is unreachable or yields nothing.",
         schemaJson = SCHEMA_WEB_SEARCH,
         code = readRawResource(context, R.raw.seed_py_web_search),
     )

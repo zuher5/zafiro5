@@ -51,6 +51,7 @@ private const val LANGUAGE_TAG_ZH_TW = "zh-TW"
 private const val LANGUAGE_TAG_EN = "en"
 private const val LANGUAGE_TAG_ES = "es"
 private const val LANGUAGE_TAG_JA = "ja"
+private const val LANGUAGE_TAG_ID = "id"
 private const val LANGUAGE_TAG_RU = "ru"
 
 /** 主题预设种子色（ARGB），顺序与 [ThemeColorLabelRes] 一一对应。 */
@@ -94,6 +95,7 @@ private fun languageOptions(): List<LanguageOption> {
         LanguageOption(tag = LANGUAGE_TAG_EN, label = "English"),
         LanguageOption(tag = LANGUAGE_TAG_ES, label = "Español"),
         LanguageOption(tag = LANGUAGE_TAG_JA, label = "日本語"),
+        LanguageOption(tag = LANGUAGE_TAG_ID, label = "Bahasa Indonesia"),
         LanguageOption(tag = LANGUAGE_TAG_RU, label = "Русский"),
     )
 }
@@ -189,9 +191,18 @@ fun ThemeSettingsContent(
                         SelectionOption(
                             id = "dynamic",
                             title = stringResource(R.string.ui_theme_color_dynamic),
-                            selected = prefs.seedColor == null,
+                            selected = !prefs.isCatppuccin && prefs.seedColor == null,
                             onClick = { scope.launch { ThemeController.setSeedColor(null) } },
                             leadingIconVector = Icons.Rounded.Palette,
+                        )
+                    )
+                    add(
+                        SelectionOption(
+                            id = "catppuccin",
+                            title = stringResource(R.string.ui_theme_color_catppuccin),
+                            leadingSwatchColor = Color(0xFFCBA6F7),
+                            selected = prefs.isCatppuccin,
+                            onClick = { scope.launch { ThemeController.setCatppuccin() } },
                         )
                     )
                     ThemeSeedColors.forEachIndexed { index, argb ->
@@ -200,11 +211,14 @@ fun ThemeSettingsContent(
                                 id = "seed-$argb",
                                 title = stringResource(ThemeColorLabelRes[index]),
                                 leadingSwatchColor = Color(argb),
-                                selected = prefs.seedColor == argb,
+                                selected = !prefs.isCatppuccin && prefs.seedColor == argb,
                                 onClick = { scope.launch { ThemeController.setSeedColor(argb) } },
                             )
                         )
                     }
+                },
+                isDarkTheme = isDarkTheme,
+            )
                 },
                 isDarkTheme = isDarkTheme,
             )

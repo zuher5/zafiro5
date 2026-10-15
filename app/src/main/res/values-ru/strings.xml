@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Zafira</string>
+    <string name="app_name">Zafiro</string>
     <string name="xposed_desc">Подключите свою модель к голосовому помощнику\n\nСейчас поддерживаются:\n\n- ColorOS Breeno\n- HyperOS XiaoAi</string>
     <string name="ui_onboard_startup_demo_button">Начать</string>
     <string name="ui_onboard_provider_pick_title">Выберите провайдера</string>
@@ -27,7 +27,7 @@
     <string name="ui_onboard_configure_error_load_failed">Не удалось загрузить настройки: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Не удалось сохранить настройки: %1$s</string>
     <string name="ui_onboard_done_headline">Всё готово.</string>
-    <string name="ui_onboard_done_description">Настройка завершена. Можно начинать работать с Zafiro или донастроить его позже в настройках.</string>
+    <string name="ui_onboard_done_description">Настройка завершена. Откройте Zafira сейчас или доработайте позже в настройках.</string>
     <string name="ui_onboard_done_enter_home">Открыть Zafiro</string>
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">Новый диалог</string>
@@ -169,7 +169,7 @@
     <string name="ui_settings_about_feedback_feature">Пожелания</string>
     <string name="ui_settings_about_feedback_bug">Сообщения об ошибках</string>
     <string name="ui_settings_about_version">Версия</string>
-    <string name="ui_settings_storage_description">Показывает, сколько места занимает каждый кеш. Нажмите на пункт, чтобы очистить. Очистка не затрагивает настройки, память и диалоги.</string>
+    <string name="ui_settings_storage_description">Размер каждого кэша. Нажмите, чтобы очистить; настройки и переписки не затрагиваются.</string>
     <string name="ui_settings_storage_tool_output">Кеш вывода инструментов</string>
     <string name="ui_settings_storage_tool_output_summary">Сохранённый полный вывод обрезанных результатов инструментов</string>
     <string name="ui_settings_storage_image_cache">Кеш изображений</string>
@@ -202,7 +202,7 @@
     <string name="ui_settings_configure_error_name_duplicate">Такое название уже есть. Укажите другое.</string>
     <string name="ui_settings_configure_error_proxy_invalid">Адрес прокси не является корректным URI</string>
     <string name="ui_settings_mcp_config">Настройка MCP</string>
-    <string name="memory_page_description">Сохранённые факты. Смахните влево или вправо, чтобы удалить, либо нажмите на запись, чтобы изменить. После добавления агент будет помнить это даже в новых диалогах.</string>
+    <string name="memory_page_description">Данные, которые агент помнит в новых переписках. Смахните, чтобы удалить, нажмите, чтобы изменить.</string>
     <string name="memory_page_empty_description">Пока ничего не сохранено. Нажмите на значок справа сверху, чтобы добавить первую запись.</string>
     <string name="memory_loading">Загрузка памяти…</string>
     <string name="memory_editor_title_create">Новая запись</string>
@@ -220,13 +220,13 @@
     <string name="memory_error_load_failed">Не удалось загрузить память: %1$s</string>
     <string name="memory_error_save_failed">Не удалось сохранить запись: %1$s</string>
     <string name="memory_error_delete_failed">Не удалось удалить запись: %1$s</string>
-    <string name="execution_rules_page_description">Правила выполнения команд Shell и инструментов. Пока эта страница предоставляет только интерфейс и не подключена к реальному перехвату.</string>
+    <string name="execution_rules_page_description">Задайте правила безопасности для выполнения Shell и инструментов.</string>
     <string name="execution_rules_empty_action_hint">Нажмите на значок справа сверху, чтобы добавить первое черновое правило.</string>
     <string name="execution_rules_loading">Загрузка правил выполнения…</string>
     <string name="execution_rules_editor_title_create">Новое правило выполнения</string>
     <string name="execution_rules_delete_dialog_title">Удалить правило выполнения</string>
     <string name="execution_rules_delete_dialog_text">Удалить правило выполнения «%1$s»? Действие необратимо.</string>
-    <string name="execution_rules_editor_description">Правила выполнения команд Shell и инструментов. Пока редактор позволяет управлять черновиками правил в интерфейсе и не подключён к реальному перехвату.</string>
+    <string name="execution_rules_editor_description">Правила проверяются перед выполнением команд Shell и инструментов.</string>
     <string name="execution_rules_field_name">Название правила</string>
     <string name="execution_rules_field_name_hint">Например: Опасные команды удаления</string>
     <string name="execution_rules_field_enabled_mode">Когда действует</string>
@@ -240,7 +240,7 @@
     <string name="tool_permission_allow">Разрешить один раз</string>
     <string name="tool_permission_deny">Запретить</string>
     <string name="screen_control_consent_title">Запрос разрешения на управление экраном</string>
-    <string name="screen_control_consent_body">Для управления экраном Zafiro нужны разрешения:\n1. Служба специальных возможностей: чтение интерфейса и нажатия\n2. Показ поверх других приложений: указатель на экране\n\nСледующим шагом появится системный запрос или страница настроек.</string>
+    <string name="screen_control_consent_body">Zafira нужен доступ к специальным возможностям и отображение поверх других приложений, чтобы управлять экраном. Далее может появиться системный запрос или страница настроек.</string>
     <string name="screen_control_consent_agree">Согласен</string>
     <string name="screen_control_consent_deny">Запретить</string>
     <string name="execution_rules_field_patterns">Шаблоны</string>
@@ -437,14 +437,14 @@
     <string name="ui_settings_configure_endpoint_mismatch_cancel_save">Сохранить как есть</string>
     <string name="ui_settings_configure_protocol_hint">После смены протокола проверьте, что адрес соответствует протоколу.</string>
     <string name="ui_settings_configure_thinking_label">Уровень размышлений</string>
-    <string name="ui_settings_configure_thinking_hint">Оставьте «Как у провайдера», чтобы использовать его поведение по умолчанию; понизьте уровень, если провайдер отклоняет высокий.</string>
+    <string name="ui_settings_configure_thinking_hint">Оставьте Provider Default или снизьте значение, если провайдер отклоняет высокий уровень.</string>
     <string name="ui_settings_configure_max_tokens_label">Максимум токенов</string>
     <string name="ui_settings_configure_max_tokens_placeholder">Например: 200000 или 200k</string>
-    <string name="ui_settings_configure_max_tokens_hint">Максимальное число токенов в одном ответе. Если оставить пустым, используется значение из облака (если доступно) или значение по умолчанию; уменьшите, если сервер сообщает о превышении лимита. Поддерживаются суффиксы k/m/b (например, 128k).</string>
+    <string name="ui_settings_configure_max_tokens_hint">Максимум выходных токенов за запрос. Поддерживает суффиксы k/m/b. Оставьте пустым, чтобы взять значение провайдера.</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">Введите корректное число (поддерживаются суффиксы k/m/b) не меньше 256</string>
     <string name="ui_settings_configure_context_window_label">Контекстное окно</string>
     <string name="ui_settings_configure_context_window_placeholder">Например: 1000000 или 1M</string>
-    <string name="ui_settings_configure_context_window_hint">Размер контекстного окна модели; используется для индикатора использования контекста. Если оставить пустым, используется значение из облака (если доступно) или значение по умолчанию.</string>
+    <string name="ui_settings_configure_context_window_hint">Окно контекста модели для кольца заполнения. Оставьте пустым, чтобы взять значение провайдера.</string>
     <string name="ui_settings_configure_error_context_window_invalid">Введите корректное число (поддерживаются суффиксы k/m/b) не меньше 1000</string>
     <string name="ui_theme_mode_system">Как в системе</string>
     <string name="ui_theme_mode_light">Светлая</string>
@@ -556,9 +556,9 @@
     <string name="text_action_error_save_failed">Не удалось сохранить действие.</string>
     <string name="text_action_error_delete_failed">Не удалось удалить действие.</string>
     <string name="crash_startup_copied_toast">Трассировка стека скопирована. Отправьте её разработчику.</string>
-    <!-- Widget -->
-    <string name="widget_search_bar_title">Быстрый поиск</string>
-    <string name="widget_search_hint">Спросить у Zafira…</string>
-    <string name="widget_action_run_desc">Новый чат</string>
-    <string name="widget_search_bar_desc">Виджет поиска и быстрых действий</string>
+    <string name="ui_home_empty_greeting">Чем я могу помочь?</string>
+    <string name="ui_home_tap_hint">Совет: нажмите на сообщение, чтобы скопировать, сгенерировать заново или разветвить</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
+    <string name="ui_settings_general_screen_control_auto_approve">Автоматически разрешать управление экраном</string>
+    <string name="ui_settings_general_screen_control_auto_approve_summary">Пропускать подтверждение перед чтением экрана и касаниями агента.</string>
 </resources>

@@ -22,6 +22,7 @@ import com.niki914.zafiro.business.permission.Permission
 import com.niki914.zafiro.business.permission.PermissionManager
 import com.niki914.zafiro.business.permission.PermissionResult
 import com.niki914.zafiro.business.permission.PermissionState
+import com.niki914.zafiro.settings.RuntimeEnvironment
 import com.niki914.zafiro.chat.agentic.accessibility.AccessibilityController.currentVersion
 import com.niki914.zafiro.chat.agentic.accessibility.AccessibilityController.ensureAccessibility
 import com.niki914.zafiro.chat.agentic.accessibility.AccessibilityController.ensureService
@@ -101,6 +102,19 @@ object AccessibilityController {
     private var shellIdentity: ShellIdentity = ShellIdentity.NONE
 
     private val permissions: PermissionManager get() = requireService()
+
+    /**
+     * 屏幕控制知情门是否自动放行（设置项，默认关）。
+     * 读不到就按「不放行」处理：宁可多问一次，也不能在拿不到设置时静默放权。
+     * 取消是协程控制流，不能被降级成「不放行」，否则回合中断会被当成拒绝。
+     */
+    private suspend fun isScreenControlAutoApproved(): Boolean = try {
+        RuntimeEnvironment.awaitSettingsGateway().isScreenControlAutoApproved()
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (_: Throwable) {
+        false
+    }
 
     private enum class ShellIdentity { ROOT, SHIZUKU, USER, NONE }
 
@@ -211,7 +225,7 @@ object AccessibilityController {
         // 后台弹不了窗 → 直接拒绝；拒绝不记忆，下次申请会再弹。
         val needsAccess = permissions.status(Permission.ACCESSIBILITY) != PermissionState.GRANTED
         val needsOverlay = permissions.status(Permission.OVERLAY) != PermissionState.GRANTED
-        if (needsAccess || needsOverlay) {
+        if ((needsAccess || needsOverlay) && !isScreenControlAutoApproved()) {
             val agentControl = runCatching { requireService<AgentControl>() }.getOrNull()
             val decision = agentControl?.decideApproval(ApprovalRequest.ScreenControlConsent)
                 ?: ApprovalDecision.Deny
@@ -238,9 +252,9 @@ object AccessibilityController {
             }
             return Result.failure(
                 RuntimeException(
-                    "Zafiro cannot fully control this device because required permissions were not granted. " +
+                    "Zafira cannot fully control this device because required permissions were not granted. " +
                             "Failed: ${failures.joinToString("; ")}. " +
-                            "Tell the user to open Settings, enable 'Zafiro' under Accessibility, " +
+                            "Tell the user to open Settings, enable 'Zafira' under Accessibility, " +
                             "and allow 'Display over other apps'."
                 )
             )
@@ -265,8 +279,8 @@ object AccessibilityController {
         if (!ensureOne(Permission.ACCESSIBILITY, failures)) {
             return Result.failure(
                 RuntimeException(
-                    "The Zafiro accessibility service is not available (${failures.joinToString("; ")}). " +
-                            "Tell the user to enable 'Zafiro' in Settings > Accessibility, then retry."
+                    "The Zafira accessibility service is not available (${failures.joinToString("; ")}). " +
+                            "Tell the user to enable 'Zafira' in Settings > Accessibility, then retry."
                 )
             )
         }

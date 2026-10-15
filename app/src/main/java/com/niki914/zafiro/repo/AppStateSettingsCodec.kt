@@ -56,6 +56,9 @@ internal data class AppStateSettings(
     /** 悬浮球在回合结束/审批到达时是否自动展开。 */
     @SerialName("floating_ball_auto_expand")
     val floatingBallAutoExpand: Boolean = true,
+    /** 屏幕控制知情门是否自动放行；默认关（每次询问）。 */
+    @SerialName("screen_control_auto_approved")
+    val screenControlAutoApproved: Boolean = false,
     /** 已经向用户弹过更新提示的远端版本号；空串 = 从未弹过。同一版本只提示一次。 */
     @SerialName("last_notified_update_version")
     val lastNotifiedUpdateVersion: String = "",

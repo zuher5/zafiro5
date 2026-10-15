@@ -16,6 +16,7 @@ import com.niki914.zafiro.app.R
 import com.niki914.zafiro.app.ui.PageBackHandler
 import com.niki914.zafiro.app.ui.PageChromeContribution
 import com.niki914.zafiro.app.ui.PageChromeMenuItem
+import kotlinx.coroutines.CancellationException
 import com.niki914.zafiro.app.ui.RegisterPageChrome
 import com.niki914.zafiro.app.ui.content.ConversationHistoryPageContent
 import com.niki914.zafiro.app.ui.model.conversation.ConversationHistoryEffect
@@ -59,21 +60,23 @@ internal fun ConversationHistoryPageRoute(
                 is ConversationHistoryEffect.OpenConversation ->
                     latestOnConversationSelected(effect.id)
 
-                // 活动会话的删除由宿主（ZafiroApp）执行，完成后回报结果，再走与普通删除一致的收尾。
+                // 活动会话的删除已由 ViewModel 无条件落库，这里只通知宿主丢弃 agent 会话。
+                // 取消是协程控制流不是业务失败，必须透传，否则页面销毁会被记成删除错误。
                 is ConversationHistoryEffect.DeleteActiveConversation ->
-                    runCatching { latestOnCurrentConversationDeleted(effect.id) }
-                        .onSuccess {
-                            viewModel.sendIntent(
-                                ConversationHistoryIntent.ActiveConversationDeleted(effect.id),
-                            )
-                        }
-                        .onFailure { throwable ->
-                            viewModel.sendIntent(
-                                ConversationHistoryIntent.DeleteFailed(
-                                    throwable.message ?: throwable::class.java.simpleName,
-                                ),
-                            )
-                        }
+                    try {
+                        latestOnCurrentConversationDeleted(effect.id)
+                        viewModel.sendIntent(
+                            ConversationHistoryIntent.ActiveConversationDeleted(effect.id),
+                        )
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (throwable: Throwable) {
+                        viewModel.sendIntent(
+                            ConversationHistoryIntent.DeleteFailed(
+                                throwable.message ?: throwable::class.java.simpleName,
+                            ),
+                        )
+                    }
             }
         }
     }

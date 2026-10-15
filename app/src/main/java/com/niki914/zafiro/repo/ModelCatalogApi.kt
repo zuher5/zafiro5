@@ -1,7 +1,6 @@
 package com.niki914.zafiro.repo
 
 import com.niki914.logging.Logger
-import com.niki914.zafiro.chat.OpenCodeFreeSupport
 import com.niki914.zafiro.settings.model.LlmProtocol
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,6 +11,8 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import com.niki914.zafiro.chat.OpenCodeFreeSupport
+import com.niki914.zafiro.settings.model.LlmProtocol
 import kotlinx.serialization.json.longOrNull
 import okhttp3.Request
 import java.util.concurrent.TimeUnit

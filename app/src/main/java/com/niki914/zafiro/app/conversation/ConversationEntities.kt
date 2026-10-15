@@ -96,7 +96,7 @@ data class ConversationRecord(
     /**
      * // githooks:ignore legacy-comment
      * 死字段（T3 遗留）：草稿已改由 XRepo 全局持久化。
-     * 本字段保留默认值仅防破坏旧调用编译，始终为空串，业务层不再消费。
+     * 本字段保留默认值仅防破坏调用编译，始终为空串，业务层未消费。
      */
     val draftText: String = "",
     val snapshot: SessionSnapshot,

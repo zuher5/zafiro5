@@ -30,13 +30,15 @@
     <string name="ui_onboard_configure_error_load_failed">讀取設定失敗：%1$s</string>
     <string name="ui_onboard_configure_error_save_failed">儲存設定失敗：%1$s</string>
     <string name="ui_onboard_done_headline">設定完成。</string>
-    <string name="ui_onboard_done_description">設定已完成，你可以立即開始使用 Zafiro，或稍後再到設定繼續調整。</string>
-    <string name="ui_onboard_done_enter_home">進入 Zafiro</string>
+    <string name="ui_onboard_done_description">設定完成。現在開啟 Zafira，或稍後在設定中微調。</string>
+    <string name="ui_onboard_done_enter_home">進入 Zafira</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">新對話</string>
     <string name="ui_home_input_placeholder">輸入訊息…</string>
+    <string name="ui_home_empty_greeting">有什麼我可以幫你？</string>
+    <string name="ui_home_tap_hint">提示：點擊訊息可複製、重新產生或分叉</string>
     <string name="ui_tool_status_called">已調用</string>
     <string name="ui_tool_status_running">執行中</string>
     <string name="ui_tool_status_success">成功</string>
@@ -135,7 +137,7 @@
 
     <!-- Settings Home Items -->
     <string name="ui_settings_model_config">模型設定</string>
-    <string name="ui_settings_model_config_summary">調整 Zafiro 的模型連接設定</string>
+    <string name="ui_settings_model_config_summary">調整 Zafira 的模型連接設定</string>
     <string name="ui_settings_memory">記憶</string>
     <string name="ui_settings_memory_summary">管理持久化的記憶與偏好設定</string>
     <string name="ui_settings_tools">工具</string>
@@ -162,7 +164,7 @@
     <string name="ui_settings_mcp">MCP</string>
     <string name="ui_settings_mcp_summary">連接外部 MCP 與工具</string>
     <string name="ui_settings_takeover">接管規則</string>
-    <string name="ui_settings_takeover_summary">設定哪些輸入交給原生助理或 Zafiro</string>
+    <string name="ui_settings_takeover_summary">設定哪些輸入交給原生助理或 Zafira</string>
     <string name="ui_settings_execution_rules">執行規則</string>
     <string name="ui_settings_execution_rules_summary">設定 Shell 的安全策略</string>
     <string name="ui_settings_storage">儲存空間</string>
@@ -178,7 +180,7 @@
     <string name="ui_settings_about_feedback_bug">Bug 回報</string>
     <string name="ui_settings_about_version">版本</string>
 
-    <string name="ui_settings_storage_description">查看各類快取佔用的空間，點選某一項即可清理。清理不會影響設定、記憶與對話記錄。</string>
+    <string name="ui_settings_storage_description">各項快取佔用。點按即可清除；不影響設定與對話。</string>
     <string name="ui_settings_storage_tool_output">工具輸出快取</string>
     <string name="ui_settings_storage_tool_output_summary">超長工具輸出的截斷匯出</string>
     <string name="ui_settings_storage_image_cache">圖片快取</string>
@@ -217,7 +219,7 @@
     <string name="ui_settings_mcp_config">MCP 設定</string>
 
     <!-- Memory Module -->
-    <string name="memory_page_description">管理記憶。你可以左右滑動以刪除，點擊以編輯單條記憶。新增後，Agent 即使在新對話中也會記得這些內容。</string>
+    <string name="memory_page_description">Agent 在新對話中仍會記住的長期資訊。向左滑動刪除，點按編輯。</string>
     <string name="memory_page_empty_description">目前沒有已儲存的記憶。點擊右上角以新增第一條記憶。</string>
     <string name="memory_loading">正在讀取記憶…</string>
     <string name="memory_editor_title_create">新增記憶</string>
@@ -237,13 +239,13 @@
     <string name="memory_error_delete_failed">刪除記憶失敗：%1$s</string>
 
     <!-- Execution Rules Module -->
-    <string name="execution_rules_page_description">設定 Shell 與工具的執行規則。目前此頁只提供規則介面，尚未接入實際攔截流程。</string>
+    <string name="execution_rules_page_description">為 Shell 與工具執行設定安全規則。</string>
     <string name="execution_rules_empty_action_hint">點擊右上角以新增第一條規則草稿。</string>
     <string name="execution_rules_loading">正在讀取執行規則…</string>
     <string name="execution_rules_editor_title_create">新增執行規則</string>
     <string name="execution_rules_delete_dialog_title">刪除執行規則</string>
     <string name="execution_rules_delete_dialog_text">確定要刪除執行規則「%1$s」嗎？此操作不可撤銷。</string>
-    <string name="execution_rules_editor_description">設定 Shell 與工具的執行規則。現時此編輯頁只用來管理規則草稿，尚未連接到實際攔截流程。</string>
+    <string name="execution_rules_editor_description">規則會在 Shell 與工具命令執行前被檢查。</string>
     <string name="execution_rules_field_name">規則名稱</string>
     <string name="execution_rules_field_name_hint">例如：高風險刪除指令</string>
     <string name="execution_rules_field_enabled_mode">生效時機</string>
@@ -252,12 +254,12 @@
     <string name="execution_rules_enabled_mode_disabled">停用</string>
     <string name="execution_rules_enabled_mode_confirm">詢問我</string>
     <string name="tool_permission_dialog_title">AI 請求執行操作</string>
-    <string name="tool_permission_request_intro">Zafiro 的工具「%1$s」請求執行以下命令：</string>
+    <string name="tool_permission_request_intro">Zafira 的工具「%1$s」請求執行以下命令：</string>
     <string name="tool_permission_matched_rule">命中規則「%1$s」</string>
     <string name="tool_permission_allow">允許本次</string>
     <string name="tool_permission_deny">拒絕</string>
     <string name="screen_control_consent_title">螢幕控制權限申請</string>
-    <string name="screen_control_consent_body">Zafiro 需要以下權限才能控制螢幕：\n1. 無障礙服務：讀取介面、執行點按\n2. 顯示在其他應用程式上層：顯示指標指示器\n\n接下來可能會彈出系統授權框或跳轉到設定頁。</string>
+    <string name="screen_control_consent_body">Zafira 需要無障礙與悬浮窗權限才能控制螢幕。接下來可能會彈出系統提示或跳至設定頁。</string>
     <string name="screen_control_consent_agree">同意</string>
     <string name="screen_control_consent_deny">拒絕</string>
     <string name="execution_rules_field_patterns">比對規則</string>
@@ -273,13 +275,13 @@
     <string name="takeover_empty_action_hint">點擊右上角以新增第一條接管規則。</string>
     <string name="takeover_loading">正在讀取接管規則…</string>
     <string name="takeover_editor_title_create">新增接管規則</string>
-    <string name="takeover_editor_description">設定哪些問題交給原生助理，哪些繼續交給 Zafiro。</string>
+    <string name="takeover_editor_description">設定哪些問題交給原生助理，哪些繼續交給 Zafira。</string>
     <string name="takeover_field_name">規則名稱</string>
     <string name="takeover_field_name_hint">例如：小布生活服務</string>
     <string name="takeover_field_enabled">啟用規則</string>
     <string name="takeover_field_target">命中時由誰接管</string>
     <string name="takeover_target_native_assistant">原生助理</string>
-    <string name="takeover_target_zafiro">Zafiro</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">規則</string>
     <string name="takeover_field_patterns_hint">天氣\n.*鬧鐘.*\n開啟.*</string>
     <string name="takeover_field_patterns_description">每行輸入一個關鍵字或正則表達式，只要符合其中一項，便會使用上方的接管方式。</string>
@@ -346,7 +348,7 @@
     <string name="custom_py_tool_save_dialog_action_close">關閉</string>
     <string name="custom_py_tool_save_failed">儲存失敗：%1$s</string>
 
-    <string name="mcp_page_description">設定 MCP 的連線方式與驗證資訊。儲存後，Zafiro 會在執行時自動發現可用工具。</string>
+    <string name="mcp_page_description">設定 MCP 的連線方式與驗證資訊。儲存後，Zafira 會在執行時自動發現可用工具。</string>
     <string name="mcp_page_empty_description">點擊右上角以新增第一個 MCP 伺服器。</string>
     <string name="mcp_loading">正在讀取已儲存的 MCP 伺服器…</string>
     <string name="mcp_editor_title_create">新增 MCP 伺服器</string>
@@ -421,6 +423,8 @@
     <string name="ui_settings_general_retry_summary">請求失敗後的自動重試</string>
     <string name="ui_settings_general_keep_screen_on">回應期間保持螢幕常亮</string>
     <string name="ui_settings_general_keep_screen_on_summary">回應與工具執行期間保持螢幕常亮</string>
+    <string name="ui_settings_general_screen_control_auto_approve">自動允許螢幕控制</string>
+    <string name="ui_settings_general_screen_control_auto_approve_summary">略過 Agent 讀取或點擊螢幕前的確認。</string>
     <string name="ui_settings_general_always_show_message_actions">總是顯示訊息操作</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">語音助理獨享一個對話</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">開啟後語音助理對話不影響主畫面歷史；關閉則與主畫面共用當前對話</string>
@@ -441,14 +445,14 @@
     <string name="ui_settings_configure_endpoint_mismatch_cancel_save">直接儲存</string>
     <string name="ui_settings_configure_protocol_hint">切換協議後，請確認端點與協議匹配。</string>
     <string name="ui_settings_configure_thinking_label">思考強度</string>
-    <string name="ui_settings_configure_thinking_hint">留空（Provider Default）時使用 Provider 預設行為；過高時若 Provider 拒絕請自行調低。</string>
+    <string name="ui_settings_configure_thinking_hint">保持「Provider Default」，或在被服務商拒絕時調低。</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">例如：200000 或 200k</string>
-    <string name="ui_settings_configure_max_tokens_hint">單次請求最多輸出多少 token。留空時優先使用雲端值，否則用預設值；伺服器回報輸出長度超限時請調小。支援 k/m/b 後綴（如 128k）。</string>
+    <string name="ui_settings_configure_max_tokens_hint">單次請求的最大輸出 token，支援 k/m/b 後綴。留空則使用服務商預設值。</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">請填寫有效數值（支援 k/m/b 後綴），不小於 256</string>
     <string name="ui_settings_configure_context_window_label">上下文視窗</string>
     <string name="ui_settings_configure_context_window_placeholder">例如：1000000 或 1M</string>
-    <string name="ui_settings_configure_context_window_hint">該模型的上下文視窗大小，影響上下文用量的顯示比例。留空時優先使用雲端值，否則用預設值。</string>
+    <string name="ui_settings_configure_context_window_hint">模型上下文視窗，用於用量環。留空則使用服務商預設值。</string>
     <string name="ui_settings_configure_error_context_window_invalid">請填寫有效數值（支援 k/m/b 後綴），不小於 1000</string>
     <string name="error_mcp_load_failed">讀取 MCP 配置失敗</string>
     <string name="error_mcp_save_failed">儲存 MCP 配置失敗</string>
@@ -477,6 +481,7 @@
     <string name="ui_theme_mode_light">淺色</string>
     <string name="ui_theme_mode_dark">深色</string>
     <string name="ui_theme_color_dynamic">動態色（桌布取色）</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">玫瑰粉</string>
     <string name="ui_theme_color_blossom">櫻花粉</string>
     <string name="ui_theme_color_lavender">薰衣草紫</string>
@@ -587,9 +592,4 @@
     <string name="text_action_error_save_failed">儲存動作失敗。</string>
     <string name="text_action_error_delete_failed">刪除動作失敗。</string>
     <string name="crash_startup_copied_toast">堆疊資訊已複製，請提交給開發者</string>
-    <!-- Widget -->
-    <string name="widget_search_bar_title">快速搜尋</string>
-    <string name="widget_search_hint">向 Zafira 提問…</string>
-    <string name="widget_action_run_desc">新對話</string>
-    <string name="widget_search_bar_desc">桌面搜尋與快速操作微件</string>
 </resources>

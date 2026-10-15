@@ -24,6 +24,7 @@ data class GeneralSettingsUiState(
     val idleTimeoutSeconds: Long = 60L,
     val retryMaxAttempts: Int = 3,
     val keepScreenOn: Boolean = true,
+    val screenControlAutoApproved: Boolean = false,
     val activeDialog: GeneralSettingsDialog? = null,
     val isLoading: Boolean = false,
 )
@@ -42,6 +43,7 @@ sealed interface GeneralSettingsIntent {
     data class SelectIdleTimeout(val seconds: Long) : GeneralSettingsIntent
     data class SelectRetryMaxAttempts(val attempts: Int) : GeneralSettingsIntent
     data class ToggleKeepScreenOn(val enabled: Boolean) : GeneralSettingsIntent
+    data class ToggleScreenControlAutoApproved(val enabled: Boolean) : GeneralSettingsIntent
 }
 
 class GeneralSettingsViewModel :
@@ -71,6 +73,8 @@ class GeneralSettingsViewModel :
             is GeneralSettingsIntent.SelectIdleTimeout -> selectIdleTimeout(intent.seconds)
             is GeneralSettingsIntent.SelectRetryMaxAttempts -> selectRetryMaxAttempts(intent.attempts)
             is GeneralSettingsIntent.ToggleKeepScreenOn -> toggleKeepScreenOn(intent.enabled)
+            is GeneralSettingsIntent.ToggleScreenControlAutoApproved ->
+                toggleScreenControlAutoApproved(intent.enabled)
         }
     }
 
@@ -86,6 +90,7 @@ class GeneralSettingsViewModel :
             val floatingBallEnabled = XRepo.floatingBallEnabled()
             val floatingBallAutoExpand = XRepo.floatingBallAutoExpand()
             val residentNotificationEnabled = XRepo.residentNotificationEnabled()
+            val screenControlAutoApproved = XRepo.screenControlAutoApproved()
             val turnNotificationEnabled = XRepo.turnNotificationEnabled()
             updateState {
                 copy(
@@ -98,6 +103,7 @@ class GeneralSettingsViewModel :
                     floatingBallEnabled = floatingBallEnabled,
                     floatingBallAutoExpand = floatingBallAutoExpand,
                     residentNotificationEnabled = residentNotificationEnabled,
+                    screenControlAutoApproved = screenControlAutoApproved,
                     turnNotificationEnabled = turnNotificationEnabled,
                     isLoading = false,
                 )
@@ -214,6 +220,15 @@ class GeneralSettingsViewModel :
             e.printStackTrace()
             throw e
         }
+    }
+
+    /**
+     * 屏幕控制知情门自动放行。开启后屏幕操作工具不再每次询问，后台调用（弹不了窗）
+     * 也不会被直接拒绝；无障碍/悬浮窗本身的授权流程不受影响。
+     */
+    private suspend fun toggleScreenControlAutoApproved(enabled: Boolean) {
+        updateState { copy(screenControlAutoApproved = enabled) }
+        XRepo.setScreenControlAutoApproved(enabled)
     }
 
     private companion object {

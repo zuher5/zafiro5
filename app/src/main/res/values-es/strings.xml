@@ -9,7 +9,7 @@
     <string name="ui_onboard_provider_pick_title">Seleccionar proveedor</string>
     <string name="ui_onboard_provider_pick_description">Comience a conectar sus modelos desde aquí.\nSeleccione un proveedor para continuar.</string>
     <string name="ui_onboard_configure_title">Configurar modelo</string>
-    <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafiro.</string>
+    <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafira.</string>
     <string name="ui_onboard_configure_next">Siguiente</string>
     <string name="ui_onboard_configure_endpoint_override_title">Endpoint personalizado</string>
     <string name="ui_onboard_configure_endpoint_override_description_off">Usar endpoint predeterminado</string>
@@ -30,13 +30,15 @@
     <string name="ui_onboard_configure_error_load_failed">Error al cargar la configuración: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Error al guardar la configuración: %1$s</string>
     <string name="ui_onboard_done_headline">Todo listo.</string>
-    <string name="ui_onboard_done_description">Configuración completada. Puede empezar a usar Zafiro o ajustar la configuración más tarde.</string>
-    <string name="ui_onboard_done_enter_home">Ir a Zafiro</string>
+    <string name="ui_onboard_done_description">Configuración completada. Abra Zafira ahora o ajústela más tarde en Ajustes.</string>
+    <string name="ui_onboard_done_enter_home">Ir a Zafira</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">Nueva conversación</string>
     <string name="ui_home_input_placeholder">Escriba un mensaje...</string>
+    <string name="ui_home_empty_greeting">¿En qué puedo ayudarte?</string>
+    <string name="ui_home_tap_hint">Consejo: toca un mensaje para copiar, regenerar o bifurcar</string>
     <string name="ui_tool_status_called">Llamado</string>
     <string name="ui_tool_status_running">Ejecutando</string>
     <string name="ui_tool_status_success">Completado</string>
@@ -163,7 +165,7 @@
     <string name="ui_settings_mcp">MCP</string>
     <string name="ui_settings_mcp_summary">Conectar MCP y herramientas externas</string>
     <string name="ui_settings_takeover">Reglas de control</string>
-    <string name="ui_settings_takeover_summary">Configurar qué entradas procesa el asistente nativo o Zafiro</string>
+    <string name="ui_settings_takeover_summary">Configurar qué entradas procesa el asistente nativo o Zafira</string>
     <string name="ui_settings_execution_rules">Reglas de ejecución</string>
     <string name="ui_settings_execution_rules_summary">Configurar la política de seguridad para comandos Shell</string>
     <string name="ui_settings_storage">Almacenamiento</string>
@@ -179,7 +181,7 @@
     <string name="ui_settings_about_feedback_bug">Notificar error</string>
     <string name="ui_settings_about_version">Versión</string>
 
-    <string name="ui_settings_storage_description">Consulta el espacio que ocupa cada caché y tócalo para borrarlo. Nunca se tocan los ajustes, los recuerdos ni las conversaciones.</string>
+    <string name="ui_settings_storage_description">Tamaño de cada caché. Toque para limpiar; los ajustes y las conversaciones no se tocan.</string>
     <string name="ui_settings_storage_tool_output">Caché de salida</string>
     <string name="ui_settings_storage_tool_output_summary">Salida completa exportada de resultados truncados</string>
     <string name="ui_settings_storage_image_cache">Caché de imágenes</string>
@@ -218,7 +220,7 @@
     <string name="ui_settings_mcp_config">Configuración de MCP</string>
 
     <!-- Memory Module -->
-    <string name="memory_page_description">Gestione memorias guardadas. Deslice a la izquierda o derecha para eliminar, o toque para editar. Una vez añadidas, el agente las recordará en todas las conversaciones.</string>
+    <string name="memory_page_description">Memorias que el agente conserva en nuevas conversaciones. Deslice para eliminar, toque para editar.</string>
     <string name="memory_page_empty_description">No hay memorias guardadas. Toque el botón superior derecho para añadir la primera.</string>
     <string name="memory_loading">Cargando memorias...</string>
     <string name="memory_editor_title_create">Añadir memoria</string>
@@ -238,13 +240,13 @@
     <string name="memory_error_delete_failed">Error al eliminar la memoria: %1$s</string>
 
     <!-- Execution Rules Module -->
-    <string name="execution_rules_page_description">Añada reglas de ejecución para mejorar la seguridad. Salvo los scripts, todas las ejecuciones de comandos de la app están reguladas por estas políticas.</string>
+    <string name="execution_rules_page_description">Establezca reglas de seguridad para la ejecución de Shell y herramientas.</string>
     <string name="execution_rules_empty_action_hint">Toque en la esquina superior derecha para añadir la primera regla de ejecución.</string>
     <string name="execution_rules_loading">Cargando reglas de ejecución...</string>
     <string name="execution_rules_editor_title_create">Nueva regla de ejecución</string>
     <string name="execution_rules_delete_dialog_title">Eliminar regla de ejecución</string>
     <string name="execution_rules_delete_dialog_text">¿Está seguro de que desea eliminar la regla de ejecución «%1$s»? Esta acción no se puede deshacer.</string>
-    <string name="execution_rules_editor_description">Añada reglas de ejecución para mejorar la seguridad. Salvo los scripts, todas las ejecuciones de comandos de la app están reguladas por estas políticas.</string>
+    <string name="execution_rules_editor_description">Las reglas se comprueban antes de ejecutar comandos de Shell y herramientas.</string>
     <string name="execution_rules_field_name">Nombre de la política</string>
     <string name="execution_rules_field_name_hint">Ejemplo: Bloquear comandos peligrosos</string>
     <string name="execution_rules_field_enabled_mode">Condición de activación</string>
@@ -253,12 +255,12 @@
     <string name="execution_rules_enabled_mode_disabled">Desactivado</string>
     <string name="execution_rules_enabled_mode_confirm">Preguntarme</string>
     <string name="tool_permission_dialog_title">La IA solicita ejecutar una operación</string>
-    <string name="tool_permission_request_intro">La herramienta de Zafiro "%1$s" solicita ejecutar el siguiente comando:</string>
+    <string name="tool_permission_request_intro">La herramienta de Zafira "%1$s" solicita ejecutar el siguiente comando:</string>
     <string name="tool_permission_matched_rule">Regla alcanzada: "%1$s"</string>
     <string name="tool_permission_allow">Permitir una vez</string>
     <string name="tool_permission_deny">Denegar</string>
     <string name="screen_control_consent_title">Solicitud de permisos de control de pantalla</string>
-    <string name="screen_control_consent_body">Zafiro necesita estos permisos para controlar la pantalla:\n1. Servicio de accesibilidad: leer la interfaz y realizar toques\n2. Superponer sobre otras apps: mostrar el indicador de puntero\n\nA continuación puede aparecer un aviso del sistema o una página de ajustes.</string>
+    <string name="screen_control_consent_body">Zafira necesita Accesibilidad y Superponer sobre otras apps para controlar la pantalla. A continuación puede aparecer un aviso del sistema o una página de ajustes.</string>
     <string name="screen_control_consent_agree">Aceptar</string>
     <string name="screen_control_consent_deny">Denegar</string>
     <string name="execution_rules_field_patterns">Reglas</string>
@@ -274,13 +276,13 @@
     <string name="takeover_empty_action_hint">Toque en la esquina superior derecha para añadir la primera regla de control.</string>
     <string name="takeover_loading">Cargando reglas de control...</string>
     <string name="takeover_editor_title_create">Nueva regla de control</string>
-    <string name="takeover_editor_description">Configure qué peticiones debe responder el asistente nativo y cuáles deben enviarse a Zafiro.</string>
+    <string name="takeover_editor_description">Configure qué peticiones debe responder el asistente nativo y cuáles deben enviarse a Zafira.</string>
     <string name="takeover_field_name">Nombre de la regla</string>
     <string name="takeover_field_name_hint">Ejemplo: Servicios locales Breeno</string>
     <string name="takeover_field_enabled">Activar regla</string>
     <string name="takeover_field_target">Asistente al coincidir</string>
     <string name="takeover_target_native_assistant">Asistente nativo</string>
-    <string name="takeover_target_zafiro">Zafiro</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">Reglas</string>
     <string name="takeover_field_patterns_hint">tiempo\n.*alarma.*\nabrir.*</string>
     <string name="takeover_field_patterns_description">Introduzca una palabra clave o expresión regular por línea. Si se detecta una coincidencia, se utilizará el asistente seleccionado arriba.</string>
@@ -347,7 +349,7 @@
     <string name="custom_py_tool_save_dialog_action_close">Cerrar</string>
     <string name="custom_py_tool_save_failed">Error al guardar: %1$s</string>
 
-    <string name="mcp_page_description">Configure los métodos de conexión y autenticación para MCP. Tras guardar, Zafiro descubrirá automáticamente las herramientas disponibles en tiempo de ejecución.</string>
+    <string name="mcp_page_description">Configure los métodos de conexión y autenticación para MCP. Tras guardar, Zafira descubrirá automáticamente las herramientas disponibles en tiempo de ejecución.</string>
     <string name="mcp_page_empty_description">Toque en la esquina superior derecha para añadir su primer servidor MCP.</string>
     <string name="mcp_loading">Cargando servidores MCP guardados...</string>
     <string name="mcp_editor_title_create">Añadir servidor MCP</string>
@@ -459,6 +461,8 @@
     <string name="ui_settings_general_retry_summary">Reintentos automáticos tras un error de solicitud</string>
     <string name="ui_settings_general_keep_screen_on">Mantener la pantalla encendida al responder</string>
     <string name="ui_settings_general_keep_screen_on_summary">Mantener la pantalla encendida mientras el agente responde y ejecuta herramientas</string>
+    <string name="ui_settings_general_screen_control_auto_approve">Aprobar el control de pantalla automáticamente</string>
+    <string name="ui_settings_general_screen_control_auto_approve_summary">Omitir la confirmación antes de que el agente lea o toque la pantalla.</string>
     <string name="ui_settings_general_always_show_message_actions">Mostrar siempre las acciones de los mensajes</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">Sesión dedicada del asistente de voz</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">Mantener aisladas las conversaciones del asistente de voz del historial principal</string>
@@ -479,20 +483,21 @@
     <string name="ui_settings_configure_endpoint_mismatch_cancel_save">Guardar tal cual</string>
     <string name="ui_settings_configure_protocol_hint">Tras cambiar el protocolo, asegúrese de que el endpoint sea compatible con dicho protocolo.</string>
     <string name="ui_settings_configure_thinking_label">Esfuerzo de razonamiento</string>
-    <string name="ui_settings_configure_thinking_hint">Deje en Provider Default para usar el comportamiento predeterminado del proveedor; redúzcalo si el proveedor rechaza un nivel alto.</string>
+    <string name="ui_settings_configure_thinking_hint">Deje Provider Default o redúzcalo si el proveedor rechaza un nivel alto.</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">Por ejemplo: 200000 o 200k</string>
-    <string name="ui_settings_configure_max_tokens_hint">Máximo de tokens que puede generar una sola solicitud. Déjelo vacío para usar el valor de la nube si está disponible, o el valor predeterminado; redúzcalo si el servidor indica que se superó el límite. Admite sufijos k/m/b (p. ej., 128k).</string>
+    <string name="ui_settings_configure_max_tokens_hint">Tokens de salida máximos por solicitud. Admite sufijos k/m/b. Déjelo vacío para usar el valor del proveedor.</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">Introduzca un número válido (sufijos k/m/b admitidos) de al menos 256</string>
     <string name="ui_settings_configure_context_window_label">Ventana de contexto</string>
     <string name="ui_settings_configure_context_window_placeholder">Por ejemplo: 1000000 o 1M</string>
-    <string name="ui_settings_configure_context_window_hint">Tamaño de la ventana de contexto del modelo, usado para el indicador de uso de contexto. Déjelo vacío para usar el valor de la nube si está disponible, o el valor predeterminado.</string>
+    <string name="ui_settings_configure_context_window_hint">Ventana de contexto del modelo, usada por el anillo de uso. Déjelo vacío para usar el valor del proveedor.</string>
     <string name="ui_settings_configure_error_context_window_invalid">Introduzca un número válido (sufijos k/m/b admitidos) de al menos 1000</string>
 
     <string name="ui_theme_mode_system">Según el sistema</string>
     <string name="ui_theme_mode_light">Claro</string>
     <string name="ui_theme_mode_dark">Oscuro</string>
     <string name="ui_theme_color_dynamic">Dinámico (del fondo)</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">Rosa</string>
     <string name="ui_theme_color_blossom">Flor</string>
     <string name="ui_theme_color_lavender">Lavanda</string>
@@ -603,9 +608,4 @@
     <string name="text_action_error_save_failed">Error al guardar la acción.</string>
     <string name="text_action_error_delete_failed">Error al eliminar la acción.</string>
     <string name="crash_startup_copied_toast">Traza de pila copiada. Envíala al desarrollador.</string>
-    <!-- Widget -->
-    <string name="widget_search_bar_title">Búsqueda rápida</string>
-    <string name="widget_search_hint">Preguntar a Zafira…</string>
-    <string name="widget_action_run_desc">Nuevo chat</string>
-    <string name="widget_search_bar_desc">Widget de búsqueda y acción rápida</string>
 </resources>

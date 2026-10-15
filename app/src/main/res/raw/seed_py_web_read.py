@@ -1,6 +1,7 @@
 # Seed tool: fetch a URL and extract readable article text (companion to py_web_search,
 # use when search only gives snippets and the full page is needed).
 # ponytail: article-container selectors break on site redesigns; Agent can self-update this script.
+import json
 import re
 import html
 import requests
@@ -82,9 +83,18 @@ def main(url: str, keyword: str = "", max_chars: int = 6000, timeout: int = 25):
                       '(KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36',
         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
     }
-    r = requests.get(url, headers=headers, timeout=timeout)
-    r.raise_for_status()
-    raw = _decoded_text(r)
+    try:
+        r = requests.get(url, headers=headers, timeout=timeout)
+        r.raise_for_status()
+        raw = _decoded_text(r)
+    except Exception as exc:
+        # 抛出只会被 runtime.py 打到 stderr，stdout 空着，模型收到「成功但无内容」。
+        # 改成结构化错误，分类器能认成 Failure。
+        print(json.dumps(
+            {"error": {"code": "FETCH_FAILED", "message": f"{url} unreachable: {exc}"}},
+            ensure_ascii=False,
+        ))
+        return
 
     # strip noisy blocks
     raw = re.sub(r'<(script|style|noscript|iframe|svg)[\s\S]*?</\1>', ' ', raw, flags=re.I)
@@ -106,5 +116,13 @@ def main(url: str, keyword: str = "", max_chars: int = 6000, timeout: int = 25):
             text = text[:max_chars]
     else:
         text = text[:max_chars]
+
+    if not text.strip():
+        # 抓到了页面但正文全被选择器/正则滤空了，报出来好过回一个空字符串。
+        print(json.dumps(
+            {"error": {"code": "NO_TEXT", "message": f"No readable text extracted from {url}"}},
+            ensure_ascii=False,
+        ))
+        return
 
     print(text)

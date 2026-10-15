@@ -1,4 +1,4 @@
-// 保护：历史页 ViewModel 的状态计算——加载成败落点、删除的活动/普通分流与收尾、批量置顶/删除状态保持与分流、重命名重载、分叉导航。
+// 保护：历史页 ViewModel 的状态计算——加载成败落点、删除（活动会话同样无条件落库重载）、批量置顶/删除状态保持与分流、重命名重载、分叉导航。
 package com.niki914.zafiro.app.ui.model.conversation
 
 import com.niki914.zafiro.api.model.AgentState
@@ -138,20 +138,44 @@ class ConversationHistoryViewModelTest {
     }
 
     @Test
-    fun deleteActiveConversation_delegatesToHostWithoutRepositoryDelete() = runTest {
+    fun deleteActiveConversation_stillRemovesFromRepositoryAndReloads() = runTest {
         val deps = FakeDeps()
+        deps.conversations = listOf(summary("a"), summary("b"))
         val viewModel = ConversationHistoryViewModel(deps.toDependencies())
         viewModel.sendIntent(ConversationHistoryIntent.SetActiveConversation("a"))
+        viewModel.sendIntent(ConversationHistoryIntent.Load)
+        advanceUntilIdle()
         val effectDeferred = async { viewModel.uiEffect.first() }
 
         viewModel.sendIntent(ConversationHistoryIntent.Delete("a"))
         advanceUntilIdle()
 
+        // 活动会话的删除不能依赖 effect 送达：落库与重载在此处无条件完成。
+        // 曾经只发 effect 就 return，effect 一丢整条删除静默消失，
+        // 表现为「最顶上那条怎么都删不掉，重开应用才恢复」。
+        assertEquals(listOf("a"), deps.deletedIds)
+        assertEquals(listOf("b"), viewModel.uiStateFlow.value.conversations.map { it.id })
         assertEquals(
             ConversationHistoryEffect.DeleteActiveConversation("a"),
             effectDeferred.await(),
         )
-        assertTrue(deps.deletedIds.isEmpty())
+    }
+
+    @Test
+    fun deleteActiveConversation_survivesUndeliveredEffect() = runTest {
+        val deps = FakeDeps()
+        deps.conversations = listOf(summary("a"))
+        val viewModel = ConversationHistoryViewModel(deps.toDependencies())
+        viewModel.sendIntent(ConversationHistoryIntent.SetActiveConversation("a"))
+        viewModel.sendIntent(ConversationHistoryIntent.Load)
+        advanceUntilIdle()
+
+        // 不订阅 uiEffect：模拟 collector 随页面销毁、effect 无处送达的场景。
+        viewModel.sendIntent(ConversationHistoryIntent.Delete("a"))
+        advanceUntilIdle()
+
+        assertEquals(listOf("a"), deps.deletedIds)
+        assertTrue(viewModel.uiStateFlow.value.conversations.isEmpty())
     }
 
     @Test

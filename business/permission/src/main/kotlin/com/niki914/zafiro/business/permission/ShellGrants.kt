@@ -78,8 +78,11 @@ internal object ShellGrants {
         run: suspend (String) -> ShellOutcome?,
         service: ComponentName?,
     ): PermissionState {
-        val svc = requireNotNull(service) {
-            "accessibilityService is required for Permission.ACCESSIBILITY"
+        val svc = service ?: run {
+            // 清单里没解析出服务组件时不能拼一个假的写进 secure settings，
+            // 报 FAILED 让链继续降级到 JUMP_SETTINGS，而不是抛异常炸掉整条链。
+            Logger.w(TAG, "skip accessibility grant: service component unresolved")
+            return PermissionState.FAILED
         }
         val get = run("settings get secure enabled_accessibility_services")
             ?: return PermissionState.FAILED

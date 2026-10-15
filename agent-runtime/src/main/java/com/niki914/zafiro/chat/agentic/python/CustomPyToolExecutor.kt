@@ -8,6 +8,8 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
 
 /**
@@ -38,17 +40,29 @@ class CustomPyToolExecutor(
         preflight.ensurePathAccess(tool.code + "\n" + argumentsJson)
         return try {
             val result = exec(CustomPyToolHarness.buildRunner(tool.code, args), tool.timeoutMs)
+            val stdout = ToolOutputTruncator.filterForAgent(
+                fullContent = result.output,
+                existingFile = result.file,
+                exportDir = exportDir,
+            )
+            // stdout 空 = 什么都没产出。Python 层的异常只会落到 stderr，
+            // 归到这里就成「成功但无内容」，模型拿不到失败信号只能瞎猜。
+            // 工具若自己打了结构化错误（{"error":{...}}），那里非空，不走这条。
+            if (stdout.isBlank()) {
+                return failureJson(
+                    tool.name,
+                    "NO_OUTPUT",
+                    "Tool produced no output. " + stderrTail(result.output),
+                )
+            }
+            // 工具自己打 {"error":{...}} 时要提到外层，否则它被裹进 stdout 字符串，
+            // 外层 ok=true 会让分类器判成成功——错误就永远到不了模型。
+            structuredError(tool.name, stdout)?.let { return it }
             JsonObject(
                 mapOf(
                     "ok" to JsonPrimitive(true),
                     "tool" to JsonPrimitive(tool.name),
-                    "stdout" to JsonPrimitive(
-                        ToolOutputTruncator.filterForAgent(
-                            fullContent = result.output,
-                            existingFile = result.file,
-                            exportDir = exportDir,
-                        )
-                    ),
+                    "stdout" to JsonPrimitive(stdout),
                 )
             ).toString()
         } catch (e: TimeoutCancellationException) {
@@ -84,4 +98,29 @@ class CustomPyToolExecutor(
             )
         ).toString()
     }
+
+    /**
+     * runtime.py 把 stderr 拼在 stdout 之后（`\n--- stderr ---\n`）。
+     * 空输出时把那段捞出来附在错误里，否则模型只知道"没输出"，猜不到真实异常。
+     */
+    private fun stderrTail(output: String): String {
+        val marker = output.lastIndexOf(STDERR_MARKER)
+        if (marker < 0) return ""
+        return output.substring(marker + STDERR_MARKER.length).trim().takeLast(STDERR_TAIL_CHARS)
+    }
+
+    /** stdout 本身是 {"error":{"code","message"}} 时转成 failureJson，否则返回 null 走成功分支。 */
+    private fun structuredError(name: String, stdout: String): String? {
+        val error = runCatching {
+            (Json.parseToJsonElement(stdout.trim()) as? JsonObject)?.get("error") as? JsonObject
+        }.getOrNull() ?: return null
+        val code = error["code"]?.jsonPrimitive?.contentOrNull?.takeIf { it.isNotBlank() }
+            ?: "TOOL_ERROR"
+        val message = error["message"]?.jsonPrimitive?.contentOrNull?.takeIf { it.isNotBlank() }
+            ?: code
+        return failureJson(name, code, message)
+    }
 }
+
+private const val STDERR_MARKER = "\n--- stderr ---\n"
+private const val STDERR_TAIL_CHARS = 400

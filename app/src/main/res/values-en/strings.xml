@@ -30,13 +30,15 @@
     <string name="ui_onboard_configure_error_load_failed">Failed to load configuration: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Failed to save configuration: %1$s</string>
     <string name="ui_onboard_done_headline">All set.</string>
-    <string name="ui_onboard_done_description">Setup is complete. You can start using Zafiro now or fine-tune it later in Settings.</string>
-    <string name="ui_onboard_done_enter_home">Open Zafiro</string>
+    <string name="ui_onboard_done_description">Setup complete. Open Zafira now, or fine-tune later in Settings.</string>
+    <string name="ui_onboard_done_enter_home">Open Zafira</string>
 
     <!-- Home -->
-    <string name="ui_home_title">Zafiro</string>
+    <string name="ui_home_title">Zafira</string>
     <string name="ui_home_menu_new_conversation">New conversation</string>
     <string name="ui_home_input_placeholder">Type a message...</string>
+    <string name="ui_home_empty_greeting">What can I help you with?</string>
+    <string name="ui_home_tap_hint">Tip: tap a message to copy, regenerate, or fork</string>
     <string name="ui_tool_status_called">Called</string>
     <string name="ui_tool_status_running">Running</string>
     <string name="ui_tool_status_success">Success</string>
@@ -136,7 +138,7 @@
 
     <!-- Settings Home Items -->
     <string name="ui_settings_model_config">Model Configuration</string>
-    <string name="ui_settings_model_config_summary">Adjust how Zafiro connects to your model</string>
+    <string name="ui_settings_model_config_summary">Adjust how Zafira connects to your model</string>
     <string name="ui_settings_memory">Memory</string>
     <string name="ui_settings_memory_summary">Manage saved memories and preferences</string>
     <string name="ui_settings_tools">Tools</string>
@@ -163,7 +165,7 @@
     <string name="ui_settings_mcp">MCP</string>
     <string name="ui_settings_mcp_summary">Connect external MCP servers and tools</string>
     <string name="ui_settings_takeover">Takeover Rules</string>
-    <string name="ui_settings_takeover_summary">Route matched requests to the native assistant or Zafiro</string>
+    <string name="ui_settings_takeover_summary">Route matched requests to the native assistant or Zafira</string>
     <string name="ui_settings_execution_rules">Execution Rules</string>
     <string name="ui_settings_execution_rules_summary">Set safety rules for Shell execution</string>
     <string name="ui_settings_storage">Storage</string>
@@ -179,7 +181,7 @@
     <string name="ui_settings_about_feedback_bug">Bug Reports</string>
     <string name="ui_settings_about_version">Version</string>
 
-    <string name="ui_settings_storage_description">See how much space each cache takes. Tap an item to clear it. Clearing never touches settings, memories, or conversations.</string>
+    <string name="ui_settings_storage_description">Cache size per item. Tap to clear; settings and conversations are untouched.</string>
     <string name="ui_settings_storage_tool_output">Tool output cache</string>
     <string name="ui_settings_storage_tool_output_summary">Exported full output of truncated tool results</string>
     <string name="ui_settings_storage_image_cache">Image cache</string>
@@ -218,7 +220,7 @@
     <string name="ui_settings_mcp_config">MCP Configuration</string>
 
     <!-- Memory Module -->
-    <string name="memory_page_description">Manage saved memories. Swipe left or right to delete, or tap an item to edit it. Once added, the Agent will remember this information even in new conversations.</string>
+    <string name="memory_page_description">Memories the Agent carries into new conversations. Swipe to delete, tap to edit.</string>
     <string name="memory_page_empty_description">No memories have been saved yet. Tap the top right to add your first memory.</string>
     <string name="memory_loading">Loading memories...</string>
     <string name="memory_editor_title_create">New Memory</string>
@@ -238,13 +240,13 @@
     <string name="memory_error_delete_failed">Failed to delete memory: %1$s</string>
 
     <!-- Execution Rules Module -->
-    <string name="execution_rules_page_description">Configure rules for Shell and tool execution. This page currently provides only the UI shell and is not yet wired into the actual interception flow.</string>
+    <string name="execution_rules_page_description">Set safety rules for Shell and tool execution.</string>
     <string name="execution_rules_empty_action_hint">Tap the top right to add your first draft rule.</string>
     <string name="execution_rules_loading">Loading execution rules...</string>
     <string name="execution_rules_editor_title_create">New Execution Rule</string>
     <string name="execution_rules_delete_dialog_title">Delete Execution Rule</string>
     <string name="execution_rules_delete_dialog_text">Are you sure you want to delete the execution rule \"%1$s\"? This action cannot be undone.</string>
-    <string name="execution_rules_editor_description">Set up rules for Shell and tool execution. For now, this editor lets you manage rule drafts in the UI and is not yet wired into the actual interception flow.</string>
+    <string name="execution_rules_editor_description">Rules are checked before Shell and tool commands run.</string>
     <string name="execution_rules_field_name">Rule Name</string>
     <string name="execution_rules_field_name_hint">For example: Dangerous delete commands</string>
     <string name="execution_rules_field_enabled_mode">Applies When</string>
@@ -253,12 +255,12 @@
     <string name="execution_rules_enabled_mode_disabled">Disabled</string>
     <string name="execution_rules_enabled_mode_confirm">Ask me</string>
     <string name="tool_permission_dialog_title">AI requests to run an operation</string>
-    <string name="tool_permission_request_intro">Zafiro tool "%1$s" wants to run the following command:</string>
+    <string name="tool_permission_request_intro">Zafira tool "%1$s" wants to run the following command:</string>
     <string name="tool_permission_matched_rule">Matched rule "%1$s"</string>
     <string name="tool_permission_allow">Allow once</string>
     <string name="tool_permission_deny">Deny</string>
     <string name="screen_control_consent_title">Screen control permission request</string>
-    <string name="screen_control_consent_body">Zafiro needs these permissions to control the screen:\n1. Accessibility service: read the UI and perform taps\n2. Display over other apps: show the pointer indicator\n\nA system prompt or a Settings page may appear next.</string>
+    <string name="screen_control_consent_body">Zafira needs Accessibility and Display over other apps to control the screen. A system prompt or Settings page may appear next.</string>
     <string name="screen_control_consent_agree">Agree</string>
     <string name="screen_control_consent_deny">Deny</string>
     <string name="execution_rules_field_patterns">Patterns</string>
@@ -274,13 +276,13 @@
     <string name="takeover_empty_action_hint">Tap the top right to add your first takeover rule.</string>
     <string name="takeover_loading">Loading takeover rules...</string>
     <string name="takeover_editor_title_create">New Takeover Rule</string>
-    <string name="takeover_editor_description">Choose which requests go to the native assistant and which stay with Zafiro.</string>
+    <string name="takeover_editor_description">Choose which requests go to the native assistant and which stay with Zafira.</string>
     <string name="takeover_field_name">Rule Name</string>
     <string name="takeover_field_name_hint">For example: Native assistant services</string>
     <string name="takeover_field_enabled">Enable Rule</string>
     <string name="takeover_field_target">Responder When Matched</string>
     <string name="takeover_target_native_assistant">Native Assistant</string>
-    <string name="takeover_target_zafiro">Zafiro</string>
+    <string name="takeover_target_zafiro">Zafira</string>
     <string name="takeover_field_patterns">Rules</string>
     <string name="takeover_field_patterns_hint">weather\n.*alarm.*\nopen.*</string>
     <string name="takeover_field_patterns_description">Enter one keyword or regular expression per line. The selected responder is used as soon as any rule matches.</string>
@@ -347,7 +349,7 @@
     <string name="custom_py_tool_save_dialog_action_close">Close</string>
     <string name="custom_py_tool_save_failed">Failed to save: %1$s</string>
 
-    <string name="mcp_page_description">Configure connection and authentication for MCP. After saving, Zafiro will automatically discover available tools at runtime.</string>
+    <string name="mcp_page_description">Configure connection and authentication for MCP. After saving, Zafira will automatically discover available tools at runtime.</string>
     <string name="mcp_page_empty_description">Tap the top right to add your first MCP server.</string>
     <string name="mcp_loading">Loading saved MCP servers...</string>
     <string name="mcp_editor_title_create">New MCP Server</string>
@@ -459,6 +461,8 @@
     <string name="ui_settings_general_retry_summary">Automatic retries after a failed request</string>
     <string name="ui_settings_general_keep_screen_on">Keep screen on while answering</string>
     <string name="ui_settings_general_keep_screen_on_summary">Keep the screen on while the agent is responding and running tools</string>
+    <string name="ui_settings_general_screen_control_auto_approve">Auto-approve screen control</string>
+    <string name="ui_settings_general_screen_control_auto_approve_summary">Skip confirmation before the agent reads or taps the screen.</string>
     <string name="ui_settings_general_always_show_message_actions">Always show message actions</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">Dedicated voice assistant session</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">Keep voice assistant conversations isolated from main chat history</string>
@@ -479,20 +483,21 @@
     <string name="ui_settings_configure_endpoint_mismatch_cancel_save">Save as is</string>
     <string name="ui_settings_configure_protocol_hint">After switching protocols, confirm the endpoint matches the protocol.</string>
     <string name="ui_settings_configure_thinking_label">Thinking Effort</string>
-    <string name="ui_settings_configure_thinking_hint">Leave as Provider Default to use the provider default behavior; lower it yourself if the provider rejects a high level.</string>
+    <string name="ui_settings_configure_thinking_hint">Leave as Provider Default, or lower it if the provider rejects a high level.</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">For example: 200000 or 200k</string>
-    <string name="ui_settings_configure_max_tokens_hint">Maximum tokens a single request may output. Leave empty to use the cloud value when available, otherwise the default; lower it if the server reports the output limit is exceeded. Supports k/m/b suffix (e.g. 128k).</string>
+    <string name="ui_settings_configure_max_tokens_hint">Max output tokens per request. Supports k/m/b suffix. Leave empty to use the provider default.</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">Enter a valid number (k/m/b suffix supported) of at least 256</string>
     <string name="ui_settings_configure_context_window_label">Context Window</string>
     <string name="ui_settings_configure_context_window_placeholder">For example: 1000000 or 1M</string>
-    <string name="ui_settings_configure_context_window_hint">The model\'s context window size, used for the context usage indicator. Leave empty to use the cloud value when available, otherwise the default.</string>
+    <string name="ui_settings_configure_context_window_hint">Model context window, used by the usage ring. Leave empty to use the provider default.</string>
     <string name="ui_settings_configure_error_context_window_invalid">Enter a valid number (k/m/b suffix supported) of at least 1000</string>
 
     <string name="ui_theme_mode_system">Follow system</string>
     <string name="ui_theme_mode_light">Light</string>
     <string name="ui_theme_mode_dark">Dark</string>
     <string name="ui_theme_color_dynamic">Dynamic (from wallpaper)</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">Rose</string>
     <string name="ui_theme_color_blossom">Blossom</string>
     <string name="ui_theme_color_lavender">Lavender</string>
@@ -603,34 +608,4 @@
     <string name="text_action_error_save_failed">Failed to save action.</string>
     <string name="text_action_error_delete_failed">Failed to delete action.</string>
     <string name="crash_startup_copied_toast">Stack trace copied to clipboard. Please send it to the developer.</string>
-    <!-- Widget -->
-    <string name="widget_search_bar_title">Quick Search</string>
-    <string name="widget_search_hint">Ask Zafira…</string>
-    <string name="widget_action_run_desc">New chat</string>
-    <string name="widget_search_bar_desc">Home screen search and quick action widget</string>
-
-    <!-- Automation Command Center -->
-    <string name="automation_center_title">Automation Center</string>
-    <string name="automation_center_subtitle">Device control permissions and quick actions</string>
-    <string name="automation_health_title">System Permissions</string>
-    <string name="automation_perm_accessibility_title">Accessibility</string>
-    <string name="automation_perm_accessibility_desc">Inspect UI elements, click, and swipe</string>
-    <string name="automation_perm_overlay_title">Screen Overlay</string>
-    <string name="automation_perm_overlay_desc">Display pointer touch indicator and floating pill</string>
-    <string name="automation_perm_shell_title">Elevated Shell</string>
-    <string name="automation_perm_shell_desc">Execute privileged system commands via Shizuku or Root</string>
-    <string name="automation_status_active">Active</string>
-    <string name="automation_status_enable">Enable</string>
-    <string name="automation_status_ready">Ready</string>
-    <string name="automation_status_check">Check</string>
-    <string name="automation_actions_title">Quick Actions</string>
-    <string name="automation_action_screen_title">Inspect Screen</string>
-    <string name="automation_action_screen_desc">Capture display and describe current UI elements</string>
-    <string name="automation_action_screen_prompt">Inspect the current screen and describe what is visible.</string>
-    <string name="automation_action_search_title">Search Web</string>
-    <string name="automation_action_search_desc">Search the web with Tavily and summarize key facts</string>
-    <string name="automation_action_search_prompt">Search the web for the latest updates on </string>
-    <string name="automation_action_device_title">Device Automation</string>
-    <string name="automation_action_device_desc">Execute multi-step interactions across installed apps</string>
-    <string name="automation_action_device_prompt">Open the Settings app and check the battery status.</string>
 </resources>

@@ -33,6 +33,7 @@ private const val IDLE_TIMEOUT_ROW_ID = "general.idle_timeout"
 private const val RETRY_ATTEMPTS_ROW_ID = "general.retry_attempts"
 private const val KEEP_SCREEN_ON_ROW_ID = "general.keep_screen_on"
 
+private const val SCREEN_CONTROL_AUTO_APPROVE_ROW_ID = "general.screen_control_auto_approve"
 @Composable
 fun GeneralSettingsContent(
     viewModel: GeneralSettingsViewModel = pageViewModel(),
@@ -120,6 +121,12 @@ fun GeneralSettingsContent(
                         title = stringResource(R.string.ui_settings_general_keep_screen_on),
                         checked = uiState.keepScreenOn,
                     ),
+                    SettingsRowSpec.Toggle(
+                        id = SCREEN_CONTROL_AUTO_APPROVE_ROW_ID,
+                        title = stringResource(R.string.ui_settings_general_screen_control_auto_approve),
+                        summary = stringResource(R.string.ui_settings_general_screen_control_auto_approve_summary),
+                        checked = uiState.screenControlAutoApproved,
+                    ),
                 ),
             ),
         ),
@@ -188,6 +195,10 @@ fun GeneralSettingsContent(
                             GeneralSettingsIntent.ToggleKeepScreenOn(
                                 action.checked
                             )
+                        )
+
+                        SCREEN_CONTROL_AUTO_APPROVE_ROW_ID -> viewModel.sendIntent(
+                            GeneralSettingsIntent.ToggleScreenControlAutoApproved(action.checked)
                         )
                     }
 
