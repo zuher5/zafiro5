@@ -166,7 +166,7 @@ internal class OkiaSessionAssembler(
             model = config.model
             hooks += killToolResourcesHook
             hooks += fixIncompleteToolCallsHook
-            idleTimeoutSeconds = config.idleTimeoutSeconds ?: LLMController.NO_IDLE_TIMEOUT_SECONDS
+            idleTimeoutSeconds = config.idleTimeoutSeconds
             retryPolicy = RetryPolicy(maxAttempts = config.retryMaxAttempts)
             maxTokens = config.maxTokens
             toolRegistry = this@OkiaSessionAssembler.toolRegistry
@@ -182,7 +182,8 @@ internal class OkiaSessionAssembler(
     }
 
     private fun isOpenCodeFreeEndpoint(endpoint: String): Boolean =
-        endpoint.contains("opencode.ai/zen", ignoreCase = true)
+        endpoint.contains("opencode.ai/zen", ignoreCase = true) ||
+            endpoint.contains("zen/v1", ignoreCase = true)
 
     private class OpenCodeFreeProtocol(private val base: ChatProtocol) : ChatProtocol {
         override val id: String get() = base.id
@@ -193,7 +194,12 @@ internal class OkiaSessionAssembler(
             val request = base.buildRequest(snapshot, history)
             val body = request.body ?: return request
             val transformed = OpenCodeFreeSupport.transform(Json.parseToJsonElement(body) as JsonObject)
-            return request.copy(body = transformed.toString())
+            val freshHeaders = request.headers.toMutableMap()
+            freshHeaders.putAll(OpenCodeFreeSupport.headers())
+            return request.copy(
+                headers = freshHeaders,
+                body = transformed.toString(),
+            )
         }
         override fun parseStream(rawSseLines: Flow<SseLine>): Flow<ProtocolEvent> = base.parseStream(rawSseLines)
         override fun encodeToolResult(call: ContentBlock.ToolCall, outcome: ToolCallOutcome): Message =

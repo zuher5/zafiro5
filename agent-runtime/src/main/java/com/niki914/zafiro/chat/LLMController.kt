@@ -20,7 +20,7 @@ import com.niki914.zafiro.settings.model.RuntimeLlmConfig as LlmConfig
  * 本门面仅代理默认实例，随 M10 演进逐步淘汰。
  */
 object LLMController {
-    internal const val NO_IDLE_TIMEOUT_SECONDS = Long.MAX_VALUE / 1000
+    internal val NO_IDLE_TIMEOUT_SECONDS: Long? = null
 
     val defaultEngine = AgentSessionEngine()
 

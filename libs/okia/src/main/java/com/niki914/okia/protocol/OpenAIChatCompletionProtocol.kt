@@ -99,6 +99,18 @@ class OpenAIChatCompletionProtocol(
                 if (state.responseModel == null) state.responseModel = it
             }
 
+            chunk["error"]?.let { errorElement ->
+                val errorMessage = when (errorElement) {
+                    is JsonObject -> (errorElement["message"] as? JsonPrimitive)?.contentOrNull
+                        ?: errorElement.toString()
+                    is JsonPrimitive -> errorElement.content
+                    else -> errorElement.toString()
+                }
+                emit(ProtocolEvent.Error(IllegalStateException(errorMessage)))
+                failed = true
+                return@collect
+            }
+
             val choice =
                 (chunk["choices"] as? JsonArray)?.firstOrNull() as? JsonObject ?: return@collect
             (choice["finish_reason"] as? JsonPrimitive)?.contentOrNull?.takeIf { it.isNotEmpty() }

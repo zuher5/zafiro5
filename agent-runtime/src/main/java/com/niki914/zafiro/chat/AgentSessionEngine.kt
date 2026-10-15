@@ -163,7 +163,6 @@ class AgentSessionEngine {
             apiKey = configWithoutRuntimePrompt.apiKey
             model = configWithoutRuntimePrompt.model
             idleTimeoutSeconds = configWithoutRuntimePrompt.idleTimeoutSeconds
-                ?: LLMController.NO_IDLE_TIMEOUT_SECONDS
             retryPolicy = RetryPolicy(maxAttempts = configWithoutRuntimePrompt.retryMaxAttempts)
             maxTokens = configWithoutRuntimePrompt.maxTokens
             thinkingLevel = configWithoutRuntimePrompt.thinkingLevel

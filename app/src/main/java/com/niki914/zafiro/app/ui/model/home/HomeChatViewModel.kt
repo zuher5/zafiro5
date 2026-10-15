@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import kotlin.coroutines.resume
 
@@ -498,9 +499,17 @@ class HomeChatViewModel internal constructor(
         }
         agent.updateDraft { it.copy(text = trimmedInput) }
         // stream() is synchronous; don't let it consume Pending images before AgentImpl finishes ingest.
-        agent.draft.first { draft -> draft.images.none { it is DraftImage.Pending } }
+        withTimeoutOrNull(3000L) {
+            agent.draft.first { draft -> draft.images.none { it is DraftImage.Pending } }
+        }
         updateState { copy(isGenerating = true) }
-        val result = agent.stream()
+        val result = try {
+            agent.stream()
+        } catch (t: Throwable) {
+            Logger.e(LOG_TAG, "agent.stream() threw: ${t.message}")
+            updateState { copy(isGenerating = false) }
+            return
+        }
         Logger.i(LOG_TAG, "send result=$result")
         if (result != TurnStart.Started) {
             updateState {
@@ -530,7 +539,12 @@ class HomeChatViewModel internal constructor(
     private suspend fun stopGenerating() {
         if (!currentState.isGenerating) return
         agent.stop()
-        updateState { copy(activeThinkingKey = null) }
+        updateState {
+            copy(
+                isGenerating = false,
+                activeThinkingKey = null,
+            )
+        }
         applyConversation(agent.conversation.value, animateTail = false)
     }
 
