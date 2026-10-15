@@ -687,6 +687,7 @@ class HomeChatViewModel internal constructor(
         val result = conversations.truncateAtTurn(currentId, turnId.toInt())
             ?: return
         Logger.i(LOG_TAG, "regenerate truncate conversationId=$currentId turnId=$turnId")
+        runCatching { agentManager.destroy(currentId) }
         loadConversation(currentId)
         agent.updateDraft { draft ->
             draft.copy(
@@ -697,6 +698,8 @@ class HomeChatViewModel internal constructor(
         }
         if (agent.stream() == TurnStart.Started) {
             updateState { copy(input = "") }
+        } else {
+            updateState { copy(input = result.promptText) }
         }
     }
 

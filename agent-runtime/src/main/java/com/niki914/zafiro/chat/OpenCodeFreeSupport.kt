@@ -20,11 +20,14 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 object OpenCodeFreeSupport {
     private val random = SecureRandom()
-    private const val UA_FALLBACK = "1.18.31"
+    private const val UA_FALLBACK = "1.19.0"
     private val uaVersionRegex = Regex("""^\d+\.\d+\.\d+$""")
     private const val UA_ENV = "BANSOS_OPENCODE_UA"
     private const val BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     private val sessionRegex = Regex("""^ses_[0-9a-f]{12}[0-9A-Za-z]{14}$""")
+
+    const val OPENCODE_PREAMBLE =
+        "You are opencode, an interactive CLI tool that helps users with software engineering tasks. Use the instructions below and the tools available to you to assist the user."
 
     private val fingerprintTools = listOf("bash", "glob", "grep", "read", "edit", "write")
 
@@ -53,15 +56,16 @@ object OpenCodeFreeSupport {
         return mapOf(
             "User-Agent" to getOpenCodeUA(),
             "Authorization" to "Bearer public",
-            "x-opencode-client" to "desktop",
+            "x-opencode-client" to "cli",
             "x-opencode-project" to projectId,
             "x-opencode-session" to sessionId,
+            "x-opencode-session-id" to sessionId,
             "x-session-affinity" to sessionId,
             "x-opencode-request" to generateRequestId(),
             // Distributed-tracing headers real opencode clients emit.
             "b3" to "$traceId-$spanId-1-$spanId",
             "traceparent" to "00-$traceId-$spanId-01",
-            "Accept" to "text/event-stream",
+            "Accept" to "*/*",
         )
     }
 
@@ -69,6 +73,33 @@ object OpenCodeFreeSupport {
         val mutable = body.toMutableMap()
         // Gate: stream=false → 403 even with valid UA/session/tools.
         mutable["stream"] = JsonPrimitive(true)
+
+        // Inject OpenCode system prompt preamble to pass Cloudflare edge inspection
+        val rawMessages = body["messages"] as? JsonArray
+        if (rawMessages != null) {
+            val messagesList = rawMessages.toMutableList()
+            val firstMsg = messagesList.firstOrNull() as? JsonObject
+            val firstRole = (firstMsg?.get("role") as? JsonPrimitive)?.content
+            if (firstRole == "system") {
+                val existingContent = (firstMsg["content"] as? JsonPrimitive)?.content.orEmpty()
+                if (!existingContent.startsWith(OPENCODE_PREAMBLE)) {
+                    val combinedContent = "$OPENCODE_PREAMBLE\n\n$existingContent"
+                    val updatedFirst = firstMsg.toMutableMap()
+                    updatedFirst["content"] = JsonPrimitive(combinedContent)
+                    messagesList[0] = JsonObject(updatedFirst)
+                }
+            } else {
+                val sysMsg = JsonObject(
+                    mapOf(
+                        "role" to JsonPrimitive("system"),
+                        "content" to JsonPrimitive(OPENCODE_PREAMBLE),
+                    ),
+                )
+                messagesList.add(0, sysMsg)
+            }
+            mutable["messages"] = JsonArray(messagesList)
+        }
+
         val model = (body["model"] as? JsonPrimitive)?.content.orEmpty()
         if (responsesModels.contains(model) || model.contains("muse-spark")) {
             val maxOutput = body["max_output_tokens"] as? JsonPrimitive
@@ -82,20 +113,10 @@ object OpenCodeFreeSupport {
             mutable.remove("max_tokens")
             mutable.remove("max_completion_tokens")
             mutable["store"] = JsonPrimitive(false)
-            mutable["tools"] = ensureResponsesFingerprintTools(body)
+            mutable["tools"] = ensureChatFingerprintTools(body)
             mutable["input"] = sanitizeResponsesItems(body)
         } else {
-            val existing = (body["tools"] as? JsonArray)
-                ?.mapNotNull { toolNameOf(it).takeIf(String::isNotBlank) }
-                ?.toMutableSet()
-                ?: mutableSetOf()
-            val injected = fingerprintTools.any { it !in existing }
             mutable["tools"] = ensureChatFingerprintTools(body)
-            // Injected decoys must never be callable; "none" hides them while
-            // caller-declared tools stay callable.
-            if (injected && body["tool_choice"] == null) {
-                mutable["tool_choice"] = JsonPrimitive("none")
-            }
         }
         return JsonObject(mutable)
     }
@@ -105,9 +126,8 @@ object OpenCodeFreeSupport {
         if (!override.isNullOrEmpty()) {
             return if (override.startsWith("opencode/")) override else "opencode/$override"
         }
-        val live = liveUaVersion
-        if (live != null && uaVersionRegex.matches(live)) return "opencode/$live"
-        return "opencode/$UA_FALLBACK"
+        val version = liveUaVersion?.takeIf { uaVersionRegex.matches(it) } ?: UA_FALLBACK
+        return "opencode/$version ai-sdk/provider-utils/4.0.23 runtime/bun/1.3.14"
     }
 
     /** Fire-and-forget: track the live opencode-ai npm version so the gate never
@@ -137,10 +157,13 @@ object OpenCodeFreeSupport {
 
     private fun ensureChatFingerprintTools(body: JsonObject): JsonArray {
         val existing = (body["tools"] as? JsonArray)?.toMutableList() ?: mutableListOf()
-        val present = existing.mapNotNull { toolNameOf(it).takeIf(String::isNotBlank) }.toMutableSet()
-        for (name in fingerprintTools) {
-            if (present.contains(name)) continue
-            existing.add(functionToolJson(name))
+        val present = existing.mapNotNull { toolNameOf(it).takeIf(String::isNotBlank) }.toSet()
+        val fingerprintTools = OpenCodeFingerprintData.toolsJsonArray
+        for (tool in fingerprintTools) {
+            val name = toolNameOf(tool)
+            if (name !in present) {
+                existing.add(tool)
+            }
         }
         return JsonArray(existing)
     }

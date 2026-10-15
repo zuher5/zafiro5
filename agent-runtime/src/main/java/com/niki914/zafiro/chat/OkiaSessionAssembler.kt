@@ -183,7 +183,9 @@ internal class OkiaSessionAssembler(
 
     private fun isOpenCodeFreeEndpoint(endpoint: String): Boolean =
         endpoint.contains("opencode.ai/zen", ignoreCase = true) ||
-            endpoint.contains("zen/v1", ignoreCase = true)
+            endpoint.contains("zen/v1", ignoreCase = true) ||
+            endpoint.contains("opencode.ai/inference", ignoreCase = true) ||
+            endpoint.contains("inference/v1", ignoreCase = true)
 
     private class OpenCodeFreeProtocol(private val base: ChatProtocol) : ChatProtocol {
         override val id: String get() = base.id
@@ -196,7 +198,13 @@ internal class OkiaSessionAssembler(
             val transformed = OpenCodeFreeSupport.transform(Json.parseToJsonElement(body) as JsonObject)
             val freshHeaders = request.headers.toMutableMap()
             freshHeaders.putAll(OpenCodeFreeSupport.headers())
+            val targetUrl = if (request.url.contains("zen/v1", ignoreCase = true)) {
+                request.url.replace("zen/v1", "inference/v1", ignoreCase = true)
+            } else {
+                request.url
+            }
             return request.copy(
+                url = targetUrl,
                 headers = freshHeaders,
                 body = transformed.toString(),
             )
