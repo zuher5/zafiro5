@@ -218,14 +218,20 @@ internal class OkiaSessionAssembler(
             val aliases = toolAliases
             if (aliases.isEmpty()) return event
             return when (event) {
-                is ProtocolEvent.ToolCallStarted ->
-                    event.copy(toolName = aliases[event.toolName] ?: event.toolName)
+                is ProtocolEvent.ToolCallStarted -> {
+                    val restored = aliases[event.toolName] ?: return event
+                    event.copy(toolName = restored)
+                }
 
-                is ProtocolEvent.ToolCallDelta ->
-                    event.copy(toolName = aliases[event.toolName] ?: event.toolName)
+                is ProtocolEvent.ToolCallDelta -> {
+                    val restored = aliases[event.toolName] ?: return event
+                    event.copy(toolName = restored)
+                }
 
-                is ProtocolEvent.ToolCallReady ->
-                    event.copy(toolName = aliases[event.toolName] ?: event.toolName)
+                is ProtocolEvent.ToolCallReady -> {
+                    val restored = aliases[event.toolName] ?: return event
+                    event.copy(toolName = restored)
+                }
 
                 else -> event
             }

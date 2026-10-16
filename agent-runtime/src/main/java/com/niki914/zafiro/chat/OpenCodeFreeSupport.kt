@@ -26,6 +26,7 @@ object OpenCodeFreeSupport {
     private val uaVersionRegex = Regex("""^\d+\.\d+\.\d+$""")
     private const val UA_ENV = "BANSOS_OPENCODE_UA"
     private const val BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    private const val HEX_DIGITS = "0123456789abcdef"
     private val sessionRegex = Regex("""^ses_[0-9a-f]{12}[0-9A-Za-z]{14}$""")
 
     const val OPENCODE_PREAMBLE =
@@ -49,10 +50,12 @@ object OpenCodeFreeSupport {
     // Live UA resolution — offline-safe, never blocks.
     // Precedence: env override > in-process live version > disk cache > pinned.
     // The gate has rejected stale UA versions before; auto-refresh keeps us off that cliff.
-    private val uaClient = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .build()
+    private val uaClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .build()
+    }
     private val uaRefreshed = AtomicBoolean(false)
 
     @Volatile
@@ -183,7 +186,10 @@ object OpenCodeFreeSupport {
      * aliased array plus the wire→caller map for restoring names downstream.
      */
     private fun ensureChatFingerprintTools(body: JsonObject): Pair<JsonArray, Map<String, String>> {
-        val existing = (body["tools"] as? JsonArray)?.toMutableList() ?: mutableListOf()
+        val existing = body["tools"] as? JsonArray
+        if (existing.isNullOrEmpty()) {
+            return OpenCodeFingerprintData.chatTools to emptyMap()
+        }
         val aliases = mutableMapOf<String, String>()
         val tools = existing.map { tool ->
             val name = toolNameOf(tool)
@@ -205,13 +211,17 @@ object OpenCodeFreeSupport {
     }
 
     private fun ensureResponsesFingerprintTools(body: JsonObject): JsonArray {
-        val existing = (body["tools"] as? JsonArray)?.toMutableList() ?: mutableListOf()
-        val present = existing.mapNotNull { toolNameOf(it).takeIf(String::isNotBlank) }.toSet()
+        val existing = body["tools"] as? JsonArray
+        if (existing.isNullOrEmpty()) {
+            return OpenCodeFingerprintData.responsesTools
+        }
+        val tools = existing.toMutableList()
+        val present = tools.mapNotNull { toolNameOf(it).takeIf(String::isNotBlank) }.toSet()
         for (tool in OpenCodeFingerprintData.responsesTools) {
             val name = toolNameOf(tool)
-            if (name !in present) existing.add(tool)
+            if (name !in present) tools.add(tool)
         }
-        return JsonArray(existing)
+        return JsonArray(tools)
     }
 
     /** Rename a tool in either the chat (`function.name`) or responses (`name`) shape. */
@@ -257,18 +267,32 @@ object OpenCodeFreeSupport {
     }
 
     private fun timeHexFrom(value: Long): String {
-        return (0..5).joinToString("") { i ->
-            (((value shr (40 - 8 * i)) and 0xff).toString(16)).padStart(2, '0')
+        val chars = CharArray(12)
+        for (i in 0..5) {
+            val b = ((value ushr (40 - 8 * i)) and 0xff).toInt()
+            chars[i * 2] = HEX_DIGITS[b ushr 4]
+            chars[i * 2 + 1] = HEX_DIGITS[b and 0x0f]
         }
+        return String(chars)
     }
 
     private fun unstableRandom(): String {
-        return (1..14).joinToString("") { BASE62[random.nextInt(BASE62.length)].toString() }
+        val chars = CharArray(14)
+        for (i in 0 until 14) {
+            chars[i] = BASE62[random.nextInt(BASE62.length)]
+        }
+        return String(chars)
     }
 
     private fun randomHex(bytes: Int): String {
         val arr = ByteArray(bytes)
         random.nextBytes(arr)
-        return arr.joinToString("") { "%02x".format(it) }
+        val chars = CharArray(bytes * 2)
+        for (i in 0 until bytes) {
+            val b = arr[i].toInt() and 0xff
+            chars[i * 2] = HEX_DIGITS[b ushr 4]
+            chars[i * 2 + 1] = HEX_DIGITS[b and 0x0f]
+        }
+        return String(chars)
     }
 }
