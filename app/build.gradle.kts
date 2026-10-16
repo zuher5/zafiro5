@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.niki914.zafira"
+        applicationId = "com.niki914.zafiro"
         minSdk = 26
         targetSdk = 34
         versionName = "1.9.1"

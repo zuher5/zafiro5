@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        buildConfigField("String", "APPLICATION_ID", "\"com.niki914.zafira\"")
+        buildConfigField("String", "APPLICATION_ID", "\"com.niki914.zafiro\"")
     }
 
     compileOptions {

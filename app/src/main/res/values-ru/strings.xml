@@ -27,7 +27,7 @@
     <string name="ui_onboard_configure_error_load_failed">Не удалось загрузить настройки: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Не удалось сохранить настройки: %1$s</string>
     <string name="ui_onboard_done_headline">Всё готово.</string>
-    <string name="ui_onboard_done_description">Настройка завершена. Откройте Zafira сейчас или доработайте позже в настройках.</string>
+    <string name="ui_onboard_done_description">Настройка завершена. Откройте Zafiro сейчас или доработайте позже в настройках.</string>
     <string name="ui_onboard_done_enter_home">Открыть Zafiro</string>
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">Новый диалог</string>
@@ -240,7 +240,7 @@
     <string name="tool_permission_allow">Разрешить один раз</string>
     <string name="tool_permission_deny">Запретить</string>
     <string name="screen_control_consent_title">Запрос разрешения на управление экраном</string>
-    <string name="screen_control_consent_body">Zafira нужен доступ к специальным возможностям и отображение поверх других приложений, чтобы управлять экраном. Далее может появиться системный запрос или страница настроек.</string>
+    <string name="screen_control_consent_body">Zafiro нужен доступ к специальным возможностям и отображение поверх других приложений, чтобы управлять экраном. Далее может появиться системный запрос или страница настроек.</string>
     <string name="screen_control_consent_agree">Согласен</string>
     <string name="screen_control_consent_deny">Запретить</string>
     <string name="execution_rules_field_patterns">Шаблоны</string>

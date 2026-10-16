@@ -36,6 +36,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -188,6 +189,9 @@ internal class OkiaSessionAssembler(
             endpoint.contains("inference/v1", ignoreCase = true)
 
     private class OpenCodeFreeProtocol(private val base: ChatProtocol) : ChatProtocol {
+        @Volatile
+        private var toolAliases: Map<String, String> = emptyMap()
+
         override val id: String get() = base.id
         override val defaultEndpoint: String? get() = base.defaultEndpoint
         override fun withCodec(codec: Json): ChatProtocol = base.withCodec(codec)
@@ -195,21 +199,54 @@ internal class OkiaSessionAssembler(
         override suspend fun buildRequest(snapshot: RequestSnapshot, history: List<Message>): HttpRequest {
             val request = base.buildRequest(snapshot, history)
             val body = request.body ?: return request
-            val transformed = OpenCodeFreeSupport.transform(Json.parseToJsonElement(body) as JsonObject)
+            val result = OpenCodeFreeSupport.transform(Json.parseToJsonElement(body) as JsonObject)
+            toolAliases = result.toolAliases
             val freshHeaders = request.headers.toMutableMap()
             freshHeaders.putAll(OpenCodeFreeSupport.headers())
-            val targetUrl = if (request.url.contains("zen/v1", ignoreCase = true)) {
-                request.url.replace("zen/v1", "inference/v1", ignoreCase = true)
-            } else {
-                request.url
-            }
             return request.copy(
-                url = targetUrl,
+                url = rewriteUrl(request.url, result.responsesPath),
                 headers = freshHeaders,
-                body = transformed.toString(),
+                body = result.body.toString(),
             )
         }
-        override fun parseStream(rawSseLines: Flow<SseLine>): Flow<ProtocolEvent> = base.parseStream(rawSseLines)
+
+        override fun parseStream(rawSseLines: Flow<SseLine>): Flow<ProtocolEvent> =
+            base.parseStream(rawSseLines).map(::restoreToolAlias)
+
+        /** Undo the `*_pi` aliasing so the loop sees Zafiro's own tool names. */
+        private fun restoreToolAlias(event: ProtocolEvent): ProtocolEvent {
+            val aliases = toolAliases
+            if (aliases.isEmpty()) return event
+            return when (event) {
+                is ProtocolEvent.ToolCallStarted ->
+                    event.copy(toolName = aliases[event.toolName] ?: event.toolName)
+
+                is ProtocolEvent.ToolCallDelta ->
+                    event.copy(toolName = aliases[event.toolName] ?: event.toolName)
+
+                is ProtocolEvent.ToolCallReady ->
+                    event.copy(toolName = aliases[event.toolName] ?: event.toolName)
+
+                else -> event
+            }
+        }
+
+        // Free-tier chat lives on /inference/v1 (the /zen/v1 path 403s);
+        // muse-class models use the sibling /responses surface.
+        private fun rewriteUrl(url: String, responsesPath: Boolean): String {
+            val inference = if (url.contains("zen/v1", ignoreCase = true)) {
+                url.replace("zen/v1", "inference/v1", ignoreCase = true)
+            } else {
+                url
+            }
+            if (!responsesPath) return inference
+            return if (inference.contains("/responses", ignoreCase = true)) {
+                inference
+            } else {
+                inference.replace("/chat/completions", "/responses", ignoreCase = true)
+            }
+        }
+
         override fun encodeToolResult(call: ContentBlock.ToolCall, outcome: ToolCallOutcome): Message =
             base.encodeToolResult(call, outcome)
         override val compat: Compat get() = base.compat

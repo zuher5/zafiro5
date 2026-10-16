@@ -19,6 +19,13 @@ internal object EndpointInference {
         return host == "api.deepseek.com" || host.endsWith(".deepseek.com")
     }
 
+    /** 免费层对话端点在 opencode.ai/inference/v1；模型目录查询走 /zen/v1/models。 */
+    private fun isOpenCodeInferenceEndpoint(endpoint: String): Boolean {
+        val host = endpoint.substringAfter("://").substringBefore('/').lowercase()
+        val isOpenCodeHost = host == "opencode.ai" || host.endsWith(".opencode.ai")
+        return isOpenCodeHost && endpoint.contains("/inference/", ignoreCase = true)
+    }
+
     private fun deepSeekBaseOf(endpoint: String): String {
         val scheme = if (endpoint.startsWith("http://")) "http://" else "https://"
         val afterScheme = endpoint.substringAfter("://", endpoint)
@@ -99,6 +106,11 @@ internal object EndpointInference {
         if (e.isBlank()) return null
         if (isDeepSeekHost(e)) {
             return "${deepSeekBaseOf(e)}/models"
+        }
+        if (isOpenCodeInferenceEndpoint(e)) {
+            val scheme = if (e.startsWith("http://")) "http://" else "https://"
+            val host = e.substringAfter("://").substringBefore('/')
+            return "$scheme$host/zen/v1/models"
         }
         val remainder = KNOWN_API_TAILS.firstOrNull { e.endsWith(it) }
             ?.let { e.removeSuffix(it) }

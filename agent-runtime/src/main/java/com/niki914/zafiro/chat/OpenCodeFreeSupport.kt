@@ -14,9 +14,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * OpenCode Zen free-tier fingerprint helpers.
  *
- * Ported from pi-bansos: upstream gate requires real OpenCode client
- * headers and a request body matching the OpenCode tool fingerprint.
- * Missing any one → 403 FreeTierError.
+ * Ported from pi-bansos 0.6.3. The v2 gate (2026-10-14) requires real OpenCode
+ * client headers and opencode's own `read` + `shell` tool schemas; the inference
+ * surface rejects `x-opencode-request`. Missing any one → 403 FreeTierError. A
+ * caller tool that shadows a real opencode tool name is aliased `*_pi` on the
+ * wire and restored from the response.
  */
 object OpenCodeFreeSupport {
     private val random = SecureRandom()
@@ -29,13 +31,20 @@ object OpenCodeFreeSupport {
     const val OPENCODE_PREAMBLE =
         "You are opencode, an interactive CLI tool that helps users with software engineering tasks. Use the instructions below and the tools available to you to assist the user."
 
-    private val fingerprintTools = listOf("bash", "glob", "grep", "read", "edit", "write")
-
     private val responsesModels = setOf("muse-spark-1.2-contributor-free", "muse-spark-1.3-contributor-free")
 
     // Project id: zen clients send a 40-char hex project hash.
     private val projectId = randomHex(20)
     private val sessionId = generateSessionId().also { require(sessionRegex.matches(it)) }
+
+    /** Transformed request body plus the wire→caller tool-name aliases the
+     *  response path must undo (empty when no caller tool collided), and
+     *  whether muse-class models target the `/responses` surface. */
+    data class TransformResult(
+        val body: JsonObject,
+        val toolAliases: Map<String, String>,
+        val responsesPath: Boolean,
+    )
 
     // Live UA resolution — offline-safe, never blocks.
     // Precedence: env override > in-process live version > disk cache > pinned.
@@ -49,11 +58,15 @@ object OpenCodeFreeSupport {
     @Volatile
     private var liveUaVersion: String? = null
 
-    fun headers(): Map<String, String> {
+    /**
+     * Fingerprint headers. [includeRequestId] is only true for the `/zen/v1`
+     * catalog call: the inference surface rejects `x-opencode-request`.
+     */
+    fun headers(includeRequestId: Boolean = false): Map<String, String> {
         refreshOpenCodeUA()
         val traceId = randomHex(16)
         val spanId = randomHex(8)
-        return mapOf(
+        val headers = mutableMapOf(
             "User-Agent" to getOpenCodeUA(),
             "Authorization" to "Bearer public",
             "x-opencode-client" to "cli",
@@ -61,44 +74,21 @@ object OpenCodeFreeSupport {
             "x-opencode-session" to sessionId,
             "x-opencode-session-id" to sessionId,
             "x-session-affinity" to sessionId,
-            "x-opencode-request" to generateRequestId(),
             // Distributed-tracing headers real opencode clients emit.
             "b3" to "$traceId-$spanId-1-$spanId",
             "traceparent" to "00-$traceId-$spanId-01",
-            "Accept" to "*/*",
+            "Accept" to "text/event-stream",
         )
+        if (includeRequestId) headers["x-opencode-request"] = generateRequestId()
+        return headers
     }
 
-    fun transform(body: JsonObject): JsonObject {
+    fun transform(body: JsonObject): TransformResult {
         val mutable = body.toMutableMap()
         // Gate: stream=false → 403 even with valid UA/session/tools.
         mutable["stream"] = JsonPrimitive(true)
 
-        // Inject OpenCode system prompt preamble to pass Cloudflare edge inspection
-        val rawMessages = body["messages"] as? JsonArray
-        if (rawMessages != null) {
-            val messagesList = rawMessages.toMutableList()
-            val firstMsg = messagesList.firstOrNull() as? JsonObject
-            val firstRole = (firstMsg?.get("role") as? JsonPrimitive)?.content
-            if (firstRole == "system") {
-                val existingContent = (firstMsg["content"] as? JsonPrimitive)?.content.orEmpty()
-                if (!existingContent.startsWith(OPENCODE_PREAMBLE)) {
-                    val combinedContent = "$OPENCODE_PREAMBLE\n\n$existingContent"
-                    val updatedFirst = firstMsg.toMutableMap()
-                    updatedFirst["content"] = JsonPrimitive(combinedContent)
-                    messagesList[0] = JsonObject(updatedFirst)
-                }
-            } else {
-                val sysMsg = JsonObject(
-                    mapOf(
-                        "role" to JsonPrimitive("system"),
-                        "content" to JsonPrimitive(OPENCODE_PREAMBLE),
-                    ),
-                )
-                messagesList.add(0, sysMsg)
-            }
-            mutable["messages"] = JsonArray(messagesList)
-        }
+        injectPreamble(body, mutable)
 
         val model = (body["model"] as? JsonPrimitive)?.content.orEmpty()
         if (responsesModels.contains(model) || model.contains("muse-spark")) {
@@ -113,12 +103,44 @@ object OpenCodeFreeSupport {
             mutable.remove("max_tokens")
             mutable.remove("max_completion_tokens")
             mutable["store"] = JsonPrimitive(false)
-            mutable["tools"] = ensureChatFingerprintTools(body)
+            mutable["tools"] = ensureResponsesFingerprintTools(body)
             mutable["input"] = sanitizeResponsesItems(body)
-        } else {
-            mutable["tools"] = ensureChatFingerprintTools(body)
+            return TransformResult(JsonObject(mutable), emptyMap(), responsesPath = true)
         }
-        return JsonObject(mutable)
+
+        val (tools, aliases) = ensureChatFingerprintTools(body)
+        mutable["tools"] = tools
+        return TransformResult(JsonObject(mutable), aliases, responsesPath = false)
+    }
+
+    /**
+     * Prepend the OpenCode system-prompt preamble the edge inspects. Existing
+     * first system message is prefixed in place; otherwise a system message is
+     * inserted at the head.
+     */
+    private fun injectPreamble(body: JsonObject, mutable: MutableMap<String, JsonElement>) {
+        val rawMessages = body["messages"] as? JsonArray ?: return
+        val messagesList = rawMessages.toMutableList()
+        val firstMsg = messagesList.firstOrNull() as? JsonObject
+        val firstRole = (firstMsg?.get("role") as? JsonPrimitive)?.content
+        if (firstRole == "system") {
+            val existingContent = (firstMsg["content"] as? JsonPrimitive)?.content.orEmpty()
+            if (!existingContent.startsWith(OPENCODE_PREAMBLE)) {
+                val combinedContent = "$OPENCODE_PREAMBLE\n\n$existingContent"
+                val updatedFirst = firstMsg.toMutableMap()
+                updatedFirst["content"] = JsonPrimitive(combinedContent)
+                messagesList[0] = JsonObject(updatedFirst)
+            }
+        } else {
+            val sysMsg = JsonObject(
+                mapOf(
+                    "role" to JsonPrimitive("system"),
+                    "content" to JsonPrimitive(OPENCODE_PREAMBLE),
+                ),
+            )
+            messagesList.add(0, sysMsg)
+        }
+        mutable["messages"] = JsonArray(messagesList)
     }
 
     fun getOpenCodeUA(): String {
@@ -155,27 +177,53 @@ object OpenCodeFreeSupport {
         }.apply { isDaemon = true }.start()
     }
 
-    private fun ensureChatFingerprintTools(body: JsonObject): JsonArray {
+    /**
+     * Alias caller tools that collide with a real opencode tool name to `*_pi`,
+     * then append the exact `read` + `shell` pair the gate requires. Returns the
+     * aliased array plus the wire→caller map for restoring names downstream.
+     */
+    private fun ensureChatFingerprintTools(body: JsonObject): Pair<JsonArray, Map<String, String>> {
         val existing = (body["tools"] as? JsonArray)?.toMutableList() ?: mutableListOf()
-        val present = existing.mapNotNull { toolNameOf(it).takeIf(String::isNotBlank) }.toSet()
-        val fingerprintTools = OpenCodeFingerprintData.toolsJsonArray
-        for (tool in fingerprintTools) {
+        val aliases = mutableMapOf<String, String>()
+        val tools = existing.map { tool ->
             val name = toolNameOf(tool)
-            if (name !in present) {
-                existing.add(tool)
+            if (name.isEmpty() || name.lowercase() !in OpenCodeFingerprintData.opencodeToolNames) {
+                tool
+            } else {
+                val alias = "${name}_pi"
+                aliases[alias] = name
+                renameTool(tool, alias)
             }
+        }.toMutableList()
+
+        val present = tools.mapNotNull { toolNameOf(it).takeIf(String::isNotBlank) }.toSet()
+        for (tool in OpenCodeFingerprintData.chatTools) {
+            val name = toolNameOf(tool)
+            if (name !in present) tools.add(tool)
         }
-        return JsonArray(existing)
+        return JsonArray(tools) to aliases
     }
 
     private fun ensureResponsesFingerprintTools(body: JsonObject): JsonArray {
         val existing = (body["tools"] as? JsonArray)?.toMutableList() ?: mutableListOf()
-        val present = existing.mapNotNull { toolNameOf(it).takeIf(String::isNotBlank) }.toMutableSet()
-        for (name in fingerprintTools) {
-            if (present.contains(name)) continue
-            existing.add(responsesToolJson(name))
+        val present = existing.mapNotNull { toolNameOf(it).takeIf(String::isNotBlank) }.toSet()
+        for (tool in OpenCodeFingerprintData.responsesTools) {
+            val name = toolNameOf(tool)
+            if (name !in present) existing.add(tool)
         }
         return JsonArray(existing)
+    }
+
+    /** Rename a tool in either the chat (`function.name`) or responses (`name`) shape. */
+    private fun renameTool(tool: JsonElement, alias: String): JsonElement {
+        val obj = tool as? JsonObject ?: return tool
+        val fn = obj["function"] as? JsonObject
+        return if (fn != null) {
+            val updatedFn = fn.toMutableMap().apply { this["name"] = JsonPrimitive(alias) }
+            JsonObject(obj.toMutableMap().apply { this["function"] = JsonObject(updatedFn) })
+        } else {
+            JsonObject(obj.toMutableMap().apply { this["name"] = JsonPrimitive(alias) })
+        }
     }
 
     private fun sanitizeResponsesItems(body: JsonObject): JsonArray {
@@ -195,26 +243,6 @@ object OpenCodeFreeSupport {
         (obj["name"] as? JsonPrimitive)?.contentOrNull?.let { return it.trim() }
         val fn = obj["function"] as? JsonObject ?: return ""
         return (fn["name"] as? JsonPrimitive)?.contentOrNull?.trim().orEmpty()
-    }
-
-    private fun functionToolJson(name: String): JsonObject {
-        return JsonObject(mapOf(
-            "type" to JsonPrimitive("function"),
-            "function" to JsonObject(mapOf(
-                "name" to JsonPrimitive(name),
-                "description" to JsonPrimitive("OpenCode built-in $name tool"),
-                "parameters" to JsonObject(mapOf("type" to JsonPrimitive("object"), "properties" to JsonObject(emptyMap()))),
-            )),
-        ))
-    }
-
-    private fun responsesToolJson(name: String): JsonObject {
-        return JsonObject(mapOf(
-            "type" to JsonPrimitive("function"),
-            "name" to JsonPrimitive(name),
-            "description" to JsonPrimitive("OpenCode built-in $name tool"),
-            "parameters" to JsonObject(mapOf("type" to JsonPrimitive("object"), "properties" to JsonObject(emptyMap()))),
-        ))
     }
 
     // One stable session per process — shape must match sessionRegex.

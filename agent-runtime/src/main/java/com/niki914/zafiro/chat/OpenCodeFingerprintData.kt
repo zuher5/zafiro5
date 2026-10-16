@@ -1,44 +1,131 @@
 package com.niki914.zafiro.chat
 
-import android.util.Base64
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
-import java.io.ByteArrayInputStream
-import java.nio.charset.StandardCharsets
-import java.util.zip.GZIPInputStream
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 /**
- * Built-in OpenCode v1.19.0 tool schemas required by the upstream Edge Gate.
- * Compressed with Gzip + Base64 to stay tiny (~7.8 KB).
+ * OpenCode free-tier tool fingerprint (v2 gate, 2026-10-14).
+ *
+ * The gate requires opencode's own `read` + `shell` tools with the exact
+ * description and parameters schema from packages/core/src/tool/plugin/
+ * {read,shell}.ts; a stub or partial schema 403s. A caller tool whose name
+ * collides with a real opencode tool travels under a `_pi` alias instead.
+ * Ported from pi-bansos 0.6.3.
  */
 internal object OpenCodeFingerprintData {
-    private const val GZIPPED_TOOLS_BASE64 = "" +
-        "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"
 
-    val toolsJsonArray: JsonArray by lazy {
-        try {
-            val bytes = Base64.decode(GZIPPED_TOOLS_BASE64, Base64.DEFAULT)
-            val decompressed = GZIPInputStream(ByteArrayInputStream(bytes)).use {
-                it.bufferedReader(StandardCharsets.UTF_8).readText()
-            }
-            Json.parseToJsonElement(decompressed) as JsonArray
-        } catch (_: Throwable) {
-            // JVM test fallback (where android.util.Base64 might not be mocked)
-            val bytes = java.util.Base64.getDecoder().decode(GZIPPED_TOOLS_BASE64)
-            val decompressed = GZIPInputStream(ByteArrayInputStream(bytes)).use {
-                it.bufferedReader(StandardCharsets.UTF_8).readText()
-            }
-            Json.parseToJsonElement(decompressed) as JsonArray
-        }
-    }
+    /** Real opencode tool names. A caller tool carrying one of these names is
+     *  aliased `*_pi` on the wire so it cannot shadow the exact pair. */
+    val opencodeToolNames: Set<String> = setOf(
+        "read", "shell", "bash", "glob", "grep", "edit", "write", "patch",
+        "webfetch", "websearch", "question", "skill", "subagent", "todowrite",
+        "mcp-resource", "opencode",
+    )
+
+    private const val READ_DESCRIPTION =
+        "Read the contents of a file or directory. Supports text files, images, and PDFs. " +
+            "Images and PDFs are presented directly to the model. Each text line is prefixed " +
+            "by its 1-based line number as <line>: <content>. The prefix is for reference and " +
+            "is not part of the file content. Directory entries are returned one per line. Use " +
+            "offset and limit to read large files or directories in sections. Prefer one larger " +
+            "read over many small slices, and use grep to find specific content in large files."
+
+    private const val SHELL_DESCRIPTION =
+        "Execute a shell command and return its output. Quote file paths containing spaces or " +
+            "special characters. Prefer dedicated tools over shell commands when possible. When " +
+            "output is large, the full result is saved to a file and a truncated preview is " +
+            "returned. Rely on automatic truncation unless filtering the output is more useful. " +
+            "Commands accept an optional timeout, background commands have no timeout by default. " +
+            "Background commands return immediately, and you will be notified when they complete."
+
+    private val readParameters = JsonObject(
+        mapOf(
+            "type" to JsonPrimitive("object"),
+            "properties" to JsonObject(
+                mapOf(
+                    "path" to stringProp("File or directory to read"),
+                    "offset" to numberProp("The line or directory entry to start reading from (1-based)"),
+                    "limit" to numberProp(
+                        "The maximum number of lines or directory entries to read " +
+                            "(defaults to and capped at 2000)"
+                    ),
+                ),
+            ),
+            "required" to JsonArray(listOf(JsonPrimitive("path"))),
+        ),
+    )
+
+    private val shellParameters = JsonObject(
+        mapOf(
+            "type" to JsonPrimitive("object"),
+            "properties" to JsonObject(
+                mapOf(
+                    "command" to stringProp("Shell command string to execute"),
+                    "workdir" to stringProp(
+                        "Working directory to execute the command in. Defaults to the current " +
+                            "working directory. When possible, avoid changing directories in the " +
+                            "command and set the working directory here instead."
+                    ),
+                    "timeout" to numberProp("Timeout in milliseconds. Set to 0 to disable the timeout."),
+                    "background" to boolProp(
+                        "Run the command in the background and return immediately (useful for dev " +
+                            "servers and long-running builds). You do not need to use '&' at the end " +
+                            "of the command when using this parameter. You will be notified when it " +
+                            "completes. DO NOT poll for completion."
+                    ),
+                ),
+            ),
+            "required" to JsonArray(listOf(JsonPrimitive("command"))),
+        ),
+    )
+
+    /** Chat Completions wire shape: `{type, function:{name, description, parameters}}`. */
+    val chatTools: JsonArray = JsonArray(
+        listOf(
+            chatTool("read", READ_DESCRIPTION, readParameters),
+            chatTool("shell", SHELL_DESCRIPTION, shellParameters),
+        ),
+    )
+
+    /** Responses wire shape: `{type, name, description, parameters}`. */
+    val responsesTools: JsonArray = JsonArray(
+        listOf(
+            responsesTool("read", READ_DESCRIPTION, readParameters),
+            responsesTool("shell", SHELL_DESCRIPTION, shellParameters),
+        ),
+    )
+
+    private fun chatTool(name: String, description: String, parameters: JsonObject): JsonObject =
+        JsonObject(
+            mapOf(
+                "type" to JsonPrimitive("function"),
+                "function" to JsonObject(
+                    mapOf(
+                        "name" to JsonPrimitive(name),
+                        "description" to JsonPrimitive(description),
+                        "parameters" to parameters,
+                    ),
+                ),
+            ),
+        )
+
+    private fun responsesTool(name: String, description: String, parameters: JsonObject): JsonObject =
+        JsonObject(
+            mapOf(
+                "type" to JsonPrimitive("function"),
+                "name" to JsonPrimitive(name),
+                "description" to JsonPrimitive(description),
+                "parameters" to parameters,
+            ),
+        )
+
+    private fun stringProp(description: String): JsonObject =
+        JsonObject(mapOf("type" to JsonPrimitive("string"), "description" to JsonPrimitive(description)))
+
+    private fun numberProp(description: String): JsonObject =
+        JsonObject(mapOf("type" to JsonPrimitive("number"), "description" to JsonPrimitive(description)))
+
+    private fun boolProp(description: String): JsonObject =
+        JsonObject(mapOf("type" to JsonPrimitive("boolean"), "description" to JsonPrimitive(description)))
 }
