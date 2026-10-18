@@ -943,7 +943,8 @@ private fun HomePageContentBody(
                         userGroupTailTurnId = tailTurn.id,
                         userGroupTappable = tailTurn.blocks.isNotEmpty() || tailIndex == uiState.turns.lastIndex,
                         userGroupText = userGroupText(uiState.turns, index),
-                        onContentTap = onContentTap,
+                        onContentTap = handleContentTap,
+                        showTapHint = index == 0 && !tapHintDismissed && actionsDisplay == MessageActionsDisplay.OnTap,
                         onReGenerate = onReGenerate,
                         onFork = onFork,
                         onRewind = onRewind,
@@ -1000,7 +1001,7 @@ private fun HomePageContentBody(
             LiquidChatComposer(
                 value = uiState.input,
                 onValueChange = onInputChange,
-                onSendClick = onSendClick,
+                onSendClick = handleSend,
                 onStopClick = onStopClick,
                 isGenerating = uiState.isGenerating,
                 contextProgress = uiState.contextProgress,

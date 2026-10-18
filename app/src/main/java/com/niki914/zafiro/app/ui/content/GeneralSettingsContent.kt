@@ -29,7 +29,6 @@ private const val ALWAYS_SHOW_ACTIONS_ROW_ID = "general.always_show_message_acti
 private const val VOICE_ASSISTANT_ISOLATED_SESSION_ROW_ID =
     "general.voice_assistant_isolated_session"
 
-private const val SCREEN_CONTROL_AUTO_APPROVE_ROW_ID = "general.screen_control_auto_approve"
 @Composable
 fun GeneralSettingsContent(
     viewModel: GeneralSettingsViewModel = pageViewModel(),

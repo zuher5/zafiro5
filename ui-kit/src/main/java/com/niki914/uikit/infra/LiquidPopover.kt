@@ -407,8 +407,7 @@ internal fun LiquidPopoverSurface(
                                 LiquidGlassPresets.Popover.applyEffects(this, isDarkTheme)
                             },
                             onDrawSurface = {
-                                drawRect(opaqueBase.copy(alpha = progress))
-                                drawRect(frostColor)
+                                drawRect(resolvedSurfaceColor)
                             },
                         )
                         .clip(panelShape)
