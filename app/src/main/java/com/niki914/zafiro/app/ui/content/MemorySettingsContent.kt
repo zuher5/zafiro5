@@ -48,6 +48,7 @@ fun MemorySettingsContent() {
                 onClick = {
                     viewModel.sendIntent(MemorySettingsIntent.StartCreate)
                 },
+                contentDescription = "Add Button",
             ),
             backHandler = PageBackHandler(
                 shouldConsumeBack = {
@@ -164,6 +165,8 @@ private fun MemorySettingsContentBody(
         positiveEnabled = !uiState.isSaving,
         enabled = !uiState.isSaving,
         onPositiveClick = onDialogSave,
+        singleLine = false,
+        maxLines = 5,
     )
 
     MemoryDeleteConfirmationDialog(
@@ -242,6 +245,8 @@ private fun MemoryEditDialogPreview() {
                 placeholder = stringResource(R.string.memory_field_content_hint),
                 positiveButtonText = stringResource(R.string.memory_save_action),
                 onPositiveClick = {},
+                singleLine = false,
+                maxLines = 5,
             )
         }
     }

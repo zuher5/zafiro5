@@ -1,5 +1,6 @@
 package com.niki914.zafiro.repo
 
+import com.niki914.zafiro.settings.model.RepetitionSensitivity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -11,6 +12,8 @@ import kotlinx.serialization.json.Json
  * 序列化说明：字段声明顺序即写盘 key 顺序（与历史手写 encode 一致），
  * 缺 key 走默认值，未知 key（如已删除的旧字段）直接忽略，畸形 JSON 回全默认值。
  */
+const val DEFAULT_COMPACTION_THRESHOLD_PERCENT: Int = 70
+
 @Serializable
 internal data class AppStateSettings(
     @SerialName("onboarding_completed")
@@ -20,15 +23,15 @@ internal data class AppStateSettings(
     /** BCP-47 tag；空串 = 跟随系统语言。 */
     @SerialName("language_tag")
     val languageTag: String = "",
-    /** 冷启动是否恢复上次会话；false = 默认进入新对话。 */
+    /** 冷启动是否恢复上次会话；true = 默认进入上次会话。 */
     @SerialName("load_last_conversation_on_startup")
-    val loadLastConversationOnStartup: Boolean = false,
+    val loadLastConversationOnStartup: Boolean = true,
     /** 主题深浅色模式；system/light/dark。 */
     @SerialName("theme_mode")
-    val themeMode: String = "dark",
+    val themeMode: String = "light",
     /** 主题种子色 ARGB hex；空串 = 跟随壁纸动态色。 */
     @SerialName("theme_seed_color")
-    val themeSeedColor: String = "",
+    val themeSeedColor: String = "FFFABD00",
     /** Markdown 字体排版缩放比例；基准为 1.0f (100%)。 */
     @SerialName("markdown_scale")
     val markdownScale: Float = 1.0f,
@@ -38,6 +41,12 @@ internal data class AppStateSettings(
     /** 传输层自动重试次数。 */
     @SerialName("llm_retry_max_attempts")
     val llmRetryMaxAttempts: Int = 3,
+    /** 复读检测灵敏度档位（RepetitionSensitivity.wireValue）。 */
+    @SerialName("repetition_sensitivity")
+    val repetitionSensitivity: String = "loose",
+    /** 上下文自动压缩阈值百分比（30..95，0 = 关闭，默认 70）。 */
+    @SerialName("context_compaction_threshold_percent")
+    val contextCompactionThresholdPercent: Int = DEFAULT_COMPACTION_THRESHOLD_PERCENT,
     /** 回答进行中保持屏幕常亮。 */
     @SerialName("keep_screen_on")
     val keepScreenOn: Boolean = true,
@@ -92,9 +101,20 @@ internal object AppStateSettingsCodec {
         return try {
             // 显式 serializer：与 ConversationRepo 一致（reified 重载在本模块不可用）。
             json.decodeFromString(AppStateSettings.serializer(), jsonString).let {
-                // 损坏文件里的兜底：themeMode 空串回到 dark；markdown_scale 越界夹回可用区间。
-                val fixed = if (it.themeMode.isBlank()) it.copy(themeMode = "dark") else it
-                fixed.copy(markdownScale = fixed.markdownScale.coerceIn(0.6f, 1.4f))
+                // 损坏文件里的兜底：themeMode 空串回到 light；markdown_scale 越界夹回可用区间。
+                val fixed = if (it.themeMode.isBlank()) it.copy(themeMode = "light") else it
+                // 灵敏度是开放字符串：未知值（手改 / 拼错 / 其他版本写入）回默认档，不崩。
+                val sanitizedCompactionThreshold = when {
+                    fixed.contextCompactionThresholdPercent == 0 -> 0
+                    else -> fixed.contextCompactionThresholdPercent.coerceIn(30, 95)
+                }
+                fixed.copy(
+                    markdownScale = fixed.markdownScale.coerceIn(0.6f, 1.4f),
+                    repetitionSensitivity = RepetitionSensitivity.fromWire(
+                        fixed.repetitionSensitivity
+                    ).wireValue,
+                    contextCompactionThresholdPercent = sanitizedCompactionThreshold,
+                )
             }
         } catch (_: SerializationException) {
             AppStateSettings()

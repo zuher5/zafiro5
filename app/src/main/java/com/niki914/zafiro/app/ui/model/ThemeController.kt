@@ -22,13 +22,13 @@ enum class ThemeMode(val storageKey: String) {
 
     companion object {
         fun fromStorageKey(value: String?): ThemeMode =
-            entries.firstOrNull { it.storageKey == value } ?: System
+            entries.firstOrNull { it.storageKey == value } ?: Light
     }
 }
 
 /** 主题偏好：深浅色模式 + 种子色（空 = 跟随壁纸动态色）。 */
 data class ThemePrefs(
-    val mode: ThemeMode = ThemeMode.Dark,
+    val mode: ThemeMode = ThemeMode.Light,
     /** ARGB int；null = 壁纸动态色。 */
     val seedColor: Int? = 0xFF52DBC9.toInt(),
     val isCatppuccin: Boolean = false,

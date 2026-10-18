@@ -72,7 +72,7 @@ class FloatingBallViewModelTest {
         advanceUntilIdle()
         viewModel.sendIntent(
             FloatingBallIntent.UpdateApprovalRequest(
-                ApprovalRequest.ToolExecution("sh", "echo 1", "test_rule")
+                ApprovalRequest.ToolExecution("sh", "echo 1", "test_rule", "echo")
             )
         )
         advanceUntilIdle()
@@ -93,7 +93,7 @@ class FloatingBallViewModelTest {
         assertEquals(FloatingBallState.Collapsed, viewModel.uiStateFlow.value.ballState)
 
         val effectDeferred = async { viewModel.uiEffect.first() }
-        val request = ApprovalRequest.ToolExecution("terminal", "rm -rf /tmp", "dangerous_rm")
+        val request = ApprovalRequest.ToolExecution("terminal", "rm -rf /tmp", "dangerous_rm", "rm -rf")
         viewModel.sendIntent(FloatingBallIntent.UpdateApprovalRequest(request))
         advanceUntilIdle()
 
@@ -111,7 +111,7 @@ class FloatingBallViewModelTest {
     @Test
     fun openAndCloseDetail_togglesState() = runTest {
         val viewModel = FloatingBallViewModel()
-        val request = ApprovalRequest.ToolExecution("terminal", "ls", "safe_ls")
+        val request = ApprovalRequest.ToolExecution("terminal", "ls", "safe_ls", "ls")
         viewModel.sendIntent(FloatingBallIntent.UpdateApprovalRequest(request))
         viewModel.sendIntent(FloatingBallIntent.CommitExpand)
         advanceUntilIdle()
@@ -128,7 +128,7 @@ class FloatingBallViewModelTest {
     @Test
     fun allowApproval_settlesAndClearsRequest() = runTest {
         val viewModel = FloatingBallViewModel()
-        val request = ApprovalRequest.ToolExecution("terminal", "id", "safe_id")
+        val request = ApprovalRequest.ToolExecution("terminal", "id", "safe_id", "id")
         viewModel.sendIntent(FloatingBallIntent.UpdateApprovalRequest(request))
         viewModel.sendIntent(FloatingBallIntent.CommitExpand)
         advanceUntilIdle()
@@ -151,7 +151,7 @@ class FloatingBallViewModelTest {
     @Test
     fun denyApproval_settlesAndClearsRequest() = runTest {
         val viewModel = FloatingBallViewModel()
-        val request = ApprovalRequest.ToolExecution("terminal", "shutdown", "danger")
+        val request = ApprovalRequest.ToolExecution("terminal", "shutdown", "danger", "shutdown")
         viewModel.sendIntent(FloatingBallIntent.UpdateApprovalRequest(request))
         advanceUntilIdle()
 
@@ -177,6 +177,49 @@ class FloatingBallViewModelTest {
         val state = viewModel.uiStateFlow.value
         assertEquals("正在生成天气信息...", state.preview)
         assertTrue(state.isStopEnabled)
+    }
+
+    // 保护：预览不得被上游 500 字喂满；超长正文必须截到 100 字，否则每次重组都要排版 5 倍文本
+    @Test
+    fun updateAgentStatus_clampsPreviewToTokenLimit() = runTest {
+        val viewModel = FloatingBallViewModel()
+        viewModel.sendIntent(FloatingBallIntent.UpdateAgentStatus("字".repeat(500), true))
+        advanceUntilIdle()
+
+        assertEquals(FloatingBallTokens.previewMaxChars, viewModel.uiStateFlow.value.preview?.length)
+    }
+
+    // 保护：截断不得切断代理对，否则 emoji 会渲染成半个字；第 100 个位置正好是 emoji 高代理时只取到第 99 个
+    @Test
+    fun updateAgentStatus_clampNeverSplitsSurrogatePair() = runTest {
+        val viewModel = FloatingBallViewModel()
+        // 前 99 字占位，第 100/101 位是一对代理对，截到 100 时不能把它劈开
+        val emoji = "\uD83D\uDE00"
+        viewModel.sendIntent(FloatingBallIntent.UpdateAgentStatus("a".repeat(99) + emoji + "tail", true))
+        advanceUntilIdle()
+
+        val preview = viewModel.uiStateFlow.value.preview!!
+        assertEquals(99, preview.length)
+        assertFalse(Character.isHighSurrogate(preview.last()))
+    }
+
+    // 保护：到字数上限后上游仍每 250ms 推同一段恒值，状态必须不再发射新值，否则持续白费一次重组
+    @Test
+    fun updateAgentStatus_identicalPreviewDoesNotReemitState() = runTest {
+        val viewModel = FloatingBallViewModel()
+        val saturated = "字".repeat(500)
+        viewModel.sendIntent(FloatingBallIntent.UpdateAgentStatus(saturated, true))
+        advanceUntilIdle()
+
+        val emissions = mutableListOf<String?>()
+        val collector = async { viewModel.uiStateFlow.collect { emissions += it.preview } }
+
+        viewModel.sendIntent(FloatingBallIntent.UpdateAgentStatus(saturated, true))
+        advanceUntilIdle()
+        collector.cancel()
+
+        // 重发同一段恒值不产生新发射，只要初始值
+        assertEquals(listOf(FloatingBallTokens.previewMaxChars.let { "字".repeat(it) }), emissions)
     }
 
     @Test
@@ -228,7 +271,7 @@ class FloatingBallViewModelTest {
 
         viewModel.sendIntent(
             FloatingBallIntent.UpdateApprovalRequest(
-                ApprovalRequest.ToolExecution("terminal", "rm -rf /", "danger")
+                ApprovalRequest.ToolExecution("terminal", "rm -rf /", "danger", "rm -rf")
             )
         )
         advanceUntilIdle()

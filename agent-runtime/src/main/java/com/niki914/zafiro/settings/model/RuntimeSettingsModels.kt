@@ -38,6 +38,10 @@ data class RuntimeLlmConfig(
     val contextWindowTokens: Long = DEFAULT_CONTEXT_WINDOW_TOKENS,
     /** ThinkingLevel.wireValue；空串 = 不发送思考字段（Provider 默认行为）。 */
     val thinkingLevel: String = "",
+    /** 复读检测灵敏度档位；见 [RepetitionSensitivity]。 */
+    val repetitionSensitivity: RepetitionSensitivity = RepetitionSensitivity.DEFAULT,
+    /** 上下文自动压缩阈值百分比（例如 70 表示 70%，0 表示关闭）。 */
+    val compactionThresholdPercent: Int = 70,
 )
 
 enum class RuntimeAgentMemoryMode {
@@ -108,6 +112,7 @@ data class RuntimeCustomPyTool(
 ) {
     companion object {
         const val DEFAULT_CUSTOM_PY_TOOL_TIMEOUT_MS: Long = 30_000L
+        const val MIN_CUSTOM_PY_TOOL_TIMEOUT_MS: Long = 1_000L
         const val MAX_CUSTOM_PY_TOOL_TIMEOUT_MS: Long = 120_000L
     }
 }
@@ -175,6 +180,7 @@ data class RuntimeToolValidation(
 /**
  * Zafiro 把自己作为 MCP 服务对外暴露的配置。
  * 默认关闭服务，且仅在白名单内的安全工具默认开放；高危工具（terminal/python）默认关闭。
+ * [keepScreenOn] 只影响服务 Running 时的 CPU 防休眠，MCP 调用不要求屏幕常亮。
  */
 data class RuntimeMcpServiceConfig(
     val enabled: Boolean = false,
@@ -182,6 +188,7 @@ data class RuntimeMcpServiceConfig(
     val host: String = DEFAULT_HOST,
     val bearerToken: String = "",
     val exposedTools: Set<String> = DEFAULT_EXPOSED_TOOLS,
+    val keepScreenOn: Boolean = true,
 ) {
     fun isToolExposed(toolName: String): Boolean {
         if (toolName.startsWith("mcp__")) {
@@ -192,6 +199,8 @@ data class RuntimeMcpServiceConfig(
 
     companion object {
         const val DEFAULT_PORT: Int = 8791
+        const val MIN_PORT: Int = 1024
+        const val MAX_PORT: Int = 65535
         const val DEFAULT_HOST: String = "127.0.0.1"
 
         val DEFAULT_EXPOSED_TOOLS: Set<String> = setOf(

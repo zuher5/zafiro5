@@ -6,10 +6,13 @@ import com.niki914.okia.conversation.Conversation
 import com.niki914.okia.conversation.SessionSnapshot
 import com.niki914.okia.error.RetryPolicy
 import com.niki914.okia.message.ContentBlock
+import com.niki914.okia.message.Message
 import com.niki914.okia.message.ThinkingLevel
+import com.niki914.okia.message.contextTokens
 import com.niki914.okia.tooling.ToolRegistry
 import com.niki914.zafiro.api.AgentControl
 import com.niki914.zafiro.api.model.FileRef
+import com.niki914.zafiro.chat.compaction.Compactor
 import com.niki914.zafiro.chat.agentic.IngestedImage
 import com.niki914.zafiro.chat.agentic.PromptComposer
 import com.niki914.zafiro.chat.agentic.PromptComposerInput
@@ -18,6 +21,7 @@ import com.niki914.zafiro.chat.agentic.shell.TerminalSessionPool
 import com.niki914.zafiro.settings.RuntimeEnvironment
 import com.niki914.zafiro.settings.model.DEFAULT_CONTEXT_WINDOW_TOKENS
 import com.niki914.zafiro.settings.model.LlmProtocol
+import com.niki914.zafiro.settings.model.RuntimeLlmConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +43,17 @@ import java.util.UUID
  * - 独立的流执行管道与回合状态（[LlmStreamPipeline]）。
  */
 class AgentSessionEngine {
-    private companion object {
+    companion object {
         const val LOG_TAG = "niki914_zafiro_AgentSessionEngine"
+        const val NO_IDLE_TIMEOUT_SECONDS = Long.MAX_VALUE / 1000
+    }
+
+    fun interface OkiaFactory {
+        suspend fun create(
+            protocol: LlmProtocol,
+            restore: SessionSnapshot?,
+            config: ResolvedLlmConfig,
+        ): Okia
     }
 
     val tenantId: String = UUID.randomUUID().toString()
@@ -69,13 +82,19 @@ class AgentSessionEngine {
 
     internal val toolRegistry: ToolRegistry get() = toolSynchronizer.toolRegistry
 
+    var compactor: Compactor = Compactor(
+        summaryGenerator = { systemPrompt, userPrompt ->
+            generateSummary(systemPrompt, userPrompt)
+        }
+    )
+
     internal var okia: Okia?
         get() = sessionAssembler.activeSession
         set(value) {
             sessionAssembler.activeSession = value
         }
 
-    internal var okiaFactory: LLMController.OkiaFactory
+    internal var okiaFactory: OkiaFactory
         get() = sessionAssembler.okiaFactory
         set(value) {
             sessionAssembler.okiaFactory = value
@@ -104,6 +123,11 @@ class AgentSessionEngine {
         prefixComposer.reset()
         contextWindowFlow.value = DEFAULT_CONTEXT_WINDOW_TOKENS
         boundConfigId = ""
+        compactor = Compactor(
+            summaryGenerator = { systemPrompt, userPrompt ->
+                generateSummary(systemPrompt, userPrompt)
+            }
+        )
     }
 
     suspend fun refresh(restore: SessionSnapshot? = null): LlmRuntimeSnapshot {
@@ -112,6 +136,7 @@ class AgentSessionEngine {
         val llmConfig = gateway.readLlmConfig(configId = boundConfigId.takeIf { it.isNotBlank() })
         sessionAssembler.validateLlmConfig(llmConfig)
         contextWindowFlow.value = llmConfig.contextWindowTokens
+        compactor.thresholdRatio = llmConfig.compactionThresholdPercent / 100f
         Logger.i(
             LOG_TAG,
             "config read provider=${llmConfig.provider} model=${llmConfig.model} " +
@@ -147,6 +172,7 @@ class AgentSessionEngine {
             maxTokens = llmConfig.maxTokens,
             thinkingLevel = llmConfig.thinkingLevel.takeIf(String::isNotBlank)
                 ?.let(ThinkingLevel::fromWire),
+            repetitionSensitivity = llmConfig.repetitionSensitivity,
         )
 
         val previousSession = runtimeState?.okia
@@ -163,9 +189,11 @@ class AgentSessionEngine {
             apiKey = configWithoutRuntimePrompt.apiKey
             model = configWithoutRuntimePrompt.model
             idleTimeoutSeconds = configWithoutRuntimePrompt.idleTimeoutSeconds
+                ?: NO_IDLE_TIMEOUT_SECONDS
             retryPolicy = RetryPolicy(maxAttempts = configWithoutRuntimePrompt.retryMaxAttempts)
             maxTokens = configWithoutRuntimePrompt.maxTokens
             thinkingLevel = configWithoutRuntimePrompt.thinkingLevel
+            repetitionConfig = configWithoutRuntimePrompt.repetitionSensitivity.toRepetitionConfig()
             proxy = configWithoutRuntimePrompt.proxy
             supportsImages =
                 sessionAssembler.isImageSupported(configWithoutRuntimePrompt.supportsImages)
@@ -222,6 +250,7 @@ class AgentSessionEngine {
      */
     suspend fun openSession(restore: SessionSnapshot) {
         val startedAtMs = System.currentTimeMillis()
+        prefixComposer.reset()
         Logger.i(
             LOG_TAG,
             "open session id=${restore.id} entries=${restore.entries.size} started"
@@ -277,7 +306,7 @@ class AgentSessionEngine {
             )
 
             val notifications = TerminalSessionPool.drainPendingNotifications()
-            val mcpNotice = prefixComposer.mcpFailureNotice(state.okia)
+            val mcpNotice = prefixComposer.mcpNotice(state.okia)
             val injection = prefixComposer.buildInjectionPrefixes(files, mcpNotice, notifications)
             if (injection != null) {
                 Logger.i(
@@ -292,6 +321,16 @@ class AgentSessionEngine {
             } else {
                 query
             }
+
+            val currentSession = state.okia
+            val contextTokens = contextTokensOf(currentSession.conversation.value) ?: 0L
+            val contextWindow = contextWindowTokens.value
+            compactor.compact(
+                session = currentSession,
+                force = false,
+                contextTokens = contextTokens,
+                contextWindow = contextWindow,
+            )
 
             streamPipeline.execute(
                 session = state.okia,
@@ -324,6 +363,7 @@ class AgentSessionEngine {
         Logger.i(LOG_TAG, "close session requested tenantId=$tenantId")
         TerminalSessionPool.closeTenantSessions(tenantId)
         sessionAssembler.closeSession()
+        prefixComposer.reset()
         runtimeState = null
         boundConfigId = ""
         Logger.i(LOG_TAG, "close session done")
@@ -332,6 +372,7 @@ class AgentSessionEngine {
     suspend fun resetConversation() {
         Logger.i(LOG_TAG, "reset conversation requested")
         sessionAssembler.resetConversation()
+        prefixComposer.reset()
         runtimeState = null
         boundConfigId = ""
         Logger.i(LOG_TAG, "reset conversation done")
@@ -345,6 +386,49 @@ class AgentSessionEngine {
 
     suspend fun ingestUserImage(uriString: String): IngestedImage? =
         imageManager.ingestUserImage(uriString)
+
+    suspend fun compact(force: Boolean = false): Boolean {
+        val session = okia ?: run {
+            refresh()
+            okia
+        } ?: return false
+        val state = runtimeState ?: run {
+            refresh()
+            runtimeState
+        } ?: return false
+        val contextTokens = contextTokensOf(session.conversation.value) ?: 0L
+        val contextWindow = contextWindowTokens.value
+        return compactor.compact(
+            session = session,
+            force = force,
+            contextTokens = contextTokens,
+            contextWindow = contextWindow,
+        )
+    }
+
+    private suspend fun generateSummary(systemPrompt: String, userPrompt: String): String {
+        val state = runtimeState ?: run {
+            refresh()
+            runtimeState
+        } ?: return ""
+        val protocol = state.sessionProtocol ?: LlmProtocol.Default
+        return sessionAssembler.generateSummary(
+            protocol = protocol,
+            config = state.snapshot.config,
+            systemPrompt = systemPrompt,
+            userPrompt = userPrompt,
+        )
+    }
+
+    private fun contextTokensOf(conversation: Conversation?): Long? {
+        conversation?.live?.usage?.contextTokens?.let { return it }
+        return conversation?.history?.asReversed()?.firstNotNullOfOrNull { entry ->
+            (entry.message as? Message.Assistant)?.message?.usage?.contextTokens
+        }
+    }
+
+    internal fun validateLlmConfig(config: RuntimeLlmConfig) =
+        sessionAssembler.validateLlmConfig(config)
 
     private data class RuntimeState(
         val snapshot: LlmRuntimeSnapshot,

@@ -32,12 +32,27 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import android.os.Build
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
+import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberCombinedBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import com.kyant.backdrop.drawPlainBackdrop
+import com.kyant.backdrop.effects.blur
+import com.kyant.backdrop.effects.runtimeShaderEffect
+import com.niki914.uikit.base.LocalAppDarkTheme
 import com.niki914.uikit.infra.nav.TitleBarScrollState
+
+val LocalScreenBackdrop: ProvidableCompositionLocal<Backdrop?> =
+    staticCompositionLocalOf { null }
 
 /** 底部安全距离中，系统导航栏 inset 之外额外留出的设计间距。 */
 private val BottomInsetSpacing = 50.dp
@@ -63,6 +78,10 @@ fun LiquidScreen(
     isOccluded: Boolean = false,
     leftButtonAlpha: Float = 1f,
     rightButtonAlpha: Float = 1f,
+    showLeftButton: Boolean? = null,
+    showRightButton: Boolean? = null,
+    onLeftClick: (() -> Unit)? = null,
+    onRightClick: (() -> Unit)? = null,
     onLeftButtonBoundsChanged: ((Rect) -> Unit)? = null,
     onRightButtonBoundsChanged: ((Rect) -> Unit)? = null,
     leftButton: (@Composable () -> Unit)? = null,
@@ -71,7 +90,9 @@ fun LiquidScreen(
     content: @Composable () -> Unit,
 ) {
     val density = LocalDensity.current
+    val contentBackdrop = rememberLayerBackdrop()
     val chromeBackdrop = rememberLayerBackdrop()
+    val screenBackdrop = rememberCombinedBackdrop(contentBackdrop, chromeBackdrop)
     val titleHorizontalPadding = with(density) { 12.dp * 2 + 48.sp.toDp() }
     val dialogHostState = remember { LiquidDialogHostState() }
     val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -122,27 +143,33 @@ fun LiquidScreen(
         state.setActionBarHeight(actionBarHeight)
     }
 
-    Box(
-        modifier = modifier.fillMaxSize(),
+    CompositionLocalProvider(
+        LocalScreenBackdrop provides screenBackdrop,
+        LocalLiquidDialogHostState provides dialogHostState,
+        LocalHasActiveDialog provides dialogHostState.hasActiveDialog,
     ) {
-        // Layer 1: page content
-        CompositionLocalProvider(
-            LocalLiquidScreenContentContext provides LiquidScreenContentContext(
-                topPadding = actionBarHeight,
-                bottomPadding = navigationBottom + BottomInsetSpacing,
-                actionButtonBottomPadding = navigationBottom + ActionButtonBottomSpacing,
-            ),
-            LocalLiquidDialogHostState provides dialogHostState,
-            LocalHasActiveDialog provides dialogHostState.hasActiveDialog,
+        Box(
+            modifier = modifier.fillMaxSize(),
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(titleBarScrollConnection),
+            // Layer 1: page content
+            CompositionLocalProvider(
+                LocalLiquidScreenContentContext provides LiquidScreenContentContext(
+                    topPadding = actionBarHeight,
+                    bottomPadding = navigationBottom + BottomInsetSpacing,
+                    actionButtonBottomPadding = navigationBottom + ActionButtonBottomSpacing,
+                    isTitleCollapsible = state.isTitleCollapsible,
+                ),
             ) {
-                content()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(titleBarScrollConnection)
+                        .layerBackdrop(contentBackdrop)
+                        .background(MaterialTheme.colorScheme.background),
+                ) {
+                    content()
+                }
             }
-        }
 
         // Layer 2: action bar background
         AnimatedVisibility(
@@ -153,16 +180,74 @@ fun LiquidScreen(
             enter = fadeIn(tween(320, easing = FastOutSlowInEasing)),
             exit = fadeOut(tween(320, easing = FastOutSlowInEasing)),
         ) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(chromeHeight)
-                    .layerBackdrop(chromeBackdrop)
-                    .background(
-                        MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = barAlpha),
-                    ),
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val isDarkTheme = LocalAppDarkTheme.current
+                val tintColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                val blurRadius = LiquidGlassPresets.TopBar.blurRadius(isDarkTheme)
+                val baseTintIntensity = LiquidGlassPresets.TopBar.tintIntensity(isDarkTheme)
+                val topInsetPx = with(density) { topInset.toPx() }
+                val fadeStartY = with(density) { (topInset + buttonSlotHeight / 2).toPx() }
+
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(chromeHeight)
+                        .graphicsLayer { alpha = barAlpha }
+                        .drawPlainBackdrop(
+                            backdrop = contentBackdrop,
+                            shape = { RectangleShape },
+                            exportedBackdrop = chromeBackdrop,
+                            effects = {
+                                blur(blurRadius.toPx())
+                                runtimeShaderEffect(
+                                    "ActionBarProgressiveBlur_v3",
+                                    """
+                                    uniform shader content;
+                                    uniform float2 size;
+                                    layout(color) uniform half4 tint;
+                                    uniform float tintIntensity;
+                                    uniform float progress;
+                                    uniform float fadeStartY;
+                                    uniform float topInset;
+
+                                    half4 main(float2 coord) {
+                                        // 从 fadeStartY（标题中线）向下衰减至 size.y 归零完全透明
+                                        float blurAlpha = smoothstep(size.y, fadeStartY, coord.y) * progress;
+                                        float tintAlpha = smoothstep(size.y, fadeStartY, coord.y) * progress;
+
+                                        // 向上到达屏幕顶部（0 ~ topInset 状态栏区间）时，底色浓度平滑升至 1.0，呈现纯正的 surfaceContainerHigh 原生背景色
+                                        float topSolidFactor = smoothstep(topInset, 0.0, coord.y);
+                                        float currentTintIntensity = mix(tintIntensity, 1.0, topSolidFactor);
+
+                                        return mix(content.eval(coord) * blurAlpha, tint * tintAlpha, currentTintIntensity);
+                                    }
+                                    """.trimIndent(),
+                                    "content",
+                                ) {
+                                    setFloatUniform("size", size.width, size.height)
+                                    setColorUniform("tint", tintColor)
+                                    setFloatUniform("tintIntensity", baseTintIntensity)
+                                    setFloatUniform("progress", barAlpha)
+                                    setFloatUniform("fadeStartY", fadeStartY)
+                                    setFloatUniform("topInset", topInsetPx)
+                                }
+                            },
+                        ),
+                )
+            } else {
+                // Android 13 以下统一采用 surfaceContainerHigh 整体容器背景
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(chromeHeight)
+                        .layerBackdrop(chromeBackdrop)
+                        .background(
+                            MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = barAlpha),
+                        ),
+                )
+            }
         }
+
 
         // Layer 3: action bar foreground
         Box(
@@ -172,6 +257,11 @@ fun LiquidScreen(
                 .fillMaxWidth()
                 .height(chromeHeight),
         ) {
+            val resolvedShowLeftButton = showLeftButton ?: state.showLeftButton
+            val resolvedShowRightButton = showRightButton ?: state.showRightButton
+            val resolvedOnLeftClick = onLeftClick ?: state.onLeftClick
+            val resolvedOnRightClick = onRightClick ?: state.onRightClick
+
             LiquidTopBar(
                 title = state.title,
                 titleDirection = state.titleDirection,
@@ -179,14 +269,14 @@ fun LiquidScreen(
                 isOccluded = isOccluded,
                 leftButtonAlpha = leftButtonAlpha,
                 rightButtonAlpha = rightButtonAlpha,
-                showLeftButton = state.showLeftButton,
-                showRightButton = state.showRightButton,
+                showLeftButton = resolvedShowLeftButton,
+                showRightButton = resolvedShowRightButton,
                 actionsEnabled = actionsEnabled,
-                onLeftClick = state.onLeftClick,
-                onRightClick = state.onRightClick,
+                onLeftClick = resolvedOnLeftClick,
+                onRightClick = resolvedOnRightClick,
                 onLeftButtonBoundsChanged = onLeftButtonBoundsChanged,
                 onRightButtonBoundsChanged = onRightButtonBoundsChanged,
-                backdrop = chromeBackdrop,
+                backdrop = screenBackdrop,
                 topInset = topInset,
                 titleHorizontalPadding = titleHorizontalPadding,
                 leftButton = leftButton,
@@ -208,4 +298,5 @@ fun LiquidScreen(
             }
         }
     }
+}
 }

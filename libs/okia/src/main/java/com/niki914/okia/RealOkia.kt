@@ -1,6 +1,7 @@
 package com.niki914.okia
 
 import com.niki914.okia.conversation.Conversation
+import com.niki914.okia.conversation.ConversationEntry
 import com.niki914.okia.conversation.RealConversation
 import com.niki914.okia.conversation.SessionSnapshot
 import com.niki914.okia.error.CallbackException
@@ -197,6 +198,14 @@ internal class RealOkia(
         turn.job.cancelAndJoin()
     }
 
+    override suspend fun append(message: Message): ConversationEntry = mutex.withLock {
+        check(!closed) { "Okia is closed" }
+        check(activeTurn == null) { "cannot append during active turn" }
+        val entry = tree.append(message)
+        publish()
+        entry
+    }
+
     override suspend fun rewind(entryId: String) {
         // 检查 + 操作同一临界区（评审发现 5）：并发 send 不能在 check 通过后、
         // tree.rewind 前启动（否则活跃回合中回退历史，loop 与树 leaf 不一致）
@@ -293,6 +302,8 @@ internal class RealOkia(
             hooks = cfg.hooks,
             httpEngine = engine,
             retryPolicy = cfg.retryPolicy,
+            repetitionConfig = cfg.repetitionConfig,
+            requestLogger = cfg.requestLogger,
             onCommit = { messages ->
                 tree.appendAll(messages)
                 live = null

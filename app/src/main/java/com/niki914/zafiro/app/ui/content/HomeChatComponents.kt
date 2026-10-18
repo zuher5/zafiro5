@@ -3,6 +3,7 @@ package com.niki914.zafiro.app.ui.content
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalIndication
+import com.kyant.backdrop.Backdrop
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -25,6 +26,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallSplit
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
@@ -85,6 +88,7 @@ import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.rememberMarkdownState
 import com.niki914.uikit.base.BaseTheme
 import com.niki914.uikit.infra.ActionBarButton
+import com.niki914.uikit.infra.LiquidGlassPresets
 import com.niki914.uikit.infra.component.LiquidTextField
 import com.niki914.uikit.infra.shape.G2BubbleShape
 import com.niki914.uikit.infra.shape.G2CardShape
@@ -148,6 +152,12 @@ internal fun toAssistantErrorUi(
         LlmErrorCode.OutputTruncated -> AssistantErrorUi(
             titleRes = R.string.ui_home_error_output_truncated_title,
             bodyRes = R.string.ui_home_error_output_truncated_body,
+        )
+
+        // 复读/退化熔断：模型输出陷入重复，框架主动中止。正文告知已中止与应对。
+        LlmErrorCode.Repetition -> AssistantErrorUi(
+            titleRes = R.string.ui_home_error_repetition_title,
+            bodyRes = R.string.ui_home_error_repetition_body,
         )
 
         // 内部错误（我们的问题 / 未知）：标题分类 + 原始 message 透传，空则兜底
@@ -482,8 +492,8 @@ fun LiquidChatComposer(
     pendingImages: List<HomeChatImage> = emptyList(),
     pendingFiles: List<HomeChatFile> = emptyList(),
     onAttachImageClick: () -> Unit = {},
+    backdrop: Backdrop? = null,
 ) {
-    val stopContentDescription = stringResource(R.string.ui_home_stop_content_description)
     // 发送按钮恒亮：无文本点击时触发 Toast 提示，能不能点不靠颜色表达。
     // contextProgress 为 null（无记账）时不画环。
     val contentColor = MaterialTheme.colorScheme.primary
@@ -515,9 +525,7 @@ fun LiquidChatComposer(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(
-                        R.string.ui_home_add_image_content_description
-                    ),
+                    contentDescription = "Add Button",
                 )
             }
         }
@@ -548,16 +556,14 @@ fun LiquidChatComposer(
                         modifier = Modifier
                             .size(28.dp)
                             .clearAndSetSemantics {
-                                contentDescription = stopContentDescription
+                                contentDescription = "Stop Button"
                             },
                         color = contentColor,
                     )
                 } else {
                     Icon(
                         painter = painterResource(R.drawable.ic_arrow_up),
-                        contentDescription = stringResource(
-                            R.string.ui_home_send_content_description
-                        ),
+                        contentDescription = "Send Button",
                     )
                 }
             }
@@ -581,6 +587,8 @@ fun LiquidChatComposer(
             attachButton()
             sendButton()
         },
+        backdrop = backdrop,
+        glassStyle = LiquidGlassPresets.ComposerBar,
         modifier = modifier.fillMaxWidth(),
         leadingContent = { attachButton() },
         trailingContent = { sendButton() },
@@ -637,6 +645,9 @@ fun TurnActionRow(
     onReGenerate: () -> Unit,
     onFork: () -> Unit,
     onRewind: () -> Unit = {},
+    branchIndex: Int = 1,
+    branchCount: Int = 1,
+    onSwitchBranch: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val isAgent = source == ActionSource.Agent
@@ -653,38 +664,133 @@ fun TurnActionRow(
         ) {
             ActionButton(
                 icon = Icons.Default.ContentCopy,
-                contentDescription = stringResource(R.string.ui_home_action_copy_content_description),
+                contentDescription = "Copy Icon",
                 onClick = onCopy,
                 iconOnly = iconOnly,
             )
             if (isAgent) {
                 ActionButton(
                     icon = Icons.Default.Refresh,
-                    contentDescription = stringResource(R.string.ui_home_action_regenerate_content_description),
+                    contentDescription = "Regenerate Icon",
                     onClick = onReGenerate,
                     iconOnly = iconOnly,
                 )
                 ActionButton(
                     icon = Icons.AutoMirrored.Filled.CallSplit,
-                    contentDescription = stringResource(R.string.ui_home_action_fork_content_description),
+                    contentDescription = "Fork Icon",
                     onClick = onFork,
                     iconOnly = iconOnly,
                 )
+                // 分支翻页器：挂在 Agent 行、排在 Regenerate/Fork 之后
+                if (branchCount > 1) {
+                    BranchPager(
+                        index = branchIndex,
+                        count = branchCount,
+                        iconOnly = iconOnly,
+                        onSwitchBranch = onSwitchBranch,
+                    )
+                }
             } else {
                 ActionButton(
                     icon = Icons.Default.Refresh,
-                    contentDescription = stringResource(R.string.ui_home_action_regenerate_content_description),
+                    contentDescription = "Regenerate Icon",
                     onClick = onReGenerate,
                     iconOnly = iconOnly,
                 )
                 ActionButton(
                     icon = Icons.Default.Undo,
-                    contentDescription = stringResource(R.string.ui_home_action_rewind_content_description),
+                    contentDescription = "Rewind Icon",
                     onClick = onRewind,
                     iconOnly = iconOnly,
                 )
             }
         }
+    }
+}
+
+/**
+ * 重新生成分支翻页器：‹ n/N ›。
+ * 与相邻按钮同尺寸同颜色、同样无波纹（与 iconOnly 按钮一致）；
+ * 只有一版时不渲染（调用方就不传入）。
+ */
+@Composable
+private fun BranchPager(
+    index: Int,
+    count: Int,
+    iconOnly: Boolean,
+    onSwitchBranch: (Int) -> Unit,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val enabledColor = colorScheme.onSurfaceVariant.copy(alpha = 0.82f)
+    val disabledColor = colorScheme.onSurfaceVariant.copy(alpha = 0.32f)
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        PagerChevron(
+            icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+            contentDescription = "Previous Branch",
+            enabled = index > 1,
+            iconOnly = iconOnly,
+            tint = if (index > 1) enabledColor else disabledColor,
+            onClick = { onSwitchBranch(-1) },
+        )
+        Text(
+            text = "$index/$count",
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
+            color = enabledColor,
+            maxLines = 1,
+            modifier = Modifier.padding(horizontal = 6.dp),
+        )
+        PagerChevron(
+            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = "Next Branch",
+            enabled = index < count,
+            iconOnly = iconOnly,
+            tint = if (index < count) enabledColor else disabledColor,
+            onClick = { onSwitchBranch(1) },
+        )
+    }
+}
+
+@Composable
+private fun PagerChevron(
+    icon: ImageVector,
+    contentDescription: String,
+    enabled: Boolean,
+    iconOnly: Boolean,
+    tint: Color,
+    onClick: () -> Unit,
+) {
+    val shape = G2CardShape(14.dp)
+    Box(
+        modifier = Modifier
+            .size(if (iconOnly) 28.dp else 38.dp)
+            .then(
+                if (iconOnly) {
+                    Modifier
+                } else {
+                    Modifier
+                        .clip(shape)
+                        .background(
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
+                            shape,
+                        )
+                }
+            )
+            .clickable(
+                enabled = enabled,
+                interactionSource = remember { MutableInteractionSource() },
+                // 翻页器无波纹：去掉点击指示，不从头像式图标堆里弹出一块矩形
+                indication = null,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(if (iconOnly) 16.dp else 20.dp),
+            tint = tint,
+        )
     }
 }
 
@@ -815,7 +921,7 @@ internal fun HomeChatImageCard(
         if (onRemove != null) {
             CardRemoveOverlay(
                 size = size,
-                contentDescription = stringResource(R.string.ui_home_image_remove_content_description),
+                contentDescription = "Remove Image Icon",
                 onRemove = onRemove,
             )
         }
@@ -911,9 +1017,7 @@ internal fun HomeChatFileCard(
         if (onRemove != null) {
             CardRemoveOverlay(
                 size = size,
-                contentDescription = stringResource(
-                    R.string.ui_home_file_remove_content_description,
-                ),
+                contentDescription = "Remove File Icon",
                 onRemove = onRemove,
             )
         }

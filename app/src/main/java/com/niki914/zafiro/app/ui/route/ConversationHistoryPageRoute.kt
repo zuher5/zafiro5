@@ -37,9 +37,6 @@ internal fun ConversationHistoryPageRoute(
     val latestOnBack by rememberUpdatedState(onBack)
     val latestOnConversationSelected by rememberUpdatedState(onConversationSelected)
     val latestOnCurrentConversationDeleted by rememberUpdatedState(onCurrentConversationDeleted)
-    val backContentDescription = stringResource(
-        R.string.ui_conversation_history_back_content_description,
-    )
     val deleteLabel = stringResource(R.string.ui_conversation_action_delete)
     val pinLabel = stringResource(R.string.ui_conversation_action_pin)
     val unpinLabel = stringResource(R.string.ui_conversation_action_unpin)
@@ -91,7 +88,6 @@ internal fun ConversationHistoryPageRoute(
         deleteLabel,
         pinLabel,
         unpinLabel,
-        backContentDescription,
     ) {
         if (uiState.selecting) {
             PageChromeContribution(
@@ -99,6 +95,7 @@ internal fun ConversationHistoryPageRoute(
                 leftAction = TopBarActionSpec(
                     icon = Icons.Default.Close,
                     onClick = { viewModel.sendIntent(ConversationHistoryIntent.ExitSelection) },
+                    contentDescription = "Close Button",
                 ),
                 menuItems = listOf(
                     PageChromeMenuItem(
@@ -140,6 +137,7 @@ internal fun ConversationHistoryPageRoute(
                     TopBarActionSpec(
                         icon = Icons.Default.Checklist,
                         onClick = { viewModel.sendIntent(ConversationHistoryIntent.EnterSelection) },
+                        contentDescription = "Select Button",
                     )
                 } else {
                     null
@@ -147,7 +145,7 @@ internal fun ConversationHistoryPageRoute(
                 rightAction = TopBarActionSpec(
                     icon = Icons.AutoMirrored.Filled.ArrowForward,
                     onClick = { latestOnBack() },
-                    contentDescription = backContentDescription,
+                    contentDescription = "Back Button",
                 ),
                 backHandler = PageBackHandler(
                     shouldConsumeBack = { true },

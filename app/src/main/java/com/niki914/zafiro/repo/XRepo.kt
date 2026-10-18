@@ -10,16 +10,15 @@ import com.niki914.zafiro.chat.agentic.buildin.BuiltinToolRegistry
 import com.niki914.zafiro.chat.agentic.python.CustomPyToolHarness
 import com.niki914.zafiro.chat.agentic.python.PyRuntime
 import com.niki914.zafiro.settings.MemoryMutationResult
+import com.niki914.zafiro.settings.model.RepetitionSensitivity
 import com.niki914.zafiro.settings.model.RuntimeMcpServiceConfig
 import com.niki914.zafiro.settings.model.RuntimeTakeoverTarget
 import com.niki914.zafiro.settings.model.TAKEOVER_FIELD_NAME
 import com.niki914.zafiro.settings.model.TAKEOVER_FIELD_PATTERNS
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -328,6 +327,14 @@ object XRepo {
         select = { llmRetryMaxAttempts },
         update = { copy(llmRetryMaxAttempts = it) },
     )
+    private val repetitionSensitivityField = PlainAppStateField(
+        select = { repetitionSensitivity },
+        update = { copy(repetitionSensitivity = it) },
+    )
+    private val contextCompactionThresholdPercentField = PlainAppStateField(
+        select = { contextCompactionThresholdPercent },
+        update = { copy(contextCompactionThresholdPercent = it) },
+    )
     private val lastNotifiedUpdateVersionField = PlainAppStateField(
         select = { lastNotifiedUpdateVersion },
         update = { copy(lastNotifiedUpdateVersion = it) },
@@ -359,6 +366,18 @@ object XRepo {
     suspend fun llmRetryMaxAttempts(): Int = llmRetryMaxAttemptsField.get()
 
     suspend fun setLlmRetryMaxAttempts(value: Int) = llmRetryMaxAttemptsField.set(value)
+
+    suspend fun repetitionSensitivity(): RepetitionSensitivity =
+        RepetitionSensitivity.fromWire(repetitionSensitivityField.get())
+
+    suspend fun setRepetitionSensitivity(value: RepetitionSensitivity) =
+        repetitionSensitivityField.set(value.wireValue)
+
+    suspend fun contextCompactionThresholdPercent(): Int =
+        contextCompactionThresholdPercentField.get()
+
+    suspend fun setContextCompactionThresholdPercent(value: Int) =
+        contextCompactionThresholdPercentField.set(value)
 
     suspend fun lastNotifiedUpdateVersion(): String = lastNotifiedUpdateVersionField.get()
 
@@ -1300,13 +1319,17 @@ data class RuntimeTextAction(
 class McpServiceApi internal constructor(
     private val repo: XRepo,
 ) {
-    private val _configFlow = MutableStateFlow<RuntimeMcpServiceConfig?>(null)
-    val configFlow: Flow<RuntimeMcpServiceConfig> = _configFlow.filterNotNull()
+    private var loaded: RuntimeMcpServiceConfig? = null
+
+    // 以默认配置为种子，保证订阅者立刻拿到值：combine 的任一上游迟迟不发射会让整条链静默不工作。
+    private val _configFlow = MutableStateFlow(RuntimeMcpServiceConfig())
+    val configFlow: StateFlow<RuntimeMcpServiceConfig> = _configFlow.asStateFlow()
 
     suspend fun get(): RuntimeMcpServiceConfig {
-        _configFlow.value?.let { return it }
+        loaded?.let { return it }
         val parsed =
             McpServiceSettingsCodec.parse(repo.readJson(StoreDescriptorRegistry.TOOLS_MCP_SERVICE_ID))
+        loaded = parsed
         _configFlow.value = parsed
         return parsed
     }
@@ -1318,6 +1341,7 @@ class McpServiceApi internal constructor(
             updated = transform(current)
             McpServiceSettingsCodec.encode(updated)
         }
+        loaded = updated
         _configFlow.value = updated
         return updated
     }
@@ -1337,8 +1361,12 @@ class McpServiceApi internal constructor(
     suspend fun setExposedTools(tools: Set<String>): RuntimeMcpServiceConfig =
         update { it.copy(exposedTools = tools) }
 
+    suspend fun setKeepScreenOnWhileRunning(value: Boolean): RuntimeMcpServiceConfig =
+        update { it.copy(keepScreenOn = value) }
+
     internal fun resetForTest() {
-        _configFlow.value = null
+        loaded = null
+        _configFlow.value = RuntimeMcpServiceConfig()
     }
 }
 

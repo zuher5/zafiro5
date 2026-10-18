@@ -41,7 +41,7 @@ fun TextActionsSettingsContent(
                 onClick = {
                     latestOnOpenActionDetail(createTitle, -1, true)
                 },
-                contentDescription = createTitle,
+                contentDescription = "Add Button",
             ),
         )
     }
@@ -79,7 +79,7 @@ fun TextActionsSettingsContent(
                 )
             }
 
-            is SettingsRowAction.Click -> Unit
+            else -> Unit
         }
     }
 }

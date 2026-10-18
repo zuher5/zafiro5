@@ -53,7 +53,7 @@ fun TakeoverSettingsContent(
                 onClick = {
                     latestOnOpenRuleDetail(null, createTitle, -1, true)
                 },
-                contentDescription = createTitle,
+                contentDescription = "Add Button",
             ),
         )
     }
@@ -131,7 +131,7 @@ private fun TakeoverSettingsContentBody(
                     onItemEnabledChanged(index, action.checked)
                 }
 
-                is SettingsRowAction.Click -> Unit
+                else -> Unit
             }
         },
     )

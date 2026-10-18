@@ -51,7 +51,7 @@ fun CustomPyToolsSettingsContent(
                 onClick = {
                     latestOnOpenToolDetail(createTitle, -1, true)
                 },
-                contentDescription = createTitle,
+                contentDescription = "Add Button",
             ),
         )
     }
@@ -117,7 +117,7 @@ fun CustomPyToolsSettingsContent(
                     }
                 }
 
-                is SettingsRowAction.Click -> Unit
+                else -> Unit
             }
         },
     )

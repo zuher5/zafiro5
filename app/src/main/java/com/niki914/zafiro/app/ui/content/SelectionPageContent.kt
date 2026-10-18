@@ -2,20 +2,13 @@ package com.niki914.zafiro.app.ui.content
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,15 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.niki914.uikit.base.LocalAppDarkTheme
 import com.niki914.uikit.infra.component.SettingsGroupCard
 import com.niki914.uikit.infra.component.SettingsItemDivider
 import com.niki914.uikit.infra.component.SettingsListItem
-import com.niki914.uikit.infra.liquidScreenBottomPadding
-import com.niki914.uikit.infra.liquidScreenTopPadding
+import com.niki914.uikit.infra.component.SettingsListPageContent
 import com.niki914.zafiro.app.R
 
 data class SelectionOption(
@@ -149,30 +139,9 @@ internal fun SelectionGroupCard(
 fun SelectionPageContent(
     options: List<SelectionOption>,
 ) {
-    val scrollState = rememberScrollState()
-    // 折叠状态由 LiquidScreen 经 nestedScroll 自动感知，页面不再上报。
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(
-                start = 16.dp,
-                end = 16.dp,
-                top = liquidScreenTopPadding(24.dp),
-                bottom = liquidScreenBottomPadding(),
-            ),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+    SettingsListPageContent(
+        description = stringResource(R.string.ui_onboard_provider_pick_description),
     ) {
-        Text(
-            text = stringResource(R.string.ui_onboard_provider_pick_description),
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontSize = 18.sp,
-                lineHeight = 28.sp,
-            ),
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
         SelectionGroupCard(options = options, isDarkTheme = LocalAppDarkTheme.current)
     }
 }

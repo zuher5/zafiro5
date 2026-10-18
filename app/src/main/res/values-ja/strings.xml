@@ -30,15 +30,15 @@
     <string name="ui_onboard_configure_error_load_failed">設定の読み込みに失敗しました：%1$s</string>
     <string name="ui_onboard_configure_error_save_failed">設定の保存に失敗しました：%1$s</string>
     <string name="ui_onboard_done_headline">準備が完了しました</string>
-    <string name="ui_onboard_done_description">セットアップ完了。Zafiro を今すぐ使うか、後で設定から調整してください。</string>
+    <string name="ui_onboard_done_description">設定が完了しました。すぐに Zafiro を使用するか、後から設定で調整できます。</string>
     <string name="ui_onboard_done_enter_home">Zafiro を開く</string>
 
     <!-- Home -->
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">新しい会話</string>
     <string name="ui_home_input_placeholder">メッセージを入力...</string>
-    <string name="ui_home_empty_greeting">何かお手伝いしましょうか？</string>
-    <string name="ui_home_tap_hint">ヒント：メッセージをタップするとコピー・再生成・分岐ができます</string>
+    <string name="ui_home_conversation_compacted">会話が圧縮されました</string>
+    <string name="ui_home_conversation_compacting">圧縮中</string>
     <string name="ui_tool_status_called">呼び出し済み</string>
     <string name="ui_tool_status_running">実行中</string>
     <string name="ui_tool_status_success">成功</string>
@@ -46,8 +46,6 @@
     <plurals name="ui_tool_chain_count">
     <item quantity="other">%d 個のツール</item>
     </plurals>
-    <string name="ui_home_send_content_description">メッセージを送信</string>
-    <string name="ui_home_add_image_content_description">画像を追加</string>
     <string name="ui_home_attach_sheet_title">会話に追加</string>
     <string name="ui_home_attach_photos">写真</string>
     <string name="ui_home_attach_camera">カメラ</string>
@@ -56,8 +54,6 @@
     <string name="ui_home_attach_unresolvable">このファイルのローカルパスを取得できません</string>
     <string name="ui_home_attach_no_permission">すべてのファイルへのアクセス権限を許可してください</string>
     <string name="ui_home_attach_unreadable">このファイルを読み取れません</string>
-    <string name="ui_home_file_remove_content_description">ファイルを削除</string>
-    <string name="ui_home_image_remove_content_description">画像を削除</string>
     <string name="ui_home_file_category_folder">フォルダ</string>
     <string name="ui_home_file_category_code">コード</string>
     <string name="ui_home_file_category_document">ドキュメント</string>
@@ -67,12 +63,6 @@
     <string name="ui_home_file_category_archive">アーカイブ</string>
     <string name="ui_home_file_category_apk">APK</string>
     <string name="ui_home_file_category_file">ファイル</string>
-    <string name="ui_home_scroll_to_bottom_content_description">一番下へスクロール</string>
-    <string name="ui_home_stop_content_description">生成を停止</string>
-    <string name="ui_home_action_copy_content_description">コピー</string>
-    <string name="ui_home_action_regenerate_content_description">再生成</string>
-    <string name="ui_home_action_fork_content_description">会話を分岐</string>
-    <string name="ui_home_action_rewind_content_description">Rewind</string>
     <string name="ui_toast_copied">コピーしました</string>
     <string name="ui_toast_generating">生成中です、しばらくお待ちください</string>
     <string name="ui_toast_empty_input">メッセージを入力してください</string>
@@ -83,13 +73,14 @@
     <string name="ui_home_error_idle_timeout_title">応答がタイムアウトしました</string>
     <string name="ui_home_error_output_truncated_title">出力が打ち切られました</string>
     <string name="ui_home_error_output_truncated_body">1 回の出力上限に達したため、返信は未完成です。モデル設定で Max Tokens を大きくしてから、もう一度生成してください。</string>
+    <string name="ui_home_error_repetition_title">出力の繰り返しを検出</string>
+    <string name="ui_home_error_repetition_body">モデルが繰り返しに陥ったのを検知し、会話を終了しました。誤検知の場合は設定で感度を調整してください。</string>
     <string name="ui_home_error_retry_exhausted_title">自動リトライがすべて失敗しました</string>
     <string name="ui_home_error_internal_title">内部エラー</string>
     <string name="ui_home_retrying_title">ネットワーク障害のため再試行中…</string>
     <string name="ui_home_thinking_title">思考</string>
     <string name="ui_home_retrying_attempt">再試行 %1$d/%2$d</string>
     <string name="runtime_error_internal">内部エラー</string>
-    <string name="ui_home_history_content_description">会話履歴</string>
     <string name="ui_conversation_history_title">会話履歴</string>
     <string name="ui_conversation_selection_count">%1$d 件選択中</string>
     <string name="ui_conversation_history_today">今日</string>
@@ -97,7 +88,6 @@
     <string name="ui_conversation_history_this_month">今月</string>
     <string name="ui_conversation_history_older">より前</string>
     <string name="ui_conversation_history_pinned_section">固定した会話</string>
-    <string name="ui_conversation_history_back_content_description">戻る</string>
     <string name="ui_conversation_history_loading">会話履歴を読み込み中...</string>
     <string name="ui_conversation_history_empty_title">会話履歴はありません</string>
     <string name="ui_conversation_history_empty_body">メッセージを送信すると、ここに会話が表示されます。</string>
@@ -154,7 +144,6 @@
     <string name="skill_delete_dialog_title">Skill の削除</string>
     <string name="skill_delete_dialog_text">Skill「%1$s」を削除してもよろしいですか？この操作は取り消せません。</string>
     <string name="skill_error_delete_failed">Skill の削除に失敗しました：%1$s</string>
-    <string name="skill_import_button">Skill をインポート</string>
     <string name="skill_import_no_skill_file">選択したフォルダ内に SKILL.md が見つからないため、インポートできません</string>
     <string name="skill_import_conflict_title">同名の Skill が既に存在します</string>
     <string name="skill_import_conflict_text">Skill「%1$s」は既に存在します。上書きしますか？</string>
@@ -180,7 +169,7 @@
     <string name="ui_settings_about_feedback_bug">バグ報告</string>
     <string name="ui_settings_about_version">バージョン</string>
 
-    <string name="ui_settings_storage_description">各キャッシュの使用量。タップで消去でき、設定と会話には影響しません。</string>
+    <string name="ui_settings_storage_description">各種キャッシュの使用量を確認し、タップして削除できます。設定・記憶・会話履歴には影響しません。</string>
     <string name="ui_settings_storage_tool_output">ツール出力キャッシュ</string>
     <string name="ui_settings_storage_tool_output_summary">切り詰められたツール出力のフルエクスポート</string>
     <string name="ui_settings_storage_image_cache">画像キャッシュ</string>
@@ -219,7 +208,7 @@
     <string name="ui_settings_mcp_config">MCP 設定</string>
 
     <!-- Memory Module -->
-    <string name="memory_page_description">Agent が新しい会話でも覚えておく長期情報。スワイプで削除、タップで編集。</string>
+    <string name="memory_page_description">メモリを管理します。左右にスワイプして削除、タップして単一のメモリを編集できます。追加された内容は、新しい会話でも Agent に記憶されます。</string>
     <string name="memory_page_empty_description">保存されたメモリはありません。右上のボタンをタップして最初のメモリを追加してください。</string>
     <string name="memory_loading">メモリを読み込み中...</string>
     <string name="memory_editor_title_create">新規メモリ</string>
@@ -239,13 +228,13 @@
     <string name="memory_error_delete_failed">メモリの削除に失敗しました：%1$s</string>
 
     <!-- Execution Rules Module -->
-    <string name="execution_rules_page_description">Shell とツール実行の安全ルールを設定します。</string>
+    <string name="execution_rules_page_description">コマンド実行の安全性を高めるための実行ルールを追加します。スクリプトを除くアプリのすべてのコマンド実行がポリシーによって管理されます。</string>
     <string name="execution_rules_empty_action_hint">右上をタップして、最初の実行ルールを追加してください。</string>
     <string name="execution_rules_loading">実行ルールを読み込み中…</string>
     <string name="execution_rules_editor_title_create">新規実行ルール</string>
     <string name="execution_rules_delete_dialog_title">実行ルールの削除</string>
     <string name="execution_rules_delete_dialog_text">実行ルール「%1$s」を削除してもよろしいですか？この操作は取り消せません。</string>
-    <string name="execution_rules_editor_description">ルールは Shell とツールのコマンド実行前に判定されます。</string>
+    <string name="execution_rules_editor_description">コマンド実行の安全性を高めるための実行ルールを追加します。スクリプトを除くアプリのすべてのコマンド実行がポリシーによって管理されます。</string>
     <string name="execution_rules_field_name">ポリシー名</string>
     <string name="execution_rules_field_name_hint">例：危険な変更の防止</string>
     <string name="execution_rules_field_enabled_mode">適用タイミング</string>
@@ -255,11 +244,11 @@
     <string name="execution_rules_enabled_mode_confirm">確認を求める</string>
     <string name="tool_permission_dialog_title">AI が操作の実行を要求しています</string>
     <string name="tool_permission_request_intro">Zafiro のツール「%1$s」が次のコマンドの実行を要求しています：</string>
-    <string name="tool_permission_matched_rule">一致したルール「%1$s」</string>
+    <string name="tool_permission_matched_rule">一致したルール「%1$s」：%2$s</string>
     <string name="tool_permission_allow">今回のみ許可</string>
     <string name="tool_permission_deny">拒否</string>
     <string name="screen_control_consent_title">画面操作権限のリクエスト</string>
-    <string name="screen_control_consent_body">画面を制御するには、Zafiro にアクセシビリティと他のアプリ上に表示の権限が必要です。次にシステム通知や設定画面が表示されることがあります。</string>
+    <string name="screen_control_consent_body">Zafiro が画面を操作するには次の権限が必要です：\n1. ユーザー補助サービス：UI の読み取りとタップの実行\n2. 他のアプリの上に重ねて表示：ポインターインジケーターの表示\n\nこの後、システムの許可ダイアログや設定画面が表示される場合があります。</string>
     <string name="screen_control_consent_agree">同意</string>
     <string name="screen_control_consent_deny">拒否</string>
     <string name="execution_rules_field_patterns">ルール</string>
@@ -412,7 +401,6 @@
 
     <string name="feedback_bug_template">## 問題の説明\n\n## 再現手順\n\n## 期待される動作\n\n## 実際の動作\n\n## デバイス情報\n- Android バージョン：\n- アシスタント（Breeno またはその他）：\n- モジュールのバージョン：\n\n## その他\n理解を深めるため、ログやスクリーンショット、画面録画などを添付できます</string>
     <string name="conversation_fork_title">Fork · %1$s</string>
-    <string name="conversation_regenerate_title">Regenerate · %1$s</string>
     <string name="conversation_rewind_title">Rewind · %1$s</string>
     <!-- Tool display names -->
     <string name="ui_tool_display_terminal">ターミナル</string>
@@ -439,7 +427,6 @@
     <string name="ui_settings_general_group_appearance">外観と言語</string>
     <string name="ui_settings_general_group_floating_notification">フローティングと通知</string>
     <string name="ui_settings_general_group_conversation">会話と操作</string>
-    <string name="ui_settings_general_group_runtime">実行と制御</string>
     <string name="ui_settings_general_floating_ball">フローティングボール</string>
     <string name="ui_settings_general_floating_ball_summary">バックグラウンド実行中にエージェントの状態とクイック操作を表示</string>
     <string name="ui_settings_general_floating_ball_auto_expand">フローティングボールの自動展開</string>
@@ -460,8 +447,23 @@
     <string name="ui_settings_general_retry_summary">リクエスト失敗後の自動リトライ</string>
     <string name="ui_settings_general_keep_screen_on">回答中は画面をオンに保つ</string>
     <string name="ui_settings_general_keep_screen_on_summary">エージェントの応答とツール実行中は画面をオフにしません</string>
-    <string name="ui_settings_general_screen_control_auto_approve">画面制御を自動承認</string>
-    <string name="ui_settings_general_screen_control_auto_approve_summary">Agent が画面を読み取る・タップする前の確認を省略します。</string>
+    <string name="ui_settings_runtime_control">実行制御</string>
+    <string name="ui_settings_runtime_control_summary">上限・再試行・繰り返し検出</string>
+    <string name="ui_settings_runtime_group_network">ネットワーク</string>
+    <string name="ui_settings_runtime_group_stability">安定性</string>
+    <string name="ui_settings_runtime_group_compaction">コンテキスト圧縮</string>
+    <string name="ui_settings_runtime_compaction_threshold">自動圧縮しきい値</string>
+    <string name="ui_settings_runtime_compaction_threshold_summary">コンテキストウィンドウの使用率がしきい値に達したときに履歴を自動圧縮します</string>
+    <string name="ui_settings_runtime_compaction_off">オフ</string>
+    <string name="ui_settings_runtime_repetition_detection">繰り返し検出</string>
+    <string name="ui_settings_runtime_repetition_summary">モデルが同じ出力を繰り返したとき、ターンを早期に中断します。厳しくするほど感度は上がりますが、正常な内容を中断する可能性も高まります</string>
+    <string name="ui_settings_runtime_sensitivity_relaxed">緩い</string>
+    <string name="ui_settings_runtime_sensitivity_loose">やや緩い</string>
+    <string name="ui_settings_runtime_sensitivity_standard">標準</string>
+    <string name="ui_settings_runtime_sensitivity_strict">厳しい</string>
+    <string name="ui_settings_runtime_sensitivity_stricter">より厳しい</string>
+    <string name="ui_settings_runtime_sensitivity_strictest">最も厳しい</string>
+    <string name="ui_settings_runtime_sensitivity_off">オフ</string>
     <string name="ui_settings_general_always_show_message_actions">メッセージ操作を常に表示</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">音声アシスタント専用セッション</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">有効にすると音声アシスタントの会話が独立し、メイン画面の履歴に影響しません</string>
@@ -469,7 +471,6 @@
     <string name="ui_settings_saved_configuration_delete_title">設定の削除</string>
     <string name="ui_settings_saved_configuration_delete_text">この設定は削除されます。この操作は元に戻せません。</string>
     <string name="ui_settings_saved_configuration_edit">編集</string>
-    <string name="ui_settings_configure_add">設定を追加</string>
     <string name="ui_settings_configure_name_label">設定名</string>
     <string name="ui_settings_configure_name_placeholder">例：DeepSeek メイン</string>
     <string name="ui_settings_configure_vision_label">ビジョンモデル</string>
@@ -482,21 +483,20 @@
     <string name="ui_settings_configure_endpoint_mismatch_cancel_save">このまま保存</string>
     <string name="ui_settings_configure_protocol_hint">プロトコル切り替え後、エンドポイントがプロトコルと一致しているか確認してください。</string>
     <string name="ui_settings_configure_thinking_label">思考強度</string>
-    <string name="ui_settings_configure_thinking_hint">Provider Default のままで、またはプロバイダーが高い値を拒否する場合は下げます。</string>
+    <string name="ui_settings_configure_thinking_hint">Provider Default のままにするとプロバイダーのデフォルト動作になります。高いレベルが拒否された場合は自分で下げてください。</string>
+    <string name="ui_settings_configure_thinking_start_label">Default</string>
+    <string name="ui_settings_configure_thinking_end_label">Max</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">例：200000 または 200k</string>
-    <string name="ui_settings_configure_max_tokens_hint">1 リクエストあたりの最大出力トークン。k/m/b の接尾辞に対応。空欄ならプロバイダーの既定値を使います。</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">有効な数値（k/m/b 接尾辞対応）を 256 以上で入力してください</string>
     <string name="ui_settings_configure_context_window_label">コンテキストウィンドウ</string>
     <string name="ui_settings_configure_context_window_placeholder">例：1000000 または 1M</string>
-    <string name="ui_settings_configure_context_window_hint">使用率リングで使うモデルのコンテキストウィンドウ。空欄ならプロバイダーの既定値を使います。</string>
     <string name="ui_settings_configure_error_context_window_invalid">有効な数値（k/m/b 接尾辞対応）を 1000 以上で入力してください</string>
 
     <string name="ui_theme_mode_system">システムに従う</string>
     <string name="ui_theme_mode_light">ライト</string>
     <string name="ui_theme_mode_dark">ダーク</string>
     <string name="ui_theme_color_dynamic">ダイナミックカラー（壁紙から）</string>
-    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">ローズ</string>
     <string name="ui_theme_color_blossom">桜</string>
     <string name="ui_theme_color_lavender">ラベンダー</string>
@@ -522,6 +522,7 @@
     <string name="agent_resident_action_stop">停止</string>
     <string name="agent_resident_action_approve">許可</string>
     <string name="agent_resident_action_decline">拒否</string>
+    <string name="agent_resident_body_matched_pattern">一致 %1$s</string>
 
     <!-- Onboarding Preferences -->
     <string name="ui_onboard_done_advanced_entry">権限と実行ルール</string>
@@ -556,6 +557,7 @@
     <string name="mcp_service_section_connection">接続とセキュリティ</string>
     <string name="mcp_service_section_tools">公開ツール</string>
     <string name="mcp_service_enable_title">MCP サービスを有効化</string>
+    <string name="mcp_service_keep_screen_on_title">実行中はスリープしない</string>
     <string name="mcp_service_enable_summary">外部エージェントが MCP 経由で Zafiro のツールにアクセスすることを許可</string>
     <string name="mcp_service_status_title">状態</string>
     <string name="mcp_service_status_running">実行中</string>

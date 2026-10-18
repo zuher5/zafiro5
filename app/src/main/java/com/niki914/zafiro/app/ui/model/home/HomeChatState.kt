@@ -3,8 +3,10 @@ package com.niki914.zafiro.app.ui.model.home
 import com.niki914.zafiro.api.model.ApprovalDecision
 import com.niki914.zafiro.api.model.ApprovalRequest
 import com.niki914.zafiro.app.conversation.ConversationRecord
+import com.niki914.zafiro.app.conversation.ConversationSummary
 import com.niki914.zafiro.app.conversation.ForkKind
 import com.niki914.zafiro.app.conversation.ForkResult
+import com.niki914.zafiro.app.conversation.TurnBranchState
 import com.niki914.zafiro.app.ui.model.SavedConfigSummary
 import com.niki914.zafiro.chat.LlmErrorCode
 
@@ -27,6 +29,15 @@ internal interface HomeConversationStore {
 
     /** 原地重生成：截断当前会话到该回合（不派生新会话），返回需回填的输入。 */
     suspend fun truncateAtTurn(conversationId: String, turnIndex: Int): ForkResult?
+
+    /** 分支组全部成员（按序号升序）；单版本会话返回空列表。 */
+    suspend fun branchGroup(conversationId: String): List<ConversationSummary>
+
+    /** 分支组内最新一版的会话 id；查不到时 null。 */
+    suspend fun latestBranchId(rootId: String): String?
+
+    /** 删除会话及其整个分支组。 */
+    suspend fun branchGroupIds(conversationId: String): List<String>
 }
 
 
@@ -89,6 +100,8 @@ data class HomeChatTurn(
     val images: List<HomeChatImage> = emptyList(),
     val files: List<HomeChatFile> = emptyList(),
     val blocks: List<HomeChatBlock> = emptyList(),
+    val isCompactedDivider: Boolean = false,
+    val isCompacting: Boolean = false,
 )
 
 /**
@@ -129,6 +142,10 @@ data class HomeChatUiState(
     val conversationVersion: Int = 0,
     val currentConversationId: String? = null,
     val currentConversationTitle: String? = null,
+    /**
+     * 按 Turn ID 映射的局部变体分支状态。
+     */
+    val turnBranches: Map<Long, TurnBranchState> = emptyMap(),
     val expandedToolRuns: Set<String> = emptySet(),
     val expandedToolResults: Set<String> = emptySet(),
     val expandedThinking: Set<String> = emptySet(),
@@ -221,6 +238,9 @@ sealed interface HomeChatIntent {
     data class ToggleThinking(val turnId: Long, val blockIndex: Int) : HomeChatIntent
     data class ToggleActionRow(val turnId: Long, val source: ActionSource) : HomeChatIntent
     data class ReGenerateAt(val turnId: Long) : HomeChatIntent
+
+    /** 翻页到指定 Turn 的相邻分支：-1 上一版、+1 下一版；超出范围忽略。 */
+    data class SwitchTurnBranch(val turnId: Long, val delta: Int) : HomeChatIntent
     data class ForkAt(val turnId: Long) : HomeChatIntent
     data class RewindAt(val turnId: Long) : HomeChatIntent
 

@@ -30,7 +30,7 @@
     <string name="ui_onboard_configure_error_load_failed">读取配置失败：%1$s</string>
     <string name="ui_onboard_configure_error_save_failed">保存配置失败：%1$s</string>
     <string name="ui_onboard_done_headline">大功告成。</string>
-    <string name="ui_onboard_done_description">设置完成。现在打开 Zafiro，或稍后在设置里微调。</string>
+    <string name="ui_onboard_done_description">配置已完成，你可以开始使用 Zafiro，或稍后在设置中继续调整。</string>
     <string name="ui_onboard_done_enter_home">进入 Zafiro</string>
 
     <!-- Home -->
@@ -39,6 +39,8 @@
     <string name="ui_home_input_placeholder">输入消息...</string>
     <string name="ui_home_empty_greeting">有什么我可以帮你？</string>
     <string name="ui_home_tap_hint">提示：点击消息可复制、重新生成或分叉</string>
+    <string name="ui_home_conversation_compacted">对话已压缩</string>
+    <string name="ui_home_conversation_compacting">正在压缩</string>
     <string name="ui_tool_status_called">已调用</string>
     <string name="ui_tool_status_running">执行中</string>
     <string name="ui_tool_status_success">成功</string>
@@ -46,8 +48,6 @@
     <plurals name="ui_tool_chain_count">
         <item quantity="other">%d 个工具</item>
     </plurals>
-    <string name="ui_home_send_content_description">发送消息</string>
-    <string name="ui_home_add_image_content_description">添加图片</string>
     <string name="ui_home_attach_sheet_title">添加到对话</string>
     <string name="ui_home_attach_photos">照片</string>
     <string name="ui_home_attach_camera">相机</string>
@@ -56,8 +56,6 @@
     <string name="ui_home_attach_unresolvable">无法获取该文件的本地路径</string>
     <string name="ui_home_attach_no_permission">请先授予所有文件访问权限</string>
     <string name="ui_home_attach_unreadable">无法读取该文件</string>
-    <string name="ui_home_file_remove_content_description">移除文件</string>
-    <string name="ui_home_image_remove_content_description">移除图片</string>
     <string name="ui_home_file_category_folder">文件夹</string>
     <string name="ui_home_file_category_code">代码</string>
     <string name="ui_home_file_category_document">文档</string>
@@ -67,12 +65,6 @@
     <string name="ui_home_file_category_archive">压缩包</string>
     <string name="ui_home_file_category_apk">安装包</string>
     <string name="ui_home_file_category_file">文件</string>
-    <string name="ui_home_scroll_to_bottom_content_description">滚动到底部</string>
-    <string name="ui_home_stop_content_description">停止生成</string>
-    <string name="ui_home_action_copy_content_description">复制</string>
-    <string name="ui_home_action_regenerate_content_description">重新生成</string>
-    <string name="ui_home_action_fork_content_description">分叉对话</string>
-    <string name="ui_home_action_rewind_content_description">Rewind</string>
     <string name="ui_toast_copied">已复制</string>
     <string name="ui_toast_generating">生成中，请稍后</string>
     <string name="ui_toast_empty_input">请输入内容</string>
@@ -83,13 +75,14 @@
     <string name="ui_home_error_idle_timeout_title">响应超时</string>
     <string name="ui_home_error_output_truncated_title">输出被截断</string>
     <string name="ui_home_error_output_truncated_body">单次输出达到上限，回答未完成。请在模型配置中调大 Max Tokens 后重新生成。</string>
+    <string name="ui_home_error_repetition_title">检测到重复输出</string>
+    <string name="ui_home_error_repetition_body">检测到模型陷入重复，已终止对话。如果误判请在设置中调整灵敏度。</string>
     <string name="ui_home_error_retry_exhausted_title">多次自动重试后仍失败</string>
     <string name="ui_home_error_internal_title">内部错误</string>
     <string name="ui_home_retrying_title">网络波动，正在重试…</string>
     <string name="ui_home_thinking_title">思考</string>
     <string name="ui_home_retrying_attempt">重试 %1$d/%2$d</string>
     <string name="runtime_error_internal">内部错误</string>
-    <string name="ui_home_history_content_description">对话历史</string>
     <string name="ui_conversation_history_title">历史对话</string>
     <string name="ui_conversation_selection_count">已选择 %1$d 项</string>
     <string name="ui_conversation_history_today">今天</string>
@@ -97,7 +90,6 @@
     <string name="ui_conversation_history_this_month">本月</string>
     <string name="ui_conversation_history_older">更早</string>
     <string name="ui_conversation_history_pinned_section">置顶对话</string>
-    <string name="ui_conversation_history_back_content_description">返回</string>
     <string name="ui_conversation_history_loading">正在读取对话历史...</string>
     <string name="ui_conversation_history_empty_title">暂无对话历史</string>
     <string name="ui_conversation_history_empty_body">发送一条消息后，对话会显示在这里。</string>
@@ -154,7 +146,6 @@
     <string name="skill_delete_dialog_title">删除 Skill</string>
     <string name="skill_delete_dialog_text">确定要删除 Skill「%1$s」吗？此操作不可撤销。</string>
     <string name="skill_error_delete_failed">删除 Skill 失败：%1$s</string>
-    <string name="skill_import_button">导入 Skill</string>
     <string name="skill_import_no_skill_file">所选文件夹中未找到 SKILL.md，无法导入</string>
     <string name="skill_import_conflict_title">同名 Skill 已存在</string>
     <string name="skill_import_conflict_text">Skill「%1$s」已存在，是否覆盖？</string>
@@ -180,7 +171,7 @@
     <string name="ui_settings_about_feedback_bug">Bug 反馈</string>
     <string name="ui_settings_about_version">版本号</string>
 
-    <string name="ui_settings_storage_description">各项缓存占用。点按即可清理；不会影响设置与对话。</string>
+    <string name="ui_settings_storage_description">查看各类缓存占用的空间，点击某一项可清理。清理不会影响配置、记忆与对话记录。</string>
     <string name="ui_settings_storage_tool_output">工具输出缓存</string>
     <string name="ui_settings_storage_tool_output_summary">超长工具输出的截断导出</string>
     <string name="ui_settings_storage_image_cache">图片缓存</string>
@@ -219,7 +210,7 @@
     <string name="ui_settings_mcp_config">MCP 配置</string>
 
     <!-- Memory Module -->
-    <string name="memory_page_description">Agent 在新对话中仍会记住的长期信息。左滑删除，点按编辑。</string>
+    <string name="memory_page_description">管理记忆，你可以通过左右滑动来删除、点击来编辑单条记忆。添加后，Agent 会记得这些内容，即使是新的对话。</string>
     <string name="memory_page_empty_description">当前没有保存的记忆。点击右上方添加第一条记忆。</string>
     <string name="memory_loading">正在读取记忆...</string>
     <string name="memory_editor_title_create">新增记忆</string>
@@ -239,13 +230,13 @@
     <string name="memory_error_delete_failed">删除记忆失败：%1$s</string>
 
     <!-- Execution Rules Module -->
-    <string name="execution_rules_page_description">为 Shell 与工具执行设置安全规则。</string>
+    <string name="execution_rules_page_description">添加执行规则，以提高命令执行的安全性。除了脚本以外，应用所有的命令执行都会受策略管控。</string>
     <string name="execution_rules_empty_action_hint">点击右上方，添加第一条执行规则。</string>
     <string name="execution_rules_loading">正在读取执行规则…</string>
     <string name="execution_rules_editor_title_create">新增执行规则</string>
     <string name="execution_rules_delete_dialog_title">删除执行规则</string>
     <string name="execution_rules_delete_dialog_text">确定要删除执行规则「%1$s」吗？此操作不可撤销。</string>
-    <string name="execution_rules_editor_description">规则会在 Shell 与工具命令执行前被检查。</string>
+    <string name="execution_rules_editor_description">添加执行规则，以提高命令执行的安全性。除了脚本以外，应用所有的命令执行都会受策略管控。</string>
     <string name="execution_rules_field_name">策略名称</string>
     <string name="execution_rules_field_name_hint">例如：危险删改</string>
     <string name="execution_rules_field_enabled_mode">生效时机</string>
@@ -255,11 +246,11 @@
     <string name="execution_rules_enabled_mode_confirm">询问我</string>
     <string name="tool_permission_dialog_title">AI 请求执行操作</string>
     <string name="tool_permission_request_intro">Zafiro 的工具「%1$s」请求执行以下命令：</string>
-    <string name="tool_permission_matched_rule">命中规则「%1$s」</string>
+    <string name="tool_permission_matched_rule">命中规则「%1$s」：%2$s</string>
     <string name="tool_permission_allow">允许本次</string>
     <string name="tool_permission_deny">拒绝</string>
     <string name="screen_control_consent_title">屏幕控制权限申请</string>
-    <string name="screen_control_consent_body">Zafiro 需要无障碍与悬浮窗权限才能控制屏幕。接下来可能会弹出系统提示或跳转设置页。</string>
+    <string name="screen_control_consent_body">Zafiro 需要以下权限才能控制屏幕：\n1. 无障碍服务：读取界面、执行点按\n2. 显示在其他应用上层：显示指针指示器\n\n接下来可能会弹出系统授权框或跳转到设置页。</string>
     <string name="screen_control_consent_agree">同意</string>
     <string name="screen_control_consent_deny">拒绝</string>
     <string name="execution_rules_field_patterns">规则</string>
@@ -412,7 +403,6 @@
 
     <string name="feedback_bug_template">## 问题描述\n\n## 复现步骤\n\n## 预期行为\n\n## 实际行为\n\n## 设备信息\n- Android 版本：\n- 助手（小布或其他）：\n- 模块版本：\n\n## 更多\n可以补充日志、截图录屏等信息，以便于我们理解</string>
     <string name="conversation_fork_title">Fork · %1$s</string>
-    <string name="conversation_regenerate_title">Regenerate · %1$s</string>
     <string name="conversation_rewind_title">Rewind · %1$s</string>
     <!-- Tool display names -->
     <string name="ui_tool_display_terminal">终端</string>
@@ -445,7 +435,6 @@
     <string name="ui_settings_general_group_appearance">外观与语言</string>
     <string name="ui_settings_general_group_floating_notification">悬浮与通知</string>
     <string name="ui_settings_general_group_conversation">对话与交互</string>
-    <string name="ui_settings_general_group_runtime">运行与控制</string>
     <string name="ui_settings_general_floating_ball">悬浮球</string>
     <string name="ui_settings_general_floating_ball_summary">后台运行时展示 Agent 状态与快捷操作</string>
     <string name="ui_settings_general_floating_ball_auto_expand">悬浮球自动展开</string>
@@ -466,8 +455,23 @@
     <string name="ui_settings_general_retry_summary">请求失败后的自动重试</string>
     <string name="ui_settings_general_keep_screen_on">回答期间保持屏幕常亮</string>
     <string name="ui_settings_general_keep_screen_on_summary">回答与工具执行期间保持屏幕常亮</string>
-    <string name="ui_settings_general_screen_control_auto_approve">自动允许屏幕控制</string>
-    <string name="ui_settings_general_screen_control_auto_approve_summary">跳过 Agent 读取或点击屏幕前的确认。</string>
+    <string name="ui_settings_runtime_control">运行控制</string>
+    <string name="ui_settings_runtime_control_summary">上限、重试与复读检测</string>
+    <string name="ui_settings_runtime_group_network">网络</string>
+    <string name="ui_settings_runtime_group_stability">稳定性</string>
+    <string name="ui_settings_runtime_group_compaction">上下文压缩</string>
+    <string name="ui_settings_runtime_compaction_threshold">自动压缩阈值</string>
+    <string name="ui_settings_runtime_compaction_threshold_summary">当上下文窗口占用达到设定阈值时自动压缩历史</string>
+    <string name="ui_settings_runtime_compaction_off">关闭</string>
+    <string name="ui_settings_runtime_repetition_detection">复读检测</string>
+    <string name="ui_settings_runtime_repetition_summary">模型持续重复输出时提前熔断；越严格越灵敏，但也越可能误判正常内容</string>
+    <string name="ui_settings_runtime_sensitivity_relaxed">宽松</string>
+    <string name="ui_settings_runtime_sensitivity_loose">较宽松</string>
+    <string name="ui_settings_runtime_sensitivity_standard">标准</string>
+    <string name="ui_settings_runtime_sensitivity_strict">严格</string>
+    <string name="ui_settings_runtime_sensitivity_stricter">更严格</string>
+    <string name="ui_settings_runtime_sensitivity_strictest">极严</string>
+    <string name="ui_settings_runtime_sensitivity_off">关闭</string>
     <string name="ui_settings_general_always_show_message_actions">总是显示消息操作</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">语音助手独享一个会话</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">开启后语音助手对话不影响主界面历史；关闭则与主界面共用当前对话</string>
@@ -475,28 +479,26 @@
     <string name="ui_settings_saved_configuration_delete_title">删除配置</string>
     <string name="ui_settings_saved_configuration_delete_text">该配置将被删除，此操作无法恢复。</string>
     <string name="ui_settings_saved_configuration_edit">编辑</string>
-    <string name="ui_settings_configure_add">添加配置</string>
     <string name="ui_settings_configure_name_label">配置名称</string>
     <string name="ui_settings_configure_name_placeholder">例如：DeepSeek 主力</string>
     <string name="ui_settings_configure_vision_label">视觉模型</string>
     <string name="ui_settings_configure_protocol_label">协议</string>
     <string name="ui_settings_configure_protocol_hint">切换协议后，请确认端点与协议匹配。</string>
     <string name="ui_settings_configure_thinking_label">思考强度</string>
-    <string name="ui_settings_configure_thinking_hint">保持「Provider Default」，或在被服务商拒绝时调低。</string>
+    <string name="ui_settings_configure_thinking_hint">留空（Provider Default）时使用 Provider 默认行为；过高时若 Provider 拒绝请自行调低。</string>
+    <string name="ui_settings_configure_thinking_start_label">Default</string>
+    <string name="ui_settings_configure_thinking_end_label">Max</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">例如：200000 或 200k</string>
-    <string name="ui_settings_configure_max_tokens_hint">单次请求的最大输出 token，支持 k/m/b 后缀。留空则使用服务商默认值。</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">请填写有效数值（支持 k/m/b 后缀），不小于 256</string>
     <string name="ui_settings_configure_context_window_label">上下文窗口</string>
     <string name="ui_settings_configure_context_window_placeholder">例如：1000000 或 1M</string>
-    <string name="ui_settings_configure_context_window_hint">模型上下文窗口，用于用量环。留空则使用服务商默认值。</string>
     <string name="ui_settings_configure_error_context_window_invalid">请填写有效数值（支持 k/m/b 后缀），不小于 1000</string>
 
     <string name="ui_theme_mode_system">跟随系统</string>
     <string name="ui_theme_mode_light">浅色</string>
     <string name="ui_theme_mode_dark">深色</string>
     <string name="ui_theme_color_dynamic">动态色（壁纸取色）</string>
-    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="ui_theme_color_rose">玫瑰粉</string>
     <string name="ui_theme_color_blossom">樱花粉</string>
     <string name="ui_theme_color_lavender">薰衣草紫</string>
@@ -509,6 +511,7 @@
     <string name="ui_theme_color_lemon">柠檬黄</string>
     <string name="ui_theme_color_amber">琥珀</string>
     <string name="ui_theme_color_sunset">落日橙</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
 
     <!-- Resident Notification -->
     <string name="agent_resident_title_idle">Agent · 待命</string>
@@ -522,6 +525,7 @@
     <string name="agent_resident_action_stop">停止</string>
     <string name="agent_resident_action_approve">允许</string>
     <string name="agent_resident_action_decline">拒绝</string>
+    <string name="agent_resident_body_matched_pattern">命中 %1$s</string>
 
     <!-- Onboarding Preferences -->
     <string name="ui_onboard_done_advanced_entry">权限与执行规则</string>
@@ -556,6 +560,7 @@
     <string name="mcp_service_section_connection">连接与鉴权</string>
     <string name="mcp_service_section_tools">暴露的工具</string>
     <string name="mcp_service_enable_title">启用 MCP 服务</string>
+    <string name="mcp_service_keep_screen_on_title">运行期间保持唤醒</string>
     <string name="mcp_service_enable_summary">允许外部 Agent 通过 MCP 访问 Zafiro 的工具</string>
     <string name="mcp_service_status_title">运行状态</string>
     <string name="mcp_service_status_running">运行中</string>

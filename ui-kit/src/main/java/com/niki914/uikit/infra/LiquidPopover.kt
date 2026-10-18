@@ -1,5 +1,6 @@
 package com.niki914.uikit.infra
 
+import android.view.MotionEvent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -37,11 +38,15 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -49,6 +54,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -59,9 +65,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.kyant.backdrop.drawBackdrop
+import com.kyant.backdrop.effects.blur
 import com.kyant.backdrop.effects.lens
+import com.kyant.backdrop.effects.vibrancy
 import com.kyant.backdrop.highlight.Highlight
 import com.kyant.backdrop.shadow.Shadow
 import com.niki914.uikit.base.LocalAppDarkTheme
@@ -96,6 +105,7 @@ fun LiquidPopover(
     containerColor: Color? = null,
     scrollable: Boolean = false,
     onProgressChanged: ((Float) -> Unit)? = null,
+    backdrop: Backdrop? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val hostState = LocalLiquidDialogHostState.current
@@ -113,6 +123,7 @@ fun LiquidPopover(
                     containerColor = containerColor,
                     scrollable = scrollable,
                     onProgressChanged = onProgressChanged,
+                    backdrop = backdrop,
                     content = content,
                 )
             }
@@ -133,6 +144,7 @@ fun LiquidPopover(
             containerColor = containerColor,
             scrollable = scrollable,
             onProgressChanged = onProgressChanged,
+            backdrop = backdrop,
             content = content,
         )
     }
@@ -156,13 +168,15 @@ internal fun LiquidPopoverSurface(
     containerColor: Color? = null,
     scrollable: Boolean = false,
     onProgressChanged: ((Float) -> Unit)? = null,
+    backdrop: Backdrop? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val animationScope = rememberCoroutineScope()
     val interactiveHighlight = remember(animationScope) {
         InteractiveHighlight(animationScope = animationScope)
     }
-    val backdrop = rememberLayerBackdrop()
+    val fallbackBackdrop = rememberLayerBackdrop()
+    val resolvedBackdrop = backdrop ?: LocalScreenBackdrop.current ?: fallbackBackdrop
     val isDarkTheme = LocalAppDarkTheme.current
     val density = LocalDensity.current
     val statusBarTopPx = WindowInsets.statusBars.getTop(density).toFloat()
@@ -204,18 +218,36 @@ internal fun LiquidPopoverSurface(
         onDismissRequest()
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // 心智对齐 DropdownMenu：完全透明的空白点击拦截区，绝无全局暗色阴影/Scrim
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onDismissRequest,
-                ),
-        )
+    val currentOnDismissRequest by rememberUpdatedState(onDismissRequest)
+    var cardBounds by remember { mutableStateOf<Rect?>(null) }
 
+    LaunchedEffect(expanded) {
+        if (!expanded) {
+            cardBounds = null
+        }
+    }
+
+    DisposableEffect(expanded) {
+        if (!expanded) return@DisposableEffect onDispose {}
+
+        val unregister = GlobalTouchDispatcher.register { event ->
+            if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                val bounds = cardBounds ?: anchorBounds
+                if (bounds != null) {
+                    val isInside = bounds.contains(Offset(event.x, event.y))
+                    if (!isInside) {
+                        currentOnDismissRequest()
+                    }
+                }
+            }
+        }
+
+        onDispose {
+            unregister()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
         SubcomposeLayout(modifier = Modifier.fillMaxSize()) { constraints ->
             val anchor = anchorBounds ?: run {
                 val defaultButtonSizePx = with(density) { 48.dp.toPx() }
@@ -346,14 +378,9 @@ internal fun LiquidPopoverSurface(
                 val contentAlpha =
                     if (progress > 0.25f) ((progress - 0.25f) / 0.75f).coerceIn(0f, 1f) else 0f
 
-                // 折叠态与 ActionBarButton 同色（磨砂半透明），展开态实心盖住后方内容。
-                // 两层：底层 surface 不透明度随 progress 升到 1（消除透光导致的明暗斑块），
-                // 上层保留磨砂 tint 以维持与按钮同源的观感。
-                val frostColor = containerColor ?: (
-                        if (isDarkTheme) Color(0xFFAFAFAF).copy(alpha = 0.15f)
-                        else Color.White.copy(alpha = 0.22f)
-                        )
-                val opaqueBase = MaterialTheme.colorScheme.surface
+                // 默认颜色与 ActionBarButton 保持 100% 一致（透明白/灰色），支持自定义传入
+                val resolvedSurfaceColor = containerColor
+                    ?: LiquidGlassPresets.Popover.surfaceColor(isDarkTheme, MaterialTheme.colorScheme)
 
                 Box(
                     modifier = Modifier
@@ -362,15 +389,10 @@ internal fun LiquidPopoverSurface(
                             height = with(density) { currentHeightPx.toDp() },
                         )
                         .drawBackdrop(
-                            backdrop = backdrop,
+                            backdrop = resolvedBackdrop,
                             shape = { panelShape },
-                            highlight = { Highlight.Ambient.copy(alpha = if (isDarkTheme) 1f else 0.4f) },
-                            shadow = {
-                                Shadow(
-                                    radius = 12.dp,
-                                    color = Color.Black.copy(if (isDarkTheme) 0.08f else 0.2f),
-                                )
-                            },
+                            highlight = { LiquidGlassPresets.Popover.highlight(isDarkTheme) },
+                            shadow = { LiquidGlassPresets.Popover.shadow(isDarkTheme) },
                             layerBlock = {
                                 if (!scrollable) {
                                     applyLiquidInteractiveTransform(
@@ -382,12 +404,7 @@ internal fun LiquidPopoverSurface(
                                 }
                             },
                             effects = {
-                                lens(
-                                    refractionHeight = 6.dp.toPx(),
-                                    refractionAmount = size.height / 2f,
-                                    depthEffect = true,
-                                    chromaticAberration = true,
-                                )
+                                LiquidGlassPresets.Popover.applyEffects(this, isDarkTheme)
                             },
                             onDrawSurface = {
                                 drawRect(opaqueBase.copy(alpha = progress))
@@ -400,7 +417,10 @@ internal fun LiquidPopoverSurface(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = {},
-                        ),
+                        )
+                        .onGloballyPositioned { coordinates ->
+                            cardBounds = coordinates.boundsInWindow()
+                        },
                 ) {
                     Box(
                         modifier = Modifier

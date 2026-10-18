@@ -31,7 +31,6 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -78,6 +77,9 @@ import com.niki914.uikit.infra.component.SettingsGroupCard
 import com.niki914.uikit.infra.component.SettingsItemSurface
 import com.niki914.uikit.infra.liquidScreenBottomPadding
 import com.niki914.uikit.infra.liquidScreenTopPadding
+import com.niki914.uikit.infra.scrollbar.LiquidScrollableContainer
+import com.niki914.uikit.infra.scrollbar.rememberLazyListStateAdapter
+import com.niki914.uikit.infra.scrollbar.rememberLiquidOverscrollController
 import com.niki914.uikit.infra.shape.G2CardShape
 import com.niki914.zafiro.app.R
 import com.niki914.zafiro.app.conversation.ConversationFormatter
@@ -312,10 +314,16 @@ private fun ConversationHistoryListContent(
     }
 
     val listState = rememberLazyListState()
-    // 折叠信号取自列表自身的整数位置：壳层累加量是手势增量之和，与真实位置有亚像素
-    // 差，而本页阈值为 0.dp，半像素正残差就会让背景板永久不透明。
+    val overscrollController = rememberLiquidOverscrollController()
+    val scrollbarState = rememberLazyListStateAdapter(listState, overscrollController)
+
+    // 折叠信号取自列表自身的整数位置与刚体平移量：壳层累加量是手势增量之和，与真实位置有亚像素
+    // 差，而本页阈值为 0.dp，半像素正残差就会让背景板永久不透明；当列表项较少发生向上超滚时，
+    // 内容推入顶栏区，顶栏也需变实体遮挡，复原后随位移归零恢复透明。
     ReportTitleBarCollapsed {
-        listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 0
+        listState.firstVisibleItemIndex > 0 ||
+            listState.firstVisibleItemScrollOffset > 0 ||
+            overscrollController.overscrollOffset.value < 0f
     }
 
     // 时间基准定时刷新：每 15 秒更新一次当前时间戳，驱动相对时间自然步进
@@ -327,18 +335,25 @@ private fun ConversationHistoryListContent(
         }
     }
 
-    LazyColumn(
-        state = listState,
+    LiquidScrollableContainer(
+        state = scrollbarState,
+        overscrollController = overscrollController,
+        topClearance = liquidScreenTopPadding(24.dp),
+        bottomClearance = liquidScreenBottomPadding(),
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            start = 16.dp,
-            top = liquidScreenTopPadding(24.dp),
-            end = 16.dp,
-            bottom = liquidScreenBottomPadding(),
-        ),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        sections.forEach { section ->
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                top = liquidScreenTopPadding(24.dp),
+                end = 16.dp,
+                bottom = liquidScreenBottomPadding(),
+            ),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            sections.forEach { section ->
             val expanded = section.bucket !in collapsedBuckets
             // 一个 section = 一个 item：header 与它的行同住一个 item，折叠时靠 item
             // 自身的高度动画把下方 section 平滑拉上来（布局推挤，不是各行各自补间，故不会互相穿透）。
@@ -446,6 +461,7 @@ private fun ConversationHistoryListContent(
         }
     }
 }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -521,8 +537,11 @@ private fun ConversationHistoryItem(
     val displayTitle = parsedTitle.cleanTitle.ifBlank { untitledConversation }
     // 置顶段独占样式：高亮底色 + 隐去派生前缀图标，右上角只留时间；
     // 时间桶里的同一会话照旧普通样式，另用图钉标识它是置顶项。
+    // 派生前缀图标只服务 Fork / Rewind：重新生成由分支翻页器表达，不是图标。
+    val originKind = parsedTitle.originKind
+        ?.takeIf { it != ConversationOriginKind.Regenerate }
     val originIcon =
-        if (inPinnedSection) null else parsedTitle.originKind?.let { originKindToIcon(it) }
+        if (inPinnedSection) null else originKind?.let { originKindToIcon(it) }
     val showPinBadge = isPinned && !inPinnedSection
     val relativeTime = formatRelativeTime(conversation.updatedAt, currentTimeMillis)
 
@@ -697,8 +716,11 @@ private fun ConversationHistoryItem(
 }
 
 private fun originKindToIcon(kind: ConversationOriginKind): ImageVector = when (kind) {
-    ConversationOriginKind.Regenerate -> Icons.Default.Refresh
-    ConversationOriginKind.Fork -> Icons.AutoMirrored.Filled.CallSplit
+    // 重新生成与 Fork 共用同一图标（前缀里剥出的 Regenerate 也走这里）
+    ConversationOriginKind.Regenerate,
+    ConversationOriginKind.Fork,
+    -> Icons.AutoMirrored.Filled.CallSplit
+
     ConversationOriginKind.Rewind -> Icons.AutoMirrored.Filled.Undo
 }
 

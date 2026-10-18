@@ -29,6 +29,8 @@ internal fun Conversation.toHomeTurns(): List<HomeChatTurn> =
             images = turn.images.map { it.toHomeImage() },
             files = turn.files.map { it.toHomeFile() },
             blocks = turn.blocks.mapIndexed { blockIndex, block -> block.toHomeBlock(blockIndex) },
+            isCompactedDivider = turn.isCompactedDivider,
+            isCompacting = turn.isCompacting,
         )
     }
 
@@ -104,4 +106,5 @@ private fun TurnFailureCode?.toLlmErrorCode(): LlmErrorCode? = when (this) {
     TurnFailureCode.ToolExecutionFailed -> LlmErrorCode.ToolExecutionFailed
     TurnFailureCode.IdleTimeout -> LlmErrorCode.IdleTimeout
     TurnFailureCode.OutputTruncated -> LlmErrorCode.OutputTruncated
+    TurnFailureCode.Repetition -> LlmErrorCode.Repetition
 }

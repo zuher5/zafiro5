@@ -47,7 +47,7 @@ fun ExecutionRulesSettingsContent(
                 onClick = {
                     latestOnOpenRuleDetail(createTitle, -1, true)
                 },
-                contentDescription = createTitle,
+                contentDescription = "Add Button",
             ),
         )
     }
@@ -93,8 +93,7 @@ private fun ExecutionRulesSettingsContentBody(
                     onOpenRuleDetail(item.name, index, false)
                 }
 
-                is SettingsRowAction.Click,
-                is SettingsRowAction.ToggleChanged -> Unit
+                else -> Unit
             }
         },
     )

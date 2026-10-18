@@ -60,6 +60,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -72,6 +73,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -117,17 +119,31 @@ import com.niki914.uikit.infra.LiquidDialog
 import com.niki914.uikit.infra.LiquidMenuItem
 import com.niki914.uikit.infra.LiquidPopover
 import com.niki914.uikit.infra.LocalHasActiveDialog
+import com.niki914.uikit.infra.LocalScreenBackdrop
 import com.niki914.uikit.infra.PopoverAlignment
 import com.niki914.uikit.infra.ProvideLiquidScreenContentForPreview
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.semantics.Role
+import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import com.kyant.backdrop.drawBackdrop
+import com.niki914.uikit.infra.LiquidGlassPresets
 import com.niki914.uikit.infra.ReportTitleBarCollapsed
+import com.niki914.uikit.infra.interaction.InteractiveHighlight
+import com.niki914.uikit.infra.interaction.LiquidButtonInteractiveStyle
+import com.niki914.uikit.infra.interaction.applyLiquidInteractiveTransform
 import com.niki914.uikit.infra.component.MaterialTintLiquidButton
 import com.niki914.uikit.infra.component.OptionRow
 import com.niki914.uikit.infra.component.OptionSheet
 import com.niki914.uikit.infra.liquidScreenTopPadding
 import com.niki914.uikit.infra.nav.pageViewModel
+import com.niki914.uikit.infra.scrollbar.LiquidOverscrollContainer
+import com.niki914.uikit.infra.scrollbar.LiquidOverscrollController
+import com.niki914.uikit.infra.scrollbar.rememberLiquidOverscrollController
 import com.niki914.zafiro.api.model.ApprovalDecision
 import com.niki914.zafiro.api.model.ApprovalRequest
 import com.niki914.zafiro.app.R
+import com.niki914.zafiro.app.conversation.TurnBranchState
 import com.niki914.zafiro.app.notification.TurnNotificationManager
 import com.niki914.zafiro.app.ui.PageChromeContribution
 import com.niki914.zafiro.app.ui.PageChromeMenuItem
@@ -183,7 +199,6 @@ fun HomePageContent(
     val viewModel = pageViewModel<HomeChatViewModel>()
     val newConversationMenuLabel = stringResource(R.string.ui_home_menu_new_conversation)
     val settingsMenuLabel = stringResource(R.string.ui_settings_menu_entry)
-    val historyContentDescription = stringResource(R.string.ui_home_history_content_description)
     val latestViewModel by rememberUpdatedState(viewModel)
     val latestOnOpenHistory by rememberUpdatedState(onOpenHistory)
     val latestOnOpenSettings by rememberUpdatedState(onOpenSettings)
@@ -228,11 +243,14 @@ fun HomePageContent(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val listState = rememberLazyListState()
+    val overscrollController = rememberLiquidOverscrollController()
 
     // Home 必须显式接管顶栏折叠信号：列表位置会由程序化驱动（自动贴底），且工具结果框
-    // 自带滚动子树——两者都是壳层累积量看不见的位移。其余页面保持自动感知。
+    // 自带滚动子树——两者都是壳层累积量看不见的位移；当向上超滚时，内容推入顶栏区，顶栏需变实体遮挡。
     ReportTitleBarCollapsed {
-        listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 0
+        listState.firstVisibleItemIndex > 0 ||
+            listState.firstVisibleItemScrollOffset > 0 ||
+            overscrollController.overscrollOffset.value < 0f
     }
 
     val imeBottom = with(density) { WindowInsets.ime.getBottom(this).toDp() }
@@ -364,7 +382,6 @@ fun HomePageContent(
     val pageChromeContribution = remember(
         newConversationMenuLabel,
         settingsMenuLabel,
-        historyContentDescription,
         titleContent,
         uiState.isConfigMenuVisible,
     ) {
@@ -380,7 +397,7 @@ fun HomePageContent(
                     }
                     latestOnOpenHistory()
                 },
-                contentDescription = historyContentDescription,
+                contentDescription = "History Button",
             ),
             menuItems = listOf(
                 PageChromeMenuItem(
@@ -467,6 +484,7 @@ fun HomePageContent(
         uiState = uiState,
         actionsDisplay = actionsDisplay,
         listState = listState,
+        overscrollController = overscrollController,
         composerBottomPadding = composerBottomPadding,
         composerGap = composerGap,
         composerHeight = composerHeight,
@@ -538,6 +556,10 @@ fun HomePageContent(
             viewModel.sendIntent(
                 HomeChatIntent.ToggleActionRow(turnId, source)
             )
+        },
+        turnBranches = uiState.turnBranches,
+        onSwitchTurnBranch = { turnId, delta ->
+            viewModel.sendIntent(HomeChatIntent.SwitchTurnBranch(turnId, delta))
         },
     )
 
@@ -728,7 +750,8 @@ private fun ToolPermissionDialog(
                 Text(
                     text = stringResource(
                         R.string.tool_permission_matched_rule,
-                        request.ruleName
+                        request.ruleName,
+                        request.matchedPattern,
                     ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
@@ -760,6 +783,7 @@ private fun HomePageContentBody(
     uiState: HomeChatUiState,
     actionsDisplay: MessageActionsDisplay,
     listState: LazyListState,
+    overscrollController: LiquidOverscrollController = rememberLiquidOverscrollController(),
     composerBottomPadding: Dp,
     composerGap: Dp,
     composerHeight: MutableState<Dp>,
@@ -791,6 +815,8 @@ private fun HomePageContentBody(
     expandedActionSource: ActionSource?,
     activeThinkingKey: String? = null,
     onToggleActionRow: (Long, ActionSource) -> Unit,
+    turnBranches: Map<Long, TurnBranchState> = emptyMap(),
+    onSwitchTurnBranch: (Long, Int) -> Unit = { _, _ -> },
 ) {
 
     // 底部避让总高：composer 底距 + 实测高度 + 统一视觉间距。列表贴底留白与箭头
@@ -798,6 +824,7 @@ private fun HomePageContentBody(
     // composerBottomPadding*2 + composerHeight，composer 顶上方留一个视觉间距
     val bottomClearance = composerBottomPadding + composerHeight.value + composerGap
     val density = LocalDensity.current
+    val chatBackdrop = rememberLayerBackdrop()
 
     // 可发现性提示（默认 OnTap 模式）：首个回合显示「点击消息执行操作」提示；
     // 任何内容点击或发送后即消失，换会话后重新出现（remember 以会话 id 为键）。
@@ -868,72 +895,82 @@ private fun HomePageContentBody(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = handleContentTap,
-                ),
-            contentPadding = PaddingValues(
-                start = 20.dp,
-                top = liquidScreenTopPadding(24.dp),
-                end = 20.dp,
-                bottom = bottomClearance,
-            ),
+        LiquidOverscrollContainer(
+            overscrollController = overscrollController,
+            modifier = Modifier.fillMaxSize(),
         ) {
-            itemsIndexed(
-                items = uiState.turns,
-                key = { _, turn -> turn.id },
-            ) { index, turn ->
-                // User 气泡组内位置（渲染层：两个相邻 UserBubble 之间无任何内容即同组，见 userBubblePosition）
-                val position = userBubblePosition(uiState.turns, index)
-                // 组归一化：点组内任意一条都弹/聚合到组尾（操作行在组尾 turn 下渲染）
-                val tailIndex = userGroupTailIndex(uiState.turns, index)
-                val tailTurn = uiState.turns[tailIndex]
-                // 顶距：组中/组末用组内间隙与上一气泡连体；组首/单条维持 turn 分隔
-                val turnTopPad = when {
-                    index == 0 -> Modifier
-                    position == UserBubblePosition.GroupMid || position == UserBubblePosition.GroupLast ->
-                        Modifier.padding(top = UserBubbleGap)
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .layerBackdrop(chatBackdrop)
+                    .background(MaterialTheme.colorScheme.background)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onContentTap,
+                    ),
+                contentPadding = PaddingValues(
+                    start = 20.dp,
+                    top = liquidScreenTopPadding(24.dp),
+                    end = 20.dp,
+                    bottom = bottomClearance,
+                ),
+            ) {
+                itemsIndexed(
+                    items = uiState.turns,
+                    key = { _, turn -> turn.id },
+                ) { index, turn ->
+                    // User 气泡组内位置（渲染层：两个相邻 UserBubble 之间无任何内容即同组，见 userBubblePosition）
+                    val position = userBubblePosition(uiState.turns, index)
+                    // 组归一化：点组内任意一条都弹/聚合到组尾（操作行在组尾 turn 下渲染）
+                    val tailIndex = userGroupTailIndex(uiState.turns, index)
+                    val tailTurn = uiState.turns[tailIndex]
+                    // 顶距：组中/组末用组内间隙与上一气泡连体；组首/单条维持 turn 分隔；分割线紧凑居中
+                    val turnTopPad = when {
+                        index == 0 -> Modifier
+                        turn.isCompactedDivider -> Modifier.padding(top = 8.dp, bottom = 8.dp)
+                        position == UserBubblePosition.GroupMid || position == UserBubblePosition.GroupLast ->
+                            Modifier.padding(top = UserBubbleGap)
 
-                    else -> Modifier.padding(top = TurnSeparator)
+                        else -> Modifier.padding(top = TurnSeparator)
+                    }
+                    HomeChatTurnItem(
+                        turn = turn,
+                        userBubblePosition = position,
+                        isLastTurn = index == uiState.turns.lastIndex,
+                        actionsDisplay = actionsDisplay,
+                        userGroupTailTurnId = tailTurn.id,
+                        userGroupTappable = tailTurn.blocks.isNotEmpty() || tailIndex == uiState.turns.lastIndex,
+                        userGroupText = userGroupText(uiState.turns, index),
+                        onContentTap = onContentTap,
+                        onReGenerate = onReGenerate,
+                        onFork = onFork,
+                        onRewind = onRewind,
+                        expandedToolRuns = expandedToolRuns,
+                        expandedToolResults = expandedToolResults,
+                        expandedThinking = expandedThinking,
+                        onToggleToolRun = onToggleToolRun,
+                        onToggleToolResult = onToggleToolResult,
+                        onToggleThinking = onToggleThinking,
+                        expandedActionTurnId = expandedActionTurnId,
+                        expandedActionSource = expandedActionSource,
+                        activeThinkingKey = activeThinkingKey,
+                        onToggleActionRow = onToggleActionRow,
+                        isGenerating = uiState.isGenerating,
+                        branchIndex = turnBranches[turn.id]?.current ?: 1,
+                        branchCount = turnBranches[turn.id]?.total ?: 1,
+                        onSwitchBranch = { delta -> onSwitchTurnBranch(turn.id, delta) },
+                        modifier = turnTopPad.fillMaxWidth(),
+                    )
                 }
-                HomeChatTurnItem(
-                    turn = turn,
-                    userBubblePosition = position,
-                    isLastTurn = index == uiState.turns.lastIndex,
-                    actionsDisplay = actionsDisplay,
-                    userGroupTailTurnId = tailTurn.id,
-                    userGroupTappable = tailTurn.blocks.isNotEmpty() || tailIndex == uiState.turns.lastIndex,
-                    userGroupText = userGroupText(uiState.turns, index),
-                    onContentTap = handleContentTap,
-                    showTapHint = index == 0 && !tapHintDismissed && actionsDisplay == MessageActionsDisplay.OnTap,
-                    onReGenerate = onReGenerate,
-                    onFork = onFork,
-                    onRewind = onRewind,
-                    expandedToolRuns = expandedToolRuns,
-                    expandedToolResults = expandedToolResults,
-                    expandedThinking = expandedThinking,
-                    onToggleToolRun = onToggleToolRun,
-                    onToggleToolResult = onToggleToolResult,
-                    onToggleThinking = onToggleThinking,
-                    expandedActionTurnId = expandedActionTurnId,
-                    expandedActionSource = expandedActionSource,
-                    activeThinkingKey = activeThinkingKey,
-                    onToggleActionRow = onToggleActionRow,
-                    isGenerating = uiState.isGenerating,
-                    modifier = turnTopPad.fillMaxWidth(),
-                )
-            }
-            item(key = "bottom_anchor") {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp),
-                )
+                item(key = "bottom_anchor") {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp),
+                    )
+                }
             }
         }
 
@@ -957,61 +994,102 @@ private fun HomePageContentBody(
             )
         }
 
-        LiquidChatComposer(
-            value = uiState.input,
-            onValueChange = onInputChange,
-            onSendClick = handleSend,
-            onStopClick = onStopClick,
-            isGenerating = uiState.isGenerating,
-            contextProgress = uiState.contextProgress,
-            pendingImages = pendingImages,
-            pendingFiles = pendingFiles,
-            onAttachImageClick = { attachSheetVisible = true },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .onFocusChanged { focusState ->
-                    onComposerFocusChanged(focusState.hasFocus)
-                }
-                .focusRequester(composerFocusRequester)
-                .padding(
-                    start = 20.dp,
-                    end = 20.dp,
-                    bottom = composerBottomPadding,
-                )
-                // 放在 padding 之后：只测 composer 本体高度，不含底边距
-                .onSizeChanged { size ->
-                    composerHeight.value = with(density) { size.height.toDp() }
-                },
-        )
+        CompositionLocalProvider(
+            LocalScreenBackdrop provides chatBackdrop,
+        ) {
+            LiquidChatComposer(
+                value = uiState.input,
+                onValueChange = onInputChange,
+                onSendClick = onSendClick,
+                onStopClick = onStopClick,
+                isGenerating = uiState.isGenerating,
+                contextProgress = uiState.contextProgress,
+                pendingImages = pendingImages,
+                pendingFiles = pendingFiles,
+                onAttachImageClick = { attachSheetVisible = true },
+                backdrop = chatBackdrop,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .onFocusChanged { focusState ->
+                        onComposerFocusChanged(focusState.hasFocus)
+                    }
+                    .focusRequester(composerFocusRequester)
+                    .padding(
+                        start = 20.dp,
+                        end = 20.dp,
+                        bottom = composerBottomPadding,
+                    )
+                    // 放在 padding 之后：只测 composer 本体高度，不含底边距
+                    .onSizeChanged { size ->
+                        composerHeight.value = with(density) { size.height.toDp() }
+                    },
+            )
+        }
 
         // 解除贴底锚定且不在底部时出现：点击恢复跟随并平滑滚回底部
         val scrollToBottomScope = rememberCoroutineScope()
+        val scrollToBottomInteractiveHighlight = remember(scrollToBottomScope) {
+            InteractiveHighlight(animationScope = scrollToBottomScope)
+        }
+        val isDarkTheme = LocalAppDarkTheme.current
+        val scrollToBottomShape = CircleShape
+        val scrollToBottomSurfaceColor = LiquidGlassPresets.ScrollToBottom.surfaceColor(isDarkTheme, MaterialTheme.colorScheme)
+
         AnimatedVisibility(
             visible = !followBottom.value && !isAtBottom,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = bottomClearance),
-            enter = fadeIn(tween(160)) + scaleIn(tween(180), initialScale = 0.82f),
-            exit = fadeOut(tween(100)) + scaleOut(tween(120), targetScale = 0.86f),
+            enter = fadeIn(tween(160)),
+            exit = fadeOut(tween(100)),
         ) {
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                    .clickable {
+                    .drawBackdrop(
+                        backdrop = chatBackdrop,
+                        shape = { scrollToBottomShape },
+                        highlight = { LiquidGlassPresets.ScrollToBottom.highlight(isDarkTheme) },
+                        shadow = { LiquidGlassPresets.ScrollToBottom.shadow(isDarkTheme) },
+                        effects = {
+                            LiquidGlassPresets.ScrollToBottom.applyEffects(this, isDarkTheme)
+                        },
+                        layerBlock = {
+                            applyLiquidInteractiveTransform(
+                                style = LiquidButtonInteractiveStyle,
+                                pressProgress = scrollToBottomInteractiveHighlight.pressProgress,
+                                offset = scrollToBottomInteractiveHighlight.offset,
+                                size = size,
+                            )
+                        },
+                        onDrawSurface = {
+                            drawRect(scrollToBottomSurfaceColor)
+                        },
+                    )
+                    .clip(scrollToBottomShape)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        role = Role.Button,
+                    ) {
                         followBottom.value = true
                         scrollToBottomScope.launch {
                             listState.animateScrollToItem(uiState.turns.size)
                         }
-                    },
+                    }
+                    .then(scrollToBottomInteractiveHighlight.gestureModifier)
+                    .then(
+                        if (LiquidButtonInteractiveStyle.highlightEnabled) {
+                            scrollToBottomInteractiveHighlight.modifier
+                        } else {
+                            Modifier
+                        }
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_down),
-                    contentDescription = stringResource(
-                        R.string.ui_home_scroll_to_bottom_content_description,
-                    ),
+                    contentDescription = "Scroll To Bottom Icon",
                     tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(18.dp),
                 )
@@ -1191,8 +1269,10 @@ private class GrantingTakePicture : ActivityResultContract<Uri, ActivityResult>(
  * 因此流式内容到达只会改变"自身→下一条"一侧，组首一侧的黏性由上一 turn 决定，组不随内容跳变。
  */
 private fun userBubblePosition(turns: List<HomeChatTurn>, index: Int): UserBubblePosition {
-    val stickyUp = index > 0 && turns[index - 1].blocks.isEmpty()
-    val stickyDown = index < turns.lastIndex && turns[index].blocks.isEmpty()
+    val current = turns.getOrNull(index)
+    if (current == null || current.isCompactedDivider) return UserBubblePosition.Single
+    val stickyUp = index > 0 && turns[index - 1].blocks.isEmpty() && !turns[index - 1].isCompactedDivider
+    val stickyDown = index < turns.lastIndex && turns[index].blocks.isEmpty() && !turns[index + 1].isCompactedDivider
     return when {
         stickyUp && stickyDown -> UserBubblePosition.GroupMid
         stickyUp -> UserBubblePosition.GroupLast
@@ -1207,16 +1287,17 @@ private fun userBubblePosition(turns: List<HomeChatTurn>, index: Int): UserBubbl
  */
 internal fun userGroupTailIndex(turns: List<HomeChatTurn>, index: Int): Int {
     var tail = index
-    while (tail < turns.lastIndex && turns[tail].blocks.isEmpty()) tail++
+    while (tail < turns.lastIndex && turns[tail].blocks.isEmpty() && !turns[tail].isCompactedDivider && !turns[tail + 1].isCompactedDivider) tail++
     return tail
 }
 
 /** index 所在 User 组的组内全部用户文本：按序、双换行分隔、跳过空白（纯图片 turn）。 */
 internal fun userGroupText(turns: List<HomeChatTurn>, index: Int): String {
     var head = index
-    while (head > 0 && turns[head - 1].blocks.isEmpty()) head--
+    while (head > 0 && turns[head - 1].blocks.isEmpty() && !turns[head - 1].isCompactedDivider) head--
     val tail = userGroupTailIndex(turns, index)
     return turns.subList(head, tail + 1)
+        .filterNot { it.isCompactedDivider }
         .map { it.userText }
         .filter { it.isNotBlank() }
         .joinToString("\n\n")
@@ -1250,8 +1331,19 @@ private fun HomeChatTurnItem(
     onToggleActionRow: (Long, ActionSource) -> Unit,
     showTapHint: Boolean = false,
     isGenerating: Boolean,
+    branchIndex: Int = 1,
+    branchCount: Int = 1,
+    onSwitchBranch: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    if (turn.isCompactedDivider) {
+        CompactedDividerItem(
+            isCompacting = turn.isCompacting,
+            modifier = modifier,
+        )
+        return
+    }
+
     val alwaysVisible = actionsDisplay == MessageActionsDisplay.Always
     // Agent 操作行：仅正生成中的末轮隐藏；已结束的旧 turn 常显（复制无害，
     // 重新生成/分叉/回退在生成中点按弹 toast，见 guarded 回调）
@@ -1565,8 +1657,58 @@ private fun HomeChatTurnItem(
                 },
                 onReGenerate = { guardedReGenerate(turn.id) },
                 onFork = { guardedFork(turn.id) },
+                // 翻页器由该轮自身分支数驱动，各轮次独立显示
+                branchIndex = branchIndex,
+                branchCount = branchCount,
+                onSwitchBranch = onSwitchBranch,
             )
         }
+    }
+}
+
+@Composable
+private fun CompactedDividerItem(
+    isCompacting: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val dots = if (isCompacting) {
+        val dotCount by produceState(initialValue = 1) {
+            while (true) {
+                delay(400)
+                value = (value % 3) + 1
+            }
+        }
+        ".".repeat(dotCount)
+    } else {
+        ""
+    }
+
+    Row(
+        modifier = modifier
+            .padding(vertical = 6.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f),
+        )
+        Text(
+            text = if (isCompacting) {
+                "${stringResource(R.string.ui_home_conversation_compacting)}$dots"
+            } else {
+                stringResource(R.string.ui_home_conversation_compacted)
+            },
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+        )
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f),
+        )
     }
 }
 
@@ -1751,4 +1893,39 @@ private fun HomeTitleConfigChip(
         }
     }
 }
+
+@Preview(
+    name = "Compacted Divider Alignment Preview",
+    showBackground = true,
+    widthDp = 400,
+    heightDp = 500,
+)
+@Composable
+private fun CompactedDividerAlignmentPreview() {
+    BaseTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            AssistantOutputText(
+                text = "这是一段用于测试两端对齐的 Markdown 文本。请观察下方分割线两端与本段文本起止边缘是否在同一条垂线上（start-to-start, end-to-end）。"
+            )
+
+            CompactedDividerItem(isCompacting = true)
+
+            AssistantOutputText(
+                text = "这是位于两条分割线中间的普通模型回复段落。"
+            )
+
+            CompactedDividerItem(isCompacting = false)
+
+            AssistantOutputText(
+                text = "这是压缩之后的新一轮回答。上方分割线展示的是「对话已压缩」完成态。"
+            )
+        }
+    }
+}
+
 

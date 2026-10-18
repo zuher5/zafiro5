@@ -27,11 +27,13 @@
     <string name="ui_onboard_configure_error_load_failed">Не удалось загрузить настройки: %1$s</string>
     <string name="ui_onboard_configure_error_save_failed">Не удалось сохранить настройки: %1$s</string>
     <string name="ui_onboard_done_headline">Всё готово.</string>
-    <string name="ui_onboard_done_description">Настройка завершена. Откройте Zafiro сейчас или доработайте позже в настройках.</string>
+    <string name="ui_onboard_done_description">Настройка завершена. Можно начинать работать с Zafiro или донастроить его позже в настройках.</string>
     <string name="ui_onboard_done_enter_home">Открыть Zafiro</string>
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">Новый диалог</string>
     <string name="ui_home_input_placeholder">Введите сообщение…</string>
+    <string name="ui_home_conversation_compacted">Диалог сжат</string>
+    <string name="ui_home_conversation_compacting">Сжатие</string>
     <string name="ui_tool_status_called">Вызван</string>
     <string name="ui_tool_status_running">Выполняется</string>
     <string name="ui_tool_status_success">Успешно</string>
@@ -42,8 +44,6 @@
         <item quantity="many">%d инструментов</item>
         <item quantity="other">%d инструмента</item>
     </plurals>
-    <string name="ui_home_send_content_description">Отправить сообщение</string>
-    <string name="ui_home_add_image_content_description">Добавить изображение</string>
     <string name="ui_home_attach_sheet_title">Добавить в диалог</string>
     <string name="ui_home_attach_photos">Фото</string>
     <string name="ui_home_attach_camera">Камера</string>
@@ -52,8 +52,6 @@
     <string name="ui_home_attach_unresolvable">Не удалось получить локальный путь к этому файлу</string>
     <string name="ui_home_attach_no_permission">Сначала выдайте доступ ко всем файлам</string>
     <string name="ui_home_attach_unreadable">Не удалось прочитать этот файл</string>
-    <string name="ui_home_file_remove_content_description">Убрать файл</string>
-    <string name="ui_home_image_remove_content_description">Убрать изображение</string>
     <string name="ui_home_file_category_folder">Папка</string>
     <string name="ui_home_file_category_code">Код</string>
     <string name="ui_home_file_category_document">Документ</string>
@@ -63,12 +61,6 @@
     <string name="ui_home_file_category_archive">Архив</string>
     <string name="ui_home_file_category_apk">APK</string>
     <string name="ui_home_file_category_file">Файл</string>
-    <string name="ui_home_scroll_to_bottom_content_description">Прокрутить вниз</string>
-    <string name="ui_home_stop_content_description">Остановить генерацию</string>
-    <string name="ui_home_action_copy_content_description">Копировать</string>
-    <string name="ui_home_action_regenerate_content_description">Сгенерировать заново</string>
-    <string name="ui_home_action_fork_content_description">Ответвить диалог</string>
-    <string name="ui_home_action_rewind_content_description">Откатить</string>
     <string name="ui_toast_copied">Скопировано</string>
     <string name="ui_toast_generating">Идёт генерация, подождите</string>
     <string name="ui_toast_empty_input">Пожалуйста, введите сообщение</string>
@@ -79,13 +71,14 @@
     <string name="ui_home_error_idle_timeout_title">Превышено время ожидания ответа</string>
     <string name="ui_home_error_output_truncated_title">Ответ обрезан</string>
     <string name="ui_home_error_output_truncated_body">Достигнут лимит длины одного ответа, поэтому ответ неполный. Увеличьте «Максимум токенов» в настройках модели и сгенерируйте ответ заново.</string>
+    <string name="ui_home_error_repetition_title">Обнаружено повторение вывода</string>
+    <string name="ui_home_error_repetition_body">Обнаружено зацикливание модели на повторах — диалог остановлен. Если это ложное срабатывание, настройте чувствительность в настройках.</string>
     <string name="ui_home_error_retry_exhausted_title">Автоматические повторы исчерпаны</string>
     <string name="ui_home_error_internal_title">Внутренняя ошибка</string>
     <string name="ui_home_retrying_title">Сбой сети, повторяем…</string>
     <string name="ui_home_thinking_title">Размышление</string>
     <string name="ui_home_retrying_attempt">Повтор %1$d из %2$d</string>
     <string name="runtime_error_internal">Внутренняя ошибка</string>
-    <string name="ui_home_history_content_description">История диалогов</string>
     <string name="ui_conversation_history_title">История</string>
     <string name="ui_conversation_selection_count">Выбрано: %1$d</string>
     <string name="ui_conversation_history_today">Сегодня</string>
@@ -93,7 +86,6 @@
     <string name="ui_conversation_history_this_month">В этом месяце</string>
     <string name="ui_conversation_history_older">Раньше</string>
     <string name="ui_conversation_history_pinned_section">Закреплённые</string>
-    <string name="ui_conversation_history_back_content_description">Назад</string>
     <string name="ui_conversation_history_loading">Загрузка истории диалогов…</string>
     <string name="ui_conversation_history_empty_title">Истории диалогов пока нет</string>
     <string name="ui_conversation_history_empty_body">Отправьте сообщение — диалоги появятся здесь.</string>
@@ -144,7 +136,6 @@
     <string name="skill_delete_dialog_title">Удалить навык</string>
     <string name="skill_delete_dialog_text">Удалить навык «%1$s»? Действие необратимо.</string>
     <string name="skill_error_delete_failed">Не удалось удалить навык: %1$s</string>
-    <string name="skill_import_button">Импортировать навык</string>
     <string name="skill_import_no_skill_file">В выбранной папке нет файла SKILL.md — импорт невозможен</string>
     <string name="skill_import_conflict_title">Такой навык уже есть</string>
     <string name="skill_import_conflict_text">Навык «%1$s» уже существует. Перезаписать?</string>
@@ -169,7 +160,7 @@
     <string name="ui_settings_about_feedback_feature">Пожелания</string>
     <string name="ui_settings_about_feedback_bug">Сообщения об ошибках</string>
     <string name="ui_settings_about_version">Версия</string>
-    <string name="ui_settings_storage_description">Размер каждого кэша. Нажмите, чтобы очистить; настройки и переписки не затрагиваются.</string>
+    <string name="ui_settings_storage_description">Показывает, сколько места занимает каждый кеш. Нажмите на пункт, чтобы очистить. Очистка не затрагивает настройки, память и диалоги.</string>
     <string name="ui_settings_storage_tool_output">Кеш вывода инструментов</string>
     <string name="ui_settings_storage_tool_output_summary">Сохранённый полный вывод обрезанных результатов инструментов</string>
     <string name="ui_settings_storage_image_cache">Кеш изображений</string>
@@ -202,7 +193,7 @@
     <string name="ui_settings_configure_error_name_duplicate">Такое название уже есть. Укажите другое.</string>
     <string name="ui_settings_configure_error_proxy_invalid">Адрес прокси не является корректным URI</string>
     <string name="ui_settings_mcp_config">Настройка MCP</string>
-    <string name="memory_page_description">Данные, которые агент помнит в новых переписках. Смахните, чтобы удалить, нажмите, чтобы изменить.</string>
+    <string name="memory_page_description">Сохранённые факты. Смахните влево или вправо, чтобы удалить, либо нажмите на запись, чтобы изменить. После добавления агент будет помнить это даже в новых диалогах.</string>
     <string name="memory_page_empty_description">Пока ничего не сохранено. Нажмите на значок справа сверху, чтобы добавить первую запись.</string>
     <string name="memory_loading">Загрузка памяти…</string>
     <string name="memory_editor_title_create">Новая запись</string>
@@ -220,13 +211,13 @@
     <string name="memory_error_load_failed">Не удалось загрузить память: %1$s</string>
     <string name="memory_error_save_failed">Не удалось сохранить запись: %1$s</string>
     <string name="memory_error_delete_failed">Не удалось удалить запись: %1$s</string>
-    <string name="execution_rules_page_description">Задайте правила безопасности для выполнения Shell и инструментов.</string>
+    <string name="execution_rules_page_description">Правила выполнения команд Shell и инструментов. Пока эта страница предоставляет только интерфейс и не подключена к реальному перехвату.</string>
     <string name="execution_rules_empty_action_hint">Нажмите на значок справа сверху, чтобы добавить первое черновое правило.</string>
     <string name="execution_rules_loading">Загрузка правил выполнения…</string>
     <string name="execution_rules_editor_title_create">Новое правило выполнения</string>
     <string name="execution_rules_delete_dialog_title">Удалить правило выполнения</string>
     <string name="execution_rules_delete_dialog_text">Удалить правило выполнения «%1$s»? Действие необратимо.</string>
-    <string name="execution_rules_editor_description">Правила проверяются перед выполнением команд Shell и инструментов.</string>
+    <string name="execution_rules_editor_description">Правила выполнения команд Shell и инструментов. Пока редактор позволяет управлять черновиками правил в интерфейсе и не подключён к реальному перехвату.</string>
     <string name="execution_rules_field_name">Название правила</string>
     <string name="execution_rules_field_name_hint">Например: Опасные команды удаления</string>
     <string name="execution_rules_field_enabled_mode">Когда действует</string>
@@ -236,11 +227,11 @@
     <string name="execution_rules_enabled_mode_confirm">Спрашивать меня</string>
     <string name="tool_permission_dialog_title">ИИ запрашивает выполнение операции</string>
     <string name="tool_permission_request_intro">Инструмент Zafiro «%1$s» хочет выполнить команду:</string>
-    <string name="tool_permission_matched_rule">Сработало правило «%1$s»</string>
+    <string name="tool_permission_matched_rule">Сработало правило «%1$s»: %2$s</string>
     <string name="tool_permission_allow">Разрешить один раз</string>
     <string name="tool_permission_deny">Запретить</string>
     <string name="screen_control_consent_title">Запрос разрешения на управление экраном</string>
-    <string name="screen_control_consent_body">Zafiro нужен доступ к специальным возможностям и отображение поверх других приложений, чтобы управлять экраном. Далее может появиться системный запрос или страница настроек.</string>
+    <string name="screen_control_consent_body">Для управления экраном Zafiro нужны разрешения:\n1. Служба специальных возможностей: чтение интерфейса и нажатия\n2. Показ поверх других приложений: указатель на экране\n\nСледующим шагом появится системный запрос или страница настроек.</string>
     <string name="screen_control_consent_agree">Согласен</string>
     <string name="screen_control_consent_deny">Запретить</string>
     <string name="execution_rules_field_patterns">Шаблоны</string>
@@ -370,7 +361,6 @@
     <string name="feedback_feature_template">## Предложение\n\n## Сценарий использования\n\n## Ожидаемый результат</string>
     <string name="feedback_bug_template">## Описание проблемы\n\n## Шаги воспроизведения\n\n## Ожидаемое поведение\n\n## Фактическое поведение\n\n## Информация об устройстве\n- Версия Android:\n- Ассистент (Breeno или другой):\n- Версия модуля:\n\n## Дополнительно\nМожно приложить логи, снимки экрана или записи — это поможет разобраться в проблеме.</string>
     <string name="conversation_fork_title">Ответвление · %1$s</string>
-    <string name="conversation_regenerate_title">Новый ответ · %1$s</string>
     <string name="conversation_rewind_title">Откат · %1$s</string>
     <string name="ui_tool_display_terminal">Терминал</string>
     <string name="ui_tool_display_shell">Shell</string>
@@ -396,7 +386,6 @@
     <string name="ui_settings_general_group_appearance">Оформление и язык</string>
     <string name="ui_settings_general_group_floating_notification">Плавающий шар и уведомления</string>
     <string name="ui_settings_general_group_conversation">Диалог и взаимодействие</string>
-    <string name="ui_settings_general_group_runtime">Работа и управление</string>
     <string name="ui_settings_general_floating_ball">Плавающий шар</string>
     <string name="ui_settings_general_floating_ball_summary">Показывает состояние агента и быстрые действия в фоне</string>
     <string name="ui_settings_general_floating_ball_auto_expand">Автораскрытие плавающего шара</string>
@@ -417,6 +406,23 @@
     <string name="ui_settings_general_retry_summary">Автоматические повторы после неудачного запроса</string>
     <string name="ui_settings_general_keep_screen_on">Не гасить экран во время ответа</string>
     <string name="ui_settings_general_keep_screen_on_summary">Не гасить экран, пока агент отвечает и выполняет инструменты</string>
+    <string name="ui_settings_runtime_control">Управление выполнением</string>
+    <string name="ui_settings_runtime_control_summary">Лимиты, повторы и обнаружение зацикливания</string>
+    <string name="ui_settings_runtime_group_network">Сеть</string>
+    <string name="ui_settings_runtime_group_stability">Стабильность</string>
+    <string name="ui_settings_runtime_group_compaction">Сжатие контекста</string>
+    <string name="ui_settings_runtime_compaction_threshold">Порог автосжатия</string>
+    <string name="ui_settings_runtime_compaction_threshold_summary">Автоматически сжимать историю при достижении порога окна контекста</string>
+    <string name="ui_settings_runtime_compaction_off">Выключено</string>
+    <string name="ui_settings_runtime_repetition_detection">Обнаружение повторов</string>
+    <string name="ui_settings_runtime_repetition_summary">Прерывает ответ, когда модель зацикливается; строгие режимы срабатывают раньше, но и чаще обрывают нормальный текст</string>
+    <string name="ui_settings_runtime_sensitivity_relaxed">Мягкая</string>
+    <string name="ui_settings_runtime_sensitivity_loose">Свободная</string>
+    <string name="ui_settings_runtime_sensitivity_standard">Стандартная</string>
+    <string name="ui_settings_runtime_sensitivity_strict">Строгая</string>
+    <string name="ui_settings_runtime_sensitivity_stricter">Более строгая</string>
+    <string name="ui_settings_runtime_sensitivity_strictest">Максимальная</string>
+    <string name="ui_settings_runtime_sensitivity_off">Выкл.</string>
     <string name="ui_settings_general_always_show_message_actions">Всегда показывать действия с сообщением</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">Выделенная сессия голосового ассистента</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">Изолировать диалоги голосового ассистента от истории основного чата</string>
@@ -424,7 +430,6 @@
     <string name="ui_settings_saved_configuration_delete_title">Удалить конфигурацию</string>
     <string name="ui_settings_saved_configuration_delete_text">Конфигурация будет удалена без возможности восстановления.</string>
     <string name="ui_settings_saved_configuration_edit">Изменить</string>
-    <string name="ui_settings_configure_add">Добавить конфигурацию</string>
     <string name="ui_settings_configure_name_label">Название</string>
     <string name="ui_settings_configure_name_placeholder">например, DeepSeek основной</string>
     <string name="ui_settings_configure_vision_label">Модель со зрением</string>
@@ -437,14 +442,14 @@
     <string name="ui_settings_configure_endpoint_mismatch_cancel_save">Сохранить как есть</string>
     <string name="ui_settings_configure_protocol_hint">После смены протокола проверьте, что адрес соответствует протоколу.</string>
     <string name="ui_settings_configure_thinking_label">Уровень размышлений</string>
-    <string name="ui_settings_configure_thinking_hint">Оставьте Provider Default или снизьте значение, если провайдер отклоняет высокий уровень.</string>
+    <string name="ui_settings_configure_thinking_hint">Оставьте «Как у провайдера», чтобы использовать его поведение по умолчанию; понизьте уровень, если провайдер отклоняет высокий.</string>
+    <string name="ui_settings_configure_thinking_start_label">Default</string>
+    <string name="ui_settings_configure_thinking_end_label">Max</string>
     <string name="ui_settings_configure_max_tokens_label">Максимум токенов</string>
     <string name="ui_settings_configure_max_tokens_placeholder">Например: 200000 или 200k</string>
-    <string name="ui_settings_configure_max_tokens_hint">Максимум выходных токенов за запрос. Поддерживает суффиксы k/m/b. Оставьте пустым, чтобы взять значение провайдера.</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">Введите корректное число (поддерживаются суффиксы k/m/b) не меньше 256</string>
     <string name="ui_settings_configure_context_window_label">Контекстное окно</string>
     <string name="ui_settings_configure_context_window_placeholder">Например: 1000000 или 1M</string>
-    <string name="ui_settings_configure_context_window_hint">Окно контекста модели для кольца заполнения. Оставьте пустым, чтобы взять значение провайдера.</string>
     <string name="ui_settings_configure_error_context_window_invalid">Введите корректное число (поддерживаются суффиксы k/m/b) не меньше 1000</string>
     <string name="ui_theme_mode_system">Как в системе</string>
     <string name="ui_theme_mode_light">Светлая</string>
@@ -473,6 +478,7 @@
     <string name="agent_resident_action_stop">Стоп</string>
     <string name="agent_resident_action_approve">Разрешить</string>
     <string name="agent_resident_action_decline">Запретить</string>
+    <string name="agent_resident_body_matched_pattern">Совпадение: %1$s</string>
     <string name="ui_onboard_done_advanced_entry">Разрешения и правила выполнения</string>
     <string name="ui_onboard_preferences_title">Разрешения и правила выполнения</string>
     <string name="ui_onboard_preferences_permissions_group">Разрешения</string>
@@ -505,6 +511,7 @@
     <string name="mcp_service_section_connection">Подключение и безопасность</string>
     <string name="mcp_service_section_tools">Доступные инструменты</string>
     <string name="mcp_service_enable_title">Включить сервис MCP</string>
+    <string name="mcp_service_keep_screen_on_title">Не давать устройству спать при работе</string>
     <string name="mcp_service_enable_summary">Разрешить внешним агентам доступ к инструментам Zafiro через MCP</string>
     <string name="mcp_service_status_title">Состояние</string>
     <string name="mcp_service_status_running">Запущен</string>
@@ -556,9 +563,4 @@
     <string name="text_action_error_save_failed">Не удалось сохранить действие.</string>
     <string name="text_action_error_delete_failed">Не удалось удалить действие.</string>
     <string name="crash_startup_copied_toast">Трассировка стека скопирована. Отправьте её разработчику.</string>
-    <string name="ui_home_empty_greeting">Чем я могу помочь?</string>
-    <string name="ui_home_tap_hint">Совет: нажмите на сообщение, чтобы скопировать, сгенерировать заново или разветвить</string>
-    <string name="ui_theme_color_catppuccin">Catppuccin</string>
-    <string name="ui_settings_general_screen_control_auto_approve">Автоматически разрешать управление экраном</string>
-    <string name="ui_settings_general_screen_control_auto_approve_summary">Пропускать подтверждение перед чтением экрана и касаниями агента.</string>
 </resources>
