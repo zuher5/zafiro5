@@ -39,6 +39,8 @@
     <string name="ui_home_input_placeholder">Ketik pesan...</string>
     <string name="ui_home_empty_greeting">Ada yang bisa saya bantu?</string>
     <string name="ui_home_tap_hint">Tips: ketuk pesan untuk menyalin, membuat ulang, atau membuat percabangan</string>
+    <string name="ui_home_conversation_compacted">Percakapan dipadatkan</string>
+    <string name="ui_home_conversation_compacting">Memadatkan</string>
     <string name="ui_tool_status_called">Dipanggil</string>
     <string name="ui_tool_status_running">Berjalan</string>
     <string name="ui_tool_status_success">Berhasil</string>
@@ -82,6 +84,8 @@
     <string name="ui_home_error_idle_timeout_title">Respons habis waktu</string>
     <string name="ui_home_error_output_truncated_title">Keluaran terpotong</string>
     <string name="ui_home_error_output_truncated_body">Batas keluaran sekali respons tercapai dan balasan tidak lengkap. Naikkan Max Tokens di konfigurasi model lalu buat ulang.</string>
+    <string name="ui_home_error_repetition_title">Terdeteksi keluaran berulang</string>
+    <string name="ui_home_error_repetition_body">Model terjebak dalam pengulangan, percakapan dihentikan. Jika ini salah deteksi, sesuaikan sensitivitas di Pengaturan.</string>
     <string name="ui_home_error_retry_exhausted_title">Percobaan ulang otomatis habis</string>
     <string name="ui_home_error_internal_title">Kesalahan internal</string>
     <string name="ui_home_retrying_title">Jaringan tersendat, mencoba lagi…</string>
@@ -437,6 +441,23 @@
     <string name="ui_settings_general_keep_screen_on_summary">Biarkan layar menyala saat agen merespons dan menjalankan alat</string>
     <string name="ui_settings_general_screen_control_auto_approve">Setujui kontrol layar otomatis</string>
     <string name="ui_settings_general_screen_control_auto_approve_summary">Lewati konfirmasi sebelum agen membaca atau mengetuk layar.</string>
+    <string name="ui_settings_runtime_control">Kontrol operasi</string>
+    <string name="ui_settings_runtime_control_summary">Batas, percobaan ulang, dan deteksi pengulangan</string>
+    <string name="ui_settings_runtime_group_network">Jaringan</string>
+    <string name="ui_settings_runtime_group_stability">Stabilitas</string>
+    <string name="ui_settings_runtime_group_compaction">Pemadatan konteks</string>
+    <string name="ui_settings_runtime_compaction_threshold">Ambang pemadatan otomatis</string>
+    <string name="ui_settings_runtime_compaction_threshold_summary">Padatkan riwayat secara otomatis saat pemakaian jendela konteks mencapai ambang</string>
+    <string name="ui_settings_runtime_compaction_off">Nonaktif</string>
+    <string name="ui_settings_runtime_repetition_detection">Deteksi pengulangan</string>
+    <string name="ui_settings_runtime_repetition_summary">Hentikan giliran saat model terus mengulang; pengaturan yang lebih ketat lebih cepat bereaksi tetapi lebih mungkin menghentikan konten yang bukan pengulangan</string>
+    <string name="ui_settings_runtime_sensitivity_relaxed">Santai</string>
+    <string name="ui_settings_runtime_sensitivity_loose">Longgar</string>
+    <string name="ui_settings_runtime_sensitivity_standard">Standar</string>
+    <string name="ui_settings_runtime_sensitivity_strict">Ketat</string>
+    <string name="ui_settings_runtime_sensitivity_stricter">Lebih ketat</string>
+    <string name="ui_settings_runtime_sensitivity_strictest">Paling ketat</string>
+    <string name="ui_settings_runtime_sensitivity_off">Nonaktif</string>
     <string name="ui_settings_general_always_show_message_actions">Selalu tampilkan aksi pesan</string>
     <string name="ui_settings_saved_configuration_title">Konfigurasi tersimpan</string>
     <string name="ui_settings_saved_configuration_delete_title">Hapus konfigurasi</string>
@@ -456,6 +477,8 @@
     <string name="ui_settings_configure_protocol_hint">Setelah mengganti protokol, pastikan endpoint sesuai dengan protokol.</string>
     <string name="ui_settings_configure_thinking_label">Upaya Berpikir</string>
     <string name="ui_settings_configure_thinking_hint">Biarkan Default Penyedia, atau turunkan jika penyedia menolak tingkat tinggi.</string>
+    <string name="ui_settings_configure_thinking_start_label">Default</string>
+    <string name="ui_settings_configure_thinking_end_label">Maks</string>
     <string name="ui_settings_configure_max_tokens_label">Token Maksimum</string>
     <string name="ui_settings_configure_max_tokens_placeholder">Contoh: %1$d</string>
     <string name="ui_settings_configure_max_tokens_hint">Token keluaran maksimum per permintaan. Mendukung sufiks k/m/b. Biarkan kosong untuk memakai nilai penyedia.</string>
@@ -491,6 +514,7 @@
     <string name="agent_resident_action_stop">Hentikan</string>
     <string name="agent_resident_action_approve">Izinkan</string>
     <string name="agent_resident_action_decline">Tolak</string>
+    <string name="agent_resident_body_matched_pattern">Cocok %1$s</string>
 
     <!-- v1.6.0 Upstream additions -->
     <string name="ui_home_thinking_title">Berpikir</string>
@@ -549,6 +573,7 @@
     <string name="ui_settings_mcp_service">Layanan MCP</string>
     <string name="ui_settings_mcp_service_summary">Ekspos alat Zafiro ke agen eksternal via MCP</string>
     <string name="mcp_service_enable_title">Aktifkan Layanan MCP</string>
+    <string name="mcp_service_keep_screen_on_title">Tetap aktif saat berjalan</string>
     <string name="mcp_service_enable_summary">Izinkan agen eksternal mengakses alat Zafiro melalui MCP</string>
     <string name="mcp_service_status_title">Status</string>
     <string name="mcp_service_status_stopped">Berhenti</string>
