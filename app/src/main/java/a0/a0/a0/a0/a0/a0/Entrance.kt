@@ -62,7 +62,7 @@ class Entrance : IXposed() {
             HookLocalSettings.update(ctx, client)
 
             // 配置从 res/raw/legacy_xposed_hooks/ 加载，注入 BaseConfigProvider。
-            // TODO 未来恢复远程配置源时，改回 XRepo.web.await()。
+            // TODO 未来恢复远程配置源时，改回远程读取。
             val config = loadConfigFromRaw(ctx, params.packageName)
             if (config != null) {
                 // 注入嵌套的 config 对象（含 actions），而非整个顶层 JSON。

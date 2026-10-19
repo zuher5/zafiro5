@@ -219,7 +219,6 @@
     <string name="memory_field_content">Contenido</string>
     <string name="memory_field_content_hint">Ejemplo: El cumpleaños del usuario es el 15 de octubre</string>
     <string name="memory_save_action">Guardar memoria</string>
-    <string name="memory_cancel_action">Cancelar</string>
     <string name="memory_delete_dialog_title">Eliminar memoria</string>
     <string name="memory_delete_dialog_text">¿Está seguro de que desea eliminar esta memoria?\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">Eliminar</string>

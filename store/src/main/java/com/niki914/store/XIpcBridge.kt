@@ -24,23 +24,6 @@ object XIpcBridge {
         fun postNotification(title: String, content: String, uri: String?): Boolean
     }
 
-    suspend fun readWebSettingsJson(context: Context, client: StoreClient?): IpcReadResult {
-        return readStoreJson(context, StoreDescriptorRegistry.WEB_SETTINGS_ID, client)
-    }
-
-    suspend fun writeWebSettingsJson(
-        context: Context,
-        json: String,
-        client: StoreClient?
-    ): IpcWriteResult {
-        return writeStoreJsonFromOwner(
-            context,
-            StoreDescriptorRegistry.WEB_SETTINGS_ID,
-            json,
-            client
-        )
-    }
-
     suspend fun readLocalSettingsJson(context: Context, client: StoreClient?): IpcReadResult {
         return readStoreJson(context, StoreDescriptorRegistry.LOCAL_SETTINGS_ID, client)
     }

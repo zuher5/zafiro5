@@ -2,7 +2,6 @@ package com.niki914.store
 
 object StoreDescriptorRegistry {
 
-    const val WEB_SETTINGS_ID = "web_settings"
     const val LOCAL_SETTINGS_ID = "local_settings"
     const val AGENT_REGISTRY_ID = "agents.registry"
     const val LLM_CONFIGS_ID = "llm.saved_configs"
@@ -23,7 +22,6 @@ object StoreDescriptorRegistry {
     private val safeAgentIdPattern = Regex("[a-z][a-z0-9_-]{1,31}")
 
     private val staticDescriptors = listOf(
-        StoreDescriptor(WEB_SETTINGS_ID, "settings/hooks.json"),
         StoreDescriptor(LOCAL_SETTINGS_ID, "local_settings.json"),
         StoreDescriptor(AGENT_REGISTRY_ID, "settings/agents/registry.json", """{"agents":[]}"""),
         StoreDescriptor(LLM_CONFIGS_ID, "settings/llm/saved_configs.json"),

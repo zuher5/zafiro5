@@ -22,7 +22,7 @@ abstract class BaseConfigProvider {
         const val LOG_TAG = "niki914_zafiro_BaseConfigProvider"
 
         // 由 Entrance.kt 在拿到 raw 配置后注入。
-        // TODO 未来切回远程配置源时，改回 XRepo.web.await().configOrNull()。
+        // TODO 未来切回远程配置源时，改回远程读取。
         @Volatile
         var config: JsonObject? = null
     }

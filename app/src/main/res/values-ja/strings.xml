@@ -218,7 +218,6 @@
     <string name="memory_field_content">内容を入力</string>
     <string name="memory_field_content_hint">例：ユーザーの誕生日は X 月 Y 日</string>
     <string name="memory_save_action">メモリを保存</string>
-    <string name="memory_cancel_action">キャンセル</string>
     <string name="memory_delete_dialog_title">メモリの削除</string>
     <string name="memory_delete_dialog_text">このメモリを削除してもよろしいですか？\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">削除</string>

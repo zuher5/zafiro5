@@ -44,17 +44,6 @@ abstract class XSettings(
         props[key]
 }
 
-class WebSettings(props: JsonObject = JsonObject(emptyMap())) : XSettings(props) {
-    val packageName: String
-        get() = getString("package_name")
-
-    val versionCode: Long
-        get() = getLong("version_code")
-
-    val config: JsonObject?
-        get() = getObject("config")
-}
-
 class LocalSettings(props: JsonObject = JsonObject(emptyMap())) : XSettings(props) {
     val onboardingCompleted: Boolean
         get() = getBoolean("onboarding_completed")

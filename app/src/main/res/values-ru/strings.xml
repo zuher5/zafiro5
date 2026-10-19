@@ -203,7 +203,6 @@
     <string name="memory_field_content">Содержание</string>
     <string name="memory_field_content_hint">Например: день рождения пользователя — X месяца, Y числа</string>
     <string name="memory_save_action">Сохранить запись</string>
-    <string name="memory_cancel_action">Отмена</string>
     <string name="memory_delete_dialog_title">Удалить запись</string>
     <string name="memory_delete_dialog_text">Удалить эту запись памяти?\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">Удалить</string>

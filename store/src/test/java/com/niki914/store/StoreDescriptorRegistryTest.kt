@@ -19,13 +19,4 @@ class StoreDescriptorRegistryTest {
         assertEquals("local_settings", descriptor!!.id)
         assertEquals("local_settings.json", descriptor.relativePath)
     }
-
-    @Test
-    fun webSettingsStoreResolvesUnderSettingsHooksJson() {
-        val descriptor =
-            StoreDescriptorRegistry.resolveDynamic(StoreDescriptorRegistry.WEB_SETTINGS_ID)
-
-        assertEquals(StoreDescriptorRegistry.WEB_SETTINGS_ID, descriptor!!.id)
-        assertEquals("settings/hooks.json", descriptor.relativePath)
-    }
 }
