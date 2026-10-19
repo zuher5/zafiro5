@@ -115,9 +115,9 @@ object BreenoConfigProvider : BaseConfigProvider() {
                 "setHasReasoningAnimPlayed"
             )
         val reasoningStateThinkingDefault: String
-            get() = getStringOrDefault("$P.business.reasoning_state_thinking_default", "思考中...")
+            get() = getStringOrDefault("$P.business.reasoning_state_thinking_default", "Thinking...")
         val reasoningStateCompleteDefault: String
-            get() = getStringOrDefault("$P.business.reasoning_state_complete_default", "已深度思考")
+            get() = getStringOrDefault("$P.business.reasoning_state_complete_default", "Thought")
         val reasoningLocalDataStartKey: String
             get() = getStringOrDefault(
                 "$P.business.reasoning_local_data_start_key",

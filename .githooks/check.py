@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""提交前坏味道检查。
+"""Pre-commit code smell check.
 
-只依赖 Python 标准库。默认检查暂存区新增行（增量），--all 检查整个工作区（全量）。
+Standard library only. By default checks added lines in the staged diff
+(incremental); --all checks the whole worktree (full).
 
-策略全部是文件顶部的常量，改策略不用改逻辑，见 .githooks/README.md。
+All policies are constants at the top of the file; changing policy does not
+require changing logic. See .githooks/README.md.
 """
 
 from __future__ import annotations
@@ -20,10 +22,10 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 # --------------------------------------------------------------------------
-# 策略：改这里就能改行为
+# Policy: change behavior here
 # --------------------------------------------------------------------------
 
-# 规则严重级别："block" 拦截提交，"warn" 只提示。
+# Rule severity: "block" rejects the commit, "warn" only reports.
 SEVERITY = {
     "monitor-lock": "block",
     "legacy-comment": "warn",
@@ -32,13 +34,14 @@ SEVERITY = {
     "log-tag": "warn",
 }
 
-# 不做检查的路径前缀（增量与全量共用）。
+# Path prefixes that are never checked (shared by incremental and full runs).
 EXCLUDE_PREFIXES = (
     "libs/",
 )
 
-# 变化叙述注释的关键词。描述了"曾经/不再是什么"的注释一律不合格：
-# 注释只描述代码当前是什么样。加词就加在这里。
+# Keywords for narrative comments. A comment describing what the code used to
+# be, or what it no longer is, is always invalid: comments only describe the
+# current state. Add new keywords here.
 NARRATIVE = re.compile(
     r"不再|改为|改成|此前|原来|原本|原先|原为|曾经|旧版"
     r"|\bno longer\b|\bused to\b|\bformerly\b|\bpreviously\b"
@@ -48,14 +51,15 @@ NARRATIVE = re.compile(
 
 TARGET_SUFFIX = ".kt"
 
-# 日志 TAG 必须以此开头（现存 59 个 tag 常量全部合规）。
+# Log TAGs must start with this prefix (all 59 existing tag constants comply).
 LOG_TAG_PREFIX = "niki914_zafiro_"
 
-# 会被当成日志 TAG 的常量名（小写后比较）。TAG_PREFIX 之类不在内。
+# Constant names treated as log TAGs (compared lowercase). TAG_PREFIX and the
+# like are not included.
 TAGISH_NAMES = ("tag", "log_tag", "logtag", "logging_tag")
 
 # --------------------------------------------------------------------------
-# 规则实现
+# Rule implementations
 # --------------------------------------------------------------------------
 
 IGNORE_DIRECTIVE = re.compile(r"githooks:ignore(-file)?\s+([\w,\-]+)")
@@ -89,7 +93,7 @@ def strip_strings(line: str) -> str:
 
 
 def raw_lines(lines: list[str]) -> set[int]:
-    """三引号字符串（多为内联的 Python / Markdown）内部的行号。"""
+    """Line numbers inside triple-quoted strings (usually inline Python / Markdown)."""
     inside = False
     raw: set[int] = set()
     for number, line in enumerate(lines, 1):
@@ -112,7 +116,7 @@ def hit_legacy_comment(line: str, ctx: LineContext) -> bool:
 def hit_inline_fqn(line: str, ctx: LineContext) -> bool:
     if is_comment(line) or line.strip().startswith(("import ", "package ")):
         return False
-    # 同名类已 import 时，内联全限定名是刻意消歧义，放行。
+    # An inline FQN is deliberate disambiguation when the class is already imported.
     return any(
         m.group(1) not in ctx.imported for m in FQN.finditer(strip_strings(line))
     )
@@ -142,32 +146,32 @@ RULES = (
     (
         "monitor-lock",
         hit_monitor_lock,
-        "使用了监视器锁 synchronized",
-        "改用 Mutex / 协程；确实需要时在本行或上一行加 // githooks:ignore monitor-lock",
+        "uses the synchronized monitor lock",
+        "use Mutex / coroutines; if truly required add // githooks:ignore monitor-lock on this or the previous line",
     ),
     (
         "legacy-comment",
         hit_legacy_comment,
-        "注释在描述已经被替换掉的旧状态",
-        "只描述当前行为；或在本行或上一行加 // githooks:ignore legacy-comment",
+        "comment describes a state that has been replaced",
+        "describe only current behavior; or add // githooks:ignore legacy-comment on this or the previous line",
     ),
     (
         "inline-fqn",
         hit_inline_fqn,
-        "内联写全限定名而不 import",
-        "补 import；若为消歧义则加 // githooks:ignore inline-fqn",
+        "fully qualified name written inline instead of imported",
+        "add the import; if disambiguation is intended add // githooks:ignore inline-fqn",
     ),
     (
         "log-api",
         hit_log_api,
-        "用了 android.util.Log / println，绕过业务 Logger",
-        "改用 com.niki914.logging.Logger；或加 // githooks:ignore log-api",
+        "uses android.util.Log / println, bypassing the business Logger",
+        "use com.niki914.logging.Logger; or add // githooks:ignore log-api",
     ),
     (
         "log-tag",
         hit_log_tag,
-        f"日志 TAG 不以 {LOG_TAG_PREFIX} 开头",
-        f"改成 {LOG_TAG_PREFIX}<ClassName>；或加 // githooks:ignore log-tag",
+        f"log TAG does not start with {LOG_TAG_PREFIX}",
+        f"rename to {LOG_TAG_PREFIX}<ClassName>; or add // githooks:ignore log-tag",
     ),
 )
 
@@ -175,7 +179,7 @@ RULE_NAMES = tuple(name for name, *_ in RULES)
 
 
 # --------------------------------------------------------------------------
-# 检查
+# Checks
 # --------------------------------------------------------------------------
 
 
@@ -204,7 +208,7 @@ def file_context(lines: list[str]) -> LineContext:
 
 
 def file_scope_rules(lines: list[str]) -> set[str]:
-    """文件级放行：`githooks:ignore-file <rule>`，写在文件任意位置。"""
+    """File-level opt-out: `githooks:ignore-file <rule>` anywhere in the file."""
     allowed: set[str] = set()
     for line in lines:
         m = IGNORE_DIRECTIVE.search(line)
@@ -214,7 +218,7 @@ def file_scope_rules(lines: list[str]) -> set[str]:
 
 
 def line_scope_rules(lines: list[str], lineno: int) -> set[str]:
-    """行级放行：写在违规行本身，或紧贴其上的上一行。"""
+    """Line-level opt-out: on the offending line itself or the line just above."""
     allowed: set[str] = set()
     for probe in (lines[lineno - 1], lines[lineno - 2] if lineno >= 2 else ""):
         m = IGNORE_DIRECTIVE.search(probe)
@@ -244,7 +248,7 @@ def collect_findings(
     candidates: dict[str, list[int]],
     rules: tuple[str, ...] = RULE_NAMES,
 ) -> tuple[list[Finding], int]:
-    """files: 路径 -> 完整文件内容；candidates: 路径 -> 待检行号（1 起）。"""
+    """files: path -> full file content; candidates: path -> line numbers (1-based)."""
     findings: list[Finding] = []
     ignored = 0
     for path, linenos in candidates.items():
@@ -272,7 +276,7 @@ def collect_findings(
 
 
 # --------------------------------------------------------------------------
-# 待检行来源
+# Candidate lines
 # --------------------------------------------------------------------------
 
 
@@ -335,7 +339,7 @@ def all_candidates(root: str, scope: list[str]) -> tuple[dict[str, str], dict[st
 
 
 # --------------------------------------------------------------------------
-# 输出
+# Output
 # --------------------------------------------------------------------------
 
 
@@ -355,15 +359,15 @@ def print_findings(findings: list[Finding], ignored: int, scope_note: str) -> in
     if findings or ignored:
         parts = []
         if blocking:
-            parts.append(f"{blocking} 阻断")
+            parts.append(f"{blocking} blocking")
         if warnings:
-            parts.append(f"{warnings} 警告")
-        parts.append(f"{ignored} 已豁免")
+            parts.append(f"{warnings} warning(s)")
+        parts.append(f"{ignored} ignored")
         print()
-        print(f"githooks: {'，'.join(parts)}{scope_note}")
+        print(f"githooks: {', '.join(parts)}{scope_note}")
 
     if blocking:
-        print("githooks: 提交被拦截。修正后重新 git add；确有必要时按 .githooks/README.md 放行。")
+        print("githooks: commit blocked. Fix and re-run git add; use the opt-outs in .githooks/README.md only when truly necessary.")
     return 1 if blocking else 0
 
 
@@ -382,7 +386,7 @@ def print_stat(findings: list[Finding], files_scanned: int) -> int:
         )
     total = sum(sum(c.values()) for c in per_module.values())
     print()
-    print(f"githooks: {files_scanned} 个文件，{total} 处违规")
+    print(f"githooks: {files_scanned} file(s), {total} violation(s)")
     return 0
 
 
@@ -394,29 +398,29 @@ def print_rules() -> int:
 
 
 # --------------------------------------------------------------------------
-# 入口
+# Entry point
 # --------------------------------------------------------------------------
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="check.py",
-        description="坏味道检查：默认只查暂存区新增行（增量）。",
+        description="Code smell check: by default only added staged lines (incremental).",
     )
     parser.add_argument(
         "--all", action="store_true",
-        help="检查整个工作区（全量），可跟路径参数限定模块。",
+        help="Check the whole worktree (full); optional path args limit the modules.",
     )
     parser.add_argument(
-        "--staged", action="store_true", help="检查暂存区新增行（默认行为）。"
+        "--staged", action="store_true", help="Check added staged lines (default)."
     )
     parser.add_argument(
         "--rule", action="append", choices=RULE_NAMES, dest="rules",
-        help="只检查指定规则，可重复。",
+        help="Check only the given rule; repeatable.",
     )
-    parser.add_argument("--stat", action="store_true", help="只输出按模块统计。")
-    parser.add_argument("--list-rules", action="store_true", help="列出规则。")
-    parser.add_argument("scope", nargs="*", help="--all 时的路径前缀限定。")
+    parser.add_argument("--stat", action="store_true", help="Only print per-module statistics.")
+    parser.add_argument("--list-rules", action="store_true", help="List rules.")
+    parser.add_argument("scope", nargs="*", help="Path prefixes to limit when using --all.")
     args = parser.parse_args(argv)
 
     if args.list_rules:
@@ -425,13 +429,13 @@ def main(argv: list[str] | None = None) -> int:
     rules = tuple(args.rules or RULE_NAMES)
     root = git(str(Path.cwd()), "rev-parse", "--show-toplevel").stdout.strip()
     if not root:
-        print("githooks: 不在 git 仓库内", file=sys.stderr)
+        print("githooks: not inside a git repository", file=sys.stderr)
         return 0
 
     if args.all:
         files, candidates = all_candidates(root, args.scope)
         scanned = len(files)
-        note = "" if not EXCLUDE_PREFIXES else "（已排除 " + ", ".join(EXCLUDE_PREFIXES) + "）"
+        note = "" if not EXCLUDE_PREFIXES else " (excluded " + ", ".join(EXCLUDE_PREFIXES) + ")"
     else:
         candidates = staged_candidates(root)
         files = staged_contents(root, list(candidates))

@@ -1,9 +1,9 @@
 #!/bin/sh
-# 提交前坏味道检查。规则与放行方式见同目录 README.md。
+# Pre-commit code smell check. Rules and opt-outs are in README.md next to this file.
 root=$(git rev-parse --show-toplevel) || exit 0
 
 if ! command -v python3 >/dev/null 2>&1; then
-	echo "githooks: 找不到 python3，跳过检查" >&2
+	echo "githooks: python3 not found, skipping check" >&2
 	exit 0
 fi
 

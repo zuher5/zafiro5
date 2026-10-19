@@ -215,7 +215,7 @@ class BreenoCardRenderer {
             // 注入思考状态标题
             val runningTool = frame.tools.lastOrNull { it.status == ToolStatus.RUNNING }
             val reasoningStateText = when {
-                runningTool != null -> "正在调用 [${runningTool.name}]..."
+                runningTool != null -> "Calling [${runningTool.name}]..."
                 isThinkingComplete -> BreenoConfigProvider.RenderCard.reasoningStateCompleteDefault
                 else -> BreenoConfigProvider.RenderCard.reasoningStateThinkingDefault
             }

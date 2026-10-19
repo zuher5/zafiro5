@@ -36,7 +36,7 @@ class FindInstalledAppsBuiltin : BuiltinTool() {
             return BuiltinToolResult.failure(
                 code = "INVALID_ARGUMENTS_JSON",
                 message = "find_installed_apps arguments must be a JSON object with a query field.",
-                hint = """Example: {"query":"微信","include_system":false,"limit":10}""",
+                hint = """Example: {"query":"wechat","include_system":false,"limit":10}""",
                 fieldErrors = mapOf(
                     "argumentsJson" to (throwable.message ?: "Invalid JSON object.")
                 ),

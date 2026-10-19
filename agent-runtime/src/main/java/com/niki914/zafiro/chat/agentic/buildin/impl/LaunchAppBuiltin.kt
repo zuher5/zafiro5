@@ -42,7 +42,7 @@ class LaunchAppBuiltin : BuiltinTool() {
             return BuiltinToolResult.failure(
                 code = "INVALID_ARGUMENTS_JSON",
                 message = "launch_app arguments must be a JSON object with package_name or app_name.",
-                hint = """Example: {"app_name":"微信"} or {"package_name":"com.tencent.mm"}""",
+                hint = """Example: {"app_name":"WeChat"} or {"package_name":"com.tencent.mm"}""",
                 fieldErrors = mapOf(
                     "argumentsJson" to (throwable.message ?: "Invalid JSON object.")
                 ),

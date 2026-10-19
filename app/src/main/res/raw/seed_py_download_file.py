@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""下载工具：给定 URL 下载文件到本地目录。
+"""Download tool: download a file from a URL to a local directory.
 
-默认目录为应用私有 downloads 子目录（由宿主注入参数，本脚本不自行决定），
-进程私有可写、零外部存储权限负担。下载后清理与重命名交由调用方处理。
+The default directory is the app's private downloads subdirectory (injected by the host;
+this script does not choose it), which is process-private, writable, and needs no external
+storage permission. Cleanup and renaming after the download are left to the caller.
 
-用法（Termux 或任意可调 python3 的环境）：
+Usage (Termux or any environment with python3):
     python3 download_file.py https://example.com/file.png
     python3 download_file.py https://example.com/file.png --filename out.png
 
-退出码：0 成功；1 下载失败。
+Exit codes: 0 success; 1 download failed.
 
-也可注册为 Zafiro python tool：main(url, filename="", path="")。
+Can also be registered as a Zafiro python tool: main(url, filename="", path="").
 """
 import argparse
 import json
@@ -23,13 +24,14 @@ from urllib.parse import urlparse
 UA = "Mozilla/5.0 (Linux; Android 14)"
 DOWNLOAD_TIMEOUT = 120
 
-# 播种时由宿主替换为绝对路径（files/downloads/py_download_file）；
-# 占位符未替换时退化为脚本当前目录，命令行直跑仍可用。
+# Replaced with an absolute path at seed time (files/downloads/py_download_file);
+# when the placeholder is not replaced, the script's current directory is used, so it
+# still works when run directly from the command line.
 DEFAULT_DOWNLOAD_DIR = "__DEFAULT_DOWNLOAD_DIR__"
 
 
 def resolve_dest(url, filename, download_dir):
-    """返回最终落盘路径：显式 filename > URL 提取 > UUID。"""
+    """Return the final path: explicit filename > extracted from URL > UUID."""
     if filename:
         return os.path.join(download_dir, filename)
     name = os.path.basename(urlparse(url).path)
@@ -60,8 +62,8 @@ def main(url, filename="", path=""):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("url", help="目标文件 URL")
-    ap.add_argument("--filename", default="", help="期望文件名（不传由 URL 提取）")
-    ap.add_argument("--path", default="", help="下载目录（不传用当前目录，宿主调用时注入私有目录）")
+    ap.add_argument("url", help="Target file URL")
+    ap.add_argument("--filename", default="", help="Desired filename (extracted from the URL if omitted)")
+    ap.add_argument("--path", default="", help="Download directory (defaults to the current directory; the host injects the private directory)")
     args = ap.parse_args()
     main(args.url, filename=args.filename, path=args.path)
