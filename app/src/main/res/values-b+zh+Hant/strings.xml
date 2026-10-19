@@ -37,6 +37,8 @@
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">新對話</string>
     <string name="ui_home_input_placeholder">輸入訊息…</string>
+    <string name="ui_home_empty_greeting">有什麼我可以幫你？</string>
+    <string name="ui_home_tap_hint">提示：點擊訊息可複製、重新產生或分支</string>
     <string name="ui_home_conversation_compacted">對話已壓縮</string>
     <string name="ui_home_conversation_compacting">正在壓縮</string>
     <string name="ui_tool_status_called">已調用</string>
@@ -494,6 +496,7 @@
     <string name="ui_theme_color_lemon">檸檬黃</string>
     <string name="ui_theme_color_amber">琥珀</string>
     <string name="ui_theme_color_sunset">落日橙</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
 
     <!-- Resident Notification -->
     <string name="agent_resident_title_idle">Agent · 待命</string>

@@ -37,6 +37,8 @@
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">新しい会話</string>
     <string name="ui_home_input_placeholder">メッセージを入力...</string>
+    <string name="ui_home_empty_greeting">何をお手伝いしましょうか？</string>
+    <string name="ui_home_tap_hint">ヒント：メッセージをタップすると、コピー・再生成・分岐ができます</string>
     <string name="ui_home_conversation_compacted">会話が圧縮されました</string>
     <string name="ui_home_conversation_compacting">圧縮中</string>
     <string name="ui_tool_status_called">呼び出し済み</string>
@@ -509,6 +511,7 @@
     <string name="ui_theme_color_lemon">レモン</string>
     <string name="ui_theme_color_amber">アンバー</string>
     <string name="ui_theme_color_sunset">サンセット</string>
+    <string name="ui_theme_color_catppuccin">Catppuccin</string>
 
     <!-- Resident Notification -->
     <string name="agent_resident_title_idle">Agent · 待機中</string>
