@@ -51,12 +51,13 @@ class MainActivity : AppCompatActivity() {
             .installPermissionLauncher(permissionLauncher)
         val startupAssistantUi = resolveStartupAssistantUi()
         val launchDecision = runBlocking {
-            val decision = AppLaunchDecision.resolve(startupAssistantUi)
-            // 同步读主题偏好：深色模式冷启动首帧不能闪白
-            ThemeController.load()
-            // 回填型设置 flow 的冷启动回填（首帧真值，防“进设置页才生效”类 bug）
-            runCatching { XRepo.hydrateSettings() }
+            // 冷启动只读一次 app_state，解析结果由语言、主题与 reactive flow 回填共享。
+            val appState = XRepo.readStartupState()
+            runCatching { XRepo.hydrateSettings(appState) }
                 .onFailure { Logger.w("niki914_zafiro_Main", "hydrate failed ${it.message}") }
+            val decision = AppLaunchDecision.resolve(startupAssistantUi, appState)
+            // 同步读主题偏好：深色模式冷启动首帧不能闪白
+            ThemeController.load(appState)
             decision
         }
         applyLanguageTag(launchDecision.languageTag)

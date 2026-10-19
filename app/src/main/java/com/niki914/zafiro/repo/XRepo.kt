@@ -275,7 +275,7 @@ object XRepo {
         val flow = MutableStateFlow(default)
 
         init {
-            XRepo.hydrateSteps.add { flow.value = XRepo.readAppStateField(select) }
+            XRepo.hydrateSteps.add { state -> flow.value = state.select() }
         }
 
         suspend fun get(): T = XRepo.readAppStateField(select).also { flow.value = it }
@@ -299,7 +299,7 @@ object XRepo {
         }
     }
 
-    private val hydrateSteps = mutableListOf<suspend () -> Unit>()
+    private val hydrateSteps = mutableListOf<(AppStateSettings) -> Unit>()
 
     private val onboardingCompletedField = PlainAppStateField(
         select = { onboardingCompleted },
@@ -521,9 +521,18 @@ object XRepo {
      * 回填型设置 flow 的统一冷启动回填：flow 初值是猜的默认值，必须有人调一次
      * 读盘才能对齐真值。MainActivity.onCreate 同步调用。
      * 响应式字段构造时已自注册到 hydrateSteps，新增无需手动登记。
+     * 读盘与 JSON 解析只做一次，全部字段共用同一份快照。
      */
     suspend fun hydrateSettings() {
-        hydrateSteps.forEach { it() }
+        hydrateSettings(readStartupState())
+    }
+
+    /** 冷启动快照：一次读盘 + 一次解析，供 MainActivity 的启动路径共享。 */
+    internal suspend fun readStartupState(): AppStateSettings =
+        AppStateSettingsCodec.parse(readJson(StoreDescriptorRegistry.APP_STATE_ID))
+
+    internal suspend fun hydrateSettings(state: AppStateSettings) {
+        hydrateSteps.forEach { it(state) }
     }
 
     private val themeModeField = PlainAppStateField(
@@ -605,7 +614,7 @@ object XRepo {
 
     private fun seedLaunchWechatTool(context: Context) = CustomPyTool(
         name = "py_launch_wechat",
-        description = "启动微信 (Launch WeChat).",
+        description = "Launch WeChat.",
         schemaJson = """{"type":"object","properties":{},"required":[]}""",
         code = readRawResource(context, R.raw.seed_py_launch_wechat),
     )

@@ -12,6 +12,7 @@ import com.niki914.uikit.base.resolveThemeColorScheme
 import com.niki914.zafiro.app.ui.model.ThemeController.load
 import com.niki914.zafiro.app.ui.model.ThemeController.setMode
 import com.niki914.zafiro.app.ui.model.ThemeController.setSeedColor
+import com.niki914.zafiro.repo.AppStateSettings
 import com.niki914.zafiro.repo.XRepo
 
 /** 深浅色模式。 */
@@ -51,12 +52,12 @@ object ThemeController {
     var prefs by mutableStateOf(ThemePrefs())
         private set
 
-    suspend fun load() {
+    internal suspend fun load(state: AppStateSettings) {
         runCatching {
-            val rawSeed = XRepo.themeSeedColor()
+            val rawSeed = state.themeSeedColor
             val isCatppuccin = rawSeed.equals("catppuccin", ignoreCase = true)
             prefs = ThemePrefs(
-                mode = ThemeMode.fromStorageKey(XRepo.themeMode()),
+                mode = ThemeMode.fromStorageKey(state.themeMode),
                 seedColor = if (isCatppuccin) null else rawSeed.takeIf { it.isNotBlank() }?.toLongOrNull(16)?.toInt(),
                 isCatppuccin = isCatppuccin,
             )
