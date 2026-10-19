@@ -82,8 +82,9 @@ interface IPythonWorkerService : IInterface {
                     val codeText = data.readString()
                     val timeoutMs = data.readLong()
                     val result = exec(codeText, timeoutMs)
-                    reply?.writeNoException()
-                    result.writeToParcel(reply!!)
+                    val out = reply ?: return false
+                    out.writeNoException()
+                    result.writeToParcel(out)
                     return true
                 }
 
