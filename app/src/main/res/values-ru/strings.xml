@@ -66,6 +66,7 @@
     <string name="ui_toast_copied">Скопировано</string>
     <string name="ui_toast_generating">Идёт генерация, подождите</string>
     <string name="ui_toast_empty_input">Пожалуйста, введите сообщение</string>
+    <string name="ui_toast_round_busy">Предыдущий раунд ещё выполняется; подождите или остановите его</string>
     <string name="ui_home_error_retry_body">Попробуйте позже.</string>
     <string name="ui_home_error_config_required_title">Настройки модели заполнены не полностью</string>
     <string name="ui_home_error_config_required_body">Заполните настройки модели.</string>

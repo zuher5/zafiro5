@@ -3,6 +3,7 @@ package com.niki914.zafiro.chat
 import com.niki914.logging.Logger
 import com.niki914.okia.Okia
 import com.niki914.okia.conversation.Conversation
+import com.niki914.okia.conversation.ConversationEntry
 import com.niki914.okia.conversation.SessionSnapshot
 import com.niki914.okia.error.RetryPolicy
 import com.niki914.okia.message.ContentBlock
@@ -35,7 +36,9 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
+import kotlin.concurrent.Volatile
 
 /**
  * 独立的 Agent 底层会话引擎。
@@ -49,6 +52,9 @@ class AgentSessionEngine {
     companion object {
         const val LOG_TAG = "niki914_zafiro_AgentSessionEngine"
         const val NO_IDLE_TIMEOUT_SECONDS = Long.MAX_VALUE / 1000
+
+        /** stop 回合的上限：超时说明回合已无法正常收尾，毒化会话待下次 refresh 重建。 */
+        const val STOP_GRACE_MS = 5_000L
     }
 
     fun interface OkiaFactory {
@@ -75,6 +81,7 @@ class AgentSessionEngine {
         toolRegistry = toolSynchronizer.toolRegistry,
         imageLoader = imageManager.imageLoader,
         ensureImageSaver = imageManager::ensureImageSaver,
+        tenantId = tenantId,
     )
     internal val streamPipeline = LlmStreamPipeline()
 
@@ -114,6 +121,10 @@ class AgentSessionEngine {
     var boundConfigId: String = ""
         private set
 
+    /** stop 超时后置位：会话里有收不了尾的僵尸回合，下次 refresh 从树快照强重建。 */
+    @Volatile
+    private var sessionPoisoned = false
+
     fun bindConfig(configId: String) {
         boundConfigId = configId
     }
@@ -121,6 +132,7 @@ class AgentSessionEngine {
     internal fun resetForTest() {
         sessionAssembler.resetForTest()
         runtimeState = null
+        sessionPoisoned = false
         toolSynchronizer.reset()
         mcpRefreshScheduler.reset()
         prefixComposer.reset()
@@ -209,11 +221,25 @@ class AgentSessionEngine {
         )
 
         val previousSession = runtimeState?.okia
+        // 毒化会话先强关：僵尸回合会让 obtainSession 里的常规 close/export 抛
+        // 「活跃回合不可 close」。有 restore（载入历史）时 restore 直接顶替；
+        // 无 restore 时从树快照重建续聊，僵尸会话整体丢弃。
+        val poisoned = sessionPoisoned
+        val poisonedRestore = if (poisoned && restore == null) currentTreeSnapshot() else null
+        if (poisoned) {
+            sessionAssembler.forceClosePoisonedSession()
+            Logger.e(
+                LOG_TAG,
+                "rebuilding poisoned session restore=${restore != null} " +
+                        "entries=${poisonedRestore?.entries?.size ?: 0}"
+            )
+        }
+        sessionPoisoned = false
         val activeSession = sessionAssembler.obtainSession(
             protocol = protocol,
             config = configWithoutRuntimePrompt,
-            restore = restore,
-            forceNew = restore != null,
+            restore = restore ?: poisonedRestore,
+            forceNew = restore != null || poisoned,
         )
         activeSession.update {
             endpoint = configWithoutRuntimePrompt.endpoint.ifBlank {
@@ -413,8 +439,16 @@ class AgentSessionEngine {
 
     suspend fun stopCurrentRound() {
         Logger.i(LOG_TAG, "stop round requested")
-        sessionAssembler.stopCurrentRound()
-        Logger.i(LOG_TAG, "stop round done")
+        val stopped = withTimeoutOrNull(STOP_GRACE_MS) { sessionAssembler.stopCurrentRound() }
+        if (stopped == null) {
+            sessionPoisoned = true
+            Logger.e(
+                LOG_TAG,
+                "stop round timed out after ${STOP_GRACE_MS}ms; session poisoned, will rebuild on next round"
+            )
+        } else {
+            Logger.i(LOG_TAG, "stop round done")
+        }
     }
 
     suspend fun ingestUserImage(uriString: String): IngestedImage? =
@@ -458,6 +492,30 @@ class AgentSessionEngine {
         return conversation?.history?.asReversed()?.firstNotNullOfOrNull { entry ->
             (entry.message as? Message.Assistant)?.message?.usage?.contextTokens
         }
+    }
+
+    /**
+     * 毒化重建的恢复快照：从会话树投影（已提交历史）线性重链 parentId。
+     * 流式中的 live 尾巴不属于已提交历史，重建后自然丢弃。
+     */
+    private fun currentTreeSnapshot(): SessionSnapshot? {
+        val conversation = sessionAssembler.currentConversation.value ?: return null
+        if (conversation.history.isEmpty()) return null
+        val history = conversation.history
+        val entries = history.mapIndexed { index, entry ->
+            ConversationEntry(
+                id = entry.id,
+                parentId = if (index == 0) null else history[index - 1].id,
+                timestamp = entry.timestamp,
+                message = entry.message,
+            )
+        }
+        return SessionSnapshot(
+            id = conversation.id,
+            leafId = conversation.leafId,
+            version = 1,
+            entries = entries,
+        )
     }
 
     internal fun validateLlmConfig(config: RuntimeLlmConfig) =

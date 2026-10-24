@@ -246,6 +246,9 @@ sealed interface HomeChatIntent {
 sealed interface HomeChatEffect {
     data class FileAttachFailed(val reason: FileAttachReason) : HomeChatEffect
     data object EmptyInputAttempted : HomeChatEffect
+
+    /** 发起被拒（TurnStart.Busy）：上一回合仍在跑，提示用户等待或停止。 */
+    data object RoundBusy : HomeChatEffect
 }
 
 /**

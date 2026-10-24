@@ -101,6 +101,12 @@ fun HomePageContent(
                     R.string.ui_toast_empty_input,
                     Toast.LENGTH_SHORT,
                 ).show()
+
+                HomeChatEffect.RoundBusy -> Toast.makeText(
+                    attachToastContext,
+                    R.string.ui_toast_round_busy,
+                    Toast.LENGTH_SHORT,
+                ).show()
             }
         }
     }

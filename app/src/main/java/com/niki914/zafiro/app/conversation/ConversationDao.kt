@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.Flow
 interface ConversationDao {
     companion object {
         private const val LOG_TAG = "niki914_zafiro_ConversationDao"
+
+        /** IN 列表分批上限：低于 SQLite 999 绑定变量限制，留足余量。 */
+        const val DELETE_ENTRY_CHUNK = 500
     }
 
     @Query("SELECT * FROM conversation ORDER BY updated_at DESC")
@@ -136,7 +139,6 @@ interface ConversationDao {
         """,
     )
     suspend fun deleteEntries(conversationId: String, entryIds: List<String>): Int
-
     @Query(
         """
         UPDATE conversation
@@ -164,7 +166,10 @@ interface ConversationDao {
         turnCount: Int,
         leafId: String?,
     ) {
-        if (entryIds.isNotEmpty()) deleteEntries(conversationId, entryIds)
+        // SQLite 绑定变量上限 999：长会话整轮截断按批删，避免 IN 列表直接抛异常
+        entryIds.chunked(DELETE_ENTRY_CHUNK).forEach { chunk ->
+            deleteEntries(conversationId, chunk)
+        }
         updateConversationAfterTruncate(
             conversationId = conversationId,
             updatedAt = updatedAt,

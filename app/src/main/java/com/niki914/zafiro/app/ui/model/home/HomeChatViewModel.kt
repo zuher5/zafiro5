@@ -109,7 +109,9 @@ class HomeChatViewModel internal constructor(
             HomeChatIntent.Warmup -> agent.warmup()
             is HomeChatIntent.ImageAttached -> attachImage(intent.uri)
             is HomeChatIntent.ImageRemoved -> removeImage(intent.id)
-            is HomeChatIntent.FileAttached -> attachFile(intent.uri)
+            // 挂起可能长达 60s（等用户从设置页回来），独立协程跑，
+            // 不占 intent 通道——通道被占住时删除会话等后续 intent 全部排队
+            is HomeChatIntent.FileAttached -> viewModelScope.launch { attachFile(intent.uri) }
             is HomeChatIntent.FileRemoved -> removeFile(intent.id)
             is HomeChatIntent.CameraCaptured -> attachCameraImage(intent.uri, intent.path)
             HomeChatIntent.StopGenerating -> stopGenerating()
@@ -532,6 +534,7 @@ class HomeChatViewModel internal constructor(
         }
         Logger.i(LOG_TAG, "send result=$result")
         if (result != TurnStart.Started) {
+            if (result == TurnStart.Busy) sendEffect(HomeChatEffect.RoundBusy)
             updateState {
                 copy(isGenerating = agent.status.value.isRunning)
             }
@@ -704,7 +707,18 @@ class HomeChatViewModel internal constructor(
             }
             val title = record.summary.title.takeIf { it.isNotBlank() }
             conversationBeingLoaded = target
-            val targetAgent = agentManager.switchTo(target)
+            val targetAgent = withTimeoutOrNull(LOAD_AGENT_GRACE_MS) {
+                agentManager.switchTo(target)
+            }
+            if (targetAgent == null) {
+                conversationBeingLoaded = null
+                tryIgnore { agentManager.destroy(target) }
+                Logger.e(
+                    LOG_TAG,
+                    "load conversation id=$target timed out after ${LOAD_AGENT_GRACE_MS}ms",
+                )
+                throw IllegalStateException("load conversation timed out: $target")
+            }
             attachBoundAgent(targetAgent)
             updateState {
                 copy(
@@ -900,6 +914,9 @@ class HomeChatViewModel internal constructor(
     companion object {
         private const val LOG_TAG = "niki914_zafiro_HomeChatState"
         private const val DRAFT_SAVE_DEBOUNCE_MS = 350L
+
+        /** switchTo（载入历史 + 重建引擎会话）的上限；超时销毁半载 agent 并失败返回。 */
+        const val LOAD_AGENT_GRACE_MS = 15_000L
     }
 }
 

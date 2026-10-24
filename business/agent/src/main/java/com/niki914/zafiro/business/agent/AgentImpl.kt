@@ -42,8 +42,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.concurrent.Volatile
 import com.niki914.okia.conversation.Conversation as OkiaConversation
 
 /**
@@ -70,6 +72,9 @@ class AgentImpl(
         const val LOG_TAG = "niki914_zafiro_AgentImpl"
         const val STATUS_TEXT_THROTTLE_MS = 250L
         const val USER_IMAGE_MIME = "image/jpeg"
+
+        /** stop 后等待回合协程退出的上限；超时放弃等待（僵尸协程由 token 守卫隔离）。 */
+        const val STOP_JOIN_GRACE_MS = 5_000L
     }
 
     private val draftFlow = MutableStateFlow(Draft())
@@ -79,7 +84,11 @@ class AgentImpl(
 
     private val roundActive = MutableStateFlow(false)
     internal val isRoundActive: Boolean get() = roundActive.value
+
+    @Volatile
     private var streamJob: Job? = null
+
+    @Volatile
     private var roundToken = 0
     private var lastStatusEmitMs = 0L
 
@@ -148,7 +157,10 @@ class AgentImpl(
         if (draft.text.isBlank() && draft.images.isEmpty() && draft.files.isEmpty()) {
             return TurnStart.DraftEmpty
         }
-        if (!roundActive.compareAndSet(expect = false, update = true)) return TurnStart.Busy
+        if (!roundActive.compareAndSet(expect = false, update = true)) {
+            if (!recoverStuckRound()) return TurnStart.Busy
+            if (!roundActive.compareAndSet(expect = false, update = true)) return TurnStart.Busy
+        }
 
         val query = draft.text
         val isCompactCommand = draft.images.isEmpty() &&
@@ -217,7 +229,9 @@ class AgentImpl(
                     )
                     engine.stream(query = query, images = contentImages, files = files)
                         .collect { event ->
-                            fold(event)
+                            // token 守卫：stop 超时放弃的僵尸回合不再折事件，
+                            // 否则它的迟到事件会污染新回合的会话树
+                            if (roundToken == token) fold(event)
                         }
                 }.onFailure { throwable ->
                     Logger.e(
@@ -246,7 +260,13 @@ class AgentImpl(
     }
 
     override fun stop() {
-        if (!roundActive.value || statusFlow.value is AgentState.Stopping) return
+        if (statusFlow.value is AgentState.Stopping) {
+            // 前一次停止的清理（引擎 stop / 回合 join）挂住时标志永远不复位；
+            // 回合协程已死即可就地复位，否则保持等待引擎侧超时毒化兜底
+            recoverStuckRound()
+            return
+        }
+        if (!roundActive.value) return
 
         activeApproval?.result?.complete(ApprovalDecision.Deny)
 
@@ -262,7 +282,17 @@ class AgentImpl(
         scope.launch {
             try {
                 engine.stopCurrentRound()
-                currentJob?.cancelAndJoin()
+                if (currentJob != null) {
+                    val joined = withTimeoutOrNull(STOP_JOIN_GRACE_MS) { currentJob.cancelAndJoin() }
+                    if (joined == null) {
+                        // 放弃等待僵尸收集器：token 守卫已保证它折不出事件，
+                        // 引擎侧会话由 stop 超时毒化重建兜底
+                        Logger.e(
+                            LOG_TAG,
+                            "stream job join timed out after ${STOP_JOIN_GRACE_MS}ms; abandoning"
+                        )
+                    }
+                }
             } finally {
                 if (roundToken == token) {
                     reducedStatus = AgentStateReducer.interrupt(reducedStatus)
@@ -439,6 +469,22 @@ class AgentImpl(
         activeApproval?.result?.complete(ApprovalDecision.Deny)
         streamJob?.cancel()
         streamJob = null
+    }
+
+    /**
+     * 卡死回合的自愈：round 标志仍在但回合协程已死——终态守卫被 Stopping 跳过、
+     * 或停止协程挂在引擎清理上时标志就是谎言。就地复位让调用方继续发起新回合；
+     * 回合协程仍活着则返回 false（真忙，不是卡死）。
+     */
+    private fun recoverStuckRound(): Boolean {
+        val job = streamJob
+        if (job != null && job.isActive) return false
+        Logger.e(LOG_TAG, "round flag stuck without an active round job; recovering")
+        reducedStatus = AgentStateReducer.interrupt(reducedStatus)
+        emitStatus(reducedStatus.status)
+        streamJob = null
+        roundActive.value = false
+        return true
     }
 
     /** 会话树 id 即 Room 会话 id（okia 惰性建实例，首轮发起时建档）。 */

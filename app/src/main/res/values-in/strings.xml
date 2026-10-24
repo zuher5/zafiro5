@@ -623,6 +623,7 @@
 
     <!-- Tool / Home -->
     <string name="ui_toast_empty_input">Silakan masukkan pesan</string>
+    <string name="ui_toast_round_busy">Ronde sebelumnya masih berjalan; tunggu atau hentikan dulu</string>
     <string name="ui_tool_display_shell">Shell</string>
     <string name="ui_tool_display_ssh">SSH</string>
 </resources>

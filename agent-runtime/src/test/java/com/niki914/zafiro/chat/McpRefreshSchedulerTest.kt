@@ -69,7 +69,7 @@ class McpRefreshSchedulerTest {
         override suspend fun update(block: OkiaConfig.Builder.() -> Unit) = error("not used")
         override suspend fun config(): OkiaConfig = error("not used")
         override suspend fun getMcpDiscoverySnapshot(): McpDiscoverySnapshot = error("not used")
-        override suspend fun close() = error("not used")
+        override suspend fun close(force: Boolean) = error("not used")
     }
 
     private fun ok(result: McpRefreshResult) =

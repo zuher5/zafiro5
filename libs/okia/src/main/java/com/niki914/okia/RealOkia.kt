@@ -256,10 +256,12 @@ internal class RealOkia(
         return mcpDiscovery.current()
     }
 
-    override suspend fun close() {
+    override suspend fun close(force: Boolean) {
         mutex.withLock {
             check(!closed) { "Okia is already closed" }
-            check(activeTurn == null) { "cannot close during active turn" }
+            if (!force) {
+                check(activeTurn == null) { "cannot close during active turn" }
+            }
             closed = true
         }
         turnScope.cancel()

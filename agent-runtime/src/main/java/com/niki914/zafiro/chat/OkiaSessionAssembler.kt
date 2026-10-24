@@ -24,9 +24,9 @@ import com.niki914.okia.protocol.OpenAIResponsesProtocol
 import com.niki914.okia.tooling.ToolRegistry
 import com.niki914.zafiro.chat.agentic.AndroidImageLoader
 import com.niki914.zafiro.chat.agentic.python.PyRuntime
-import com.niki914.zafiro.chat.agentic.shell.SessionRegistry
 import com.niki914.zafiro.chat.agentic.shell.TerminalSessionPool
 import com.niki914.zafiro.chat.compaction.ContextPruner
+import com.niki914.zafiro.api.util.runCatchingCancellable
 import com.niki914.zafiro.settings.model.LlmProtocol
 import com.niki914.zafiro.settings.model.RuntimeLlmConfig
 import com.niki914.okia.protocol.ProtocolEvent
@@ -60,6 +60,8 @@ internal class OkiaSessionAssembler(
     private val toolRegistry: ToolRegistry,
     private val imageLoader: AndroidImageLoader?,
     private val ensureImageSaver: suspend () -> ImageSaver?,
+    /** 租户（引擎）隔离键：回合终止只杀本租户的工具资源，不波及并发 Agent。 */
+    private val tenantId: String = "",
 ) {
     internal companion object {
         const val LOG_TAG = "niki914_zafiro_OkiaSessionAssembler"
@@ -181,10 +183,32 @@ internal class OkiaSessionAssembler(
         conversationFlow.value = null
     }
 
+    /**
+     * 毒化会话的强关（引擎 stop 超时后调用）：跳过活跃回合检查取消 turnScope，
+     * 断掉僵尸回合的在途作业后整体丢弃实例。常规路径严禁调用——会绕过
+     * 「活跃回合不可 close」的并发契约。
+     */
+    suspend fun forceClosePoisonedSession() {
+        val session = activeSession ?: return
+        runCatchingCancellable { session.close(force = true) }
+            .onFailure { throwable ->
+                Logger.e(
+                    LOG_TAG,
+                    "poisoned session force close failed errorType=${throwable::class.simpleName} " +
+                            "message=${throwable.message}"
+                )
+            }
+        activeSession = null
+        sessionProtocol = null
+        sessionOpenCodeFree = null
+        sessionForwardJob?.cancel()
+        sessionForwardJob = null
+        conversationFlow.value = null
+    }
+
     suspend fun resetConversation() {
         PyRuntime.kill()
-        TerminalSessionPool.closeAll()
-        SessionRegistry.clear()
+        TerminalSessionPool.closeTenantSessions(tenantId)
         closeSession()
     }
 
@@ -434,10 +458,12 @@ internal class OkiaSessionAssembler(
 
     private val killToolResourcesHook = object : Hooks {
         override suspend fun beforeStop(calls: List<ContentBlock.ToolCall>) {
-            Logger.i(LOG_TAG, "beforeStop killing tool resources dispatchedCalls=${calls.size}")
+            Logger.i(
+                LOG_TAG,
+                "beforeStop killing tool resources dispatchedCalls=${calls.size} tenant=$tenantId"
+            )
             PyRuntime.kill()
-            TerminalSessionPool.closeAll()
-            SessionRegistry.clear()
+            TerminalSessionPool.closeTenantSessions(tenantId)
         }
     }
 }

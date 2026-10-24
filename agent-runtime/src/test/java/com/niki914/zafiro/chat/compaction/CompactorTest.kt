@@ -101,7 +101,7 @@ class CompactorTest {
         override suspend fun config(): OkiaConfig = error("not used")
         override suspend fun refreshMcpTools(): McpRefreshResult = error("not used")
         override suspend fun getMcpDiscoverySnapshot(): McpDiscoverySnapshot = error("not used")
-        override suspend fun close() = Unit
+        override suspend fun close(force: Boolean) = Unit
     }
 
     @Test

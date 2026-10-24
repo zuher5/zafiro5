@@ -79,8 +79,9 @@ interface Okia {
     // 当前 MCP 发现快照（MCP 推迟 T9，当前实现抛未实现）
     suspend fun getMcpDiscoverySnapshot(): McpDiscoverySnapshot
 
-    // 释放实例资源
-    suspend fun close(): Unit
+    // 释放实例资源。force = 跳过活跃回合检查：宿主的 stop() 清理超时后，
+    // 回合已不可能正常收尾，强关取消 turnScope 断掉在途作业、把实例置为终态。
+    suspend fun close(force: Boolean = false): Unit
 
     companion object {
 
