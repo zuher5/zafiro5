@@ -5,12 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.niki914.logging.Logger
 import com.niki914.uikit.base.ComposeMVIViewModel
 import com.niki914.zafiro.app.R
+import com.niki914.zafiro.app.ui.settings.form.buildFormSpec
 import com.niki914.zafiro.repo.XRepo
 import com.niki914.zafiro.settings.model.RuntimeTakeoverRule
 import com.niki914.zafiro.settings.model.RuntimeTakeoverTarget
 import com.niki914.zafiro.settings.model.TAKEOVER_FIELD_NAME
 import com.niki914.zafiro.settings.model.TAKEOVER_FIELD_PATTERNS
-import kotlinx.coroutines.CancellationException
+import com.niki914.zafiro.api.util.runCatchingCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -48,8 +49,19 @@ data class TakeoverRuleFormSnapshot(
     val patterns: List<String>,
 )
 
+val TakeoverRuleFormSpec = buildFormSpec<TakeoverRuleFormSnapshot, String> {
+    field("name", R.string.takeover_field_name) { it.name }
+    field("target", R.string.takeover_field_target) { it.target }
+    field("enabled", R.string.takeover_field_enabled) { it.enabled }
+    field("patterns", R.string.takeover_field_patterns) { it.patterns }
+}
+
 val TakeoverRuleFormState.hasUnsavedChanges: Boolean
-    get() = initialSnapshot?.let { it != toSnapshot() } ?: false
+    get() = TakeoverRuleFormSpec.hasChanges(initialSnapshot, toSnapshot())
+
+fun TakeoverRuleFormState.unsavedFieldLabelRes(): List<Int> {
+    return TakeoverRuleFormSpec.dirtyFieldLabelRes(initialSnapshot, toSnapshot())
+}
 
 data class TakeoverDeleteConfirmationState(
     val value: String,
@@ -168,7 +180,7 @@ class TakeoverSettingsViewModel :
     private suspend fun load() {
         updateState { copy(isLoading = true) }
         val startedAtMs = System.currentTimeMillis()
-        try {
+        runCatchingCancellable {
             val loadedItems = XRepo.takeoverRules.list().map { it.toItem() }
             val defaultTarget = XRepo.takeoverRules.getDefaultTarget().toUiTarget()
             Logger.d(
@@ -184,8 +196,7 @@ class TakeoverSettingsViewModel :
                     inlineError = null,
                 )
             }
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "load failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -247,13 +258,12 @@ class TakeoverSettingsViewModel :
                 inlineError = null,
             )
         }
-        try {
+        runCatchingCancellable {
             XRepo.takeoverRules.setEnabled(currentItem.id, enabled)
             Logger.i(LOG_TAG, "toggleItemEnabled ruleId=${currentItem.id} enabled=$enabled")
             updateState { copy(isSaving = false) }
             notifySettingsChanged()
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(
                 LOG_TAG,
                 "toggleItemEnabled failed ruleId=${currentItem.id} reason=${throwable.message}"
@@ -334,7 +344,7 @@ class TakeoverSettingsViewModel :
                 inlineError = null,
             )
         }
-        try {
+        runCatchingCancellable {
             XRepo.takeoverRules.replace(
                 previousId = normalizedFormState.previousId,
                 rule = nextRule,
@@ -363,8 +373,7 @@ class TakeoverSettingsViewModel :
             }
             notifySettingsChanged()
             sendEffect(TakeoverSettingsEffect.ExitDetail)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "save failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -396,7 +405,7 @@ class TakeoverSettingsViewModel :
         val currentId = currentState.formState.id ?: return
         val editingIndex = currentState.formState.editingIndex
         updateState { copy(isSaving = true) }
-        try {
+        runCatchingCancellable {
             XRepo.takeoverRules.delete(currentId)
             Logger.i(LOG_TAG, "deleteCurrent succeeded ruleId=$currentId")
             val updatedItems = if (editingIndex != null) {
@@ -414,8 +423,7 @@ class TakeoverSettingsViewModel :
             }
             notifySettingsChanged()
             sendEffect(TakeoverSettingsEffect.ExitDetail)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "deleteCurrent failed ruleId=$currentId reason=${throwable.message}")
             updateState {
                 copy(
@@ -429,13 +437,12 @@ class TakeoverSettingsViewModel :
     private suspend fun setDefaultTarget(target: TakeoverTarget) {
         val previousTarget = currentState.defaultTarget
         updateState { copy(defaultTarget = target, inlineError = null, isSaving = true) }
-        try {
+        runCatchingCancellable {
             XRepo.takeoverRules.setDefaultTarget(target.toRuntime())
             Logger.i(LOG_TAG, "setDefaultTarget target=$target")
             updateState { copy(isSaving = false) }
             notifySettingsChanged()
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "setDefaultTarget failed target=$target reason=${throwable.message}")
             updateState {
                 copy(

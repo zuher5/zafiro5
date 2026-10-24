@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.niki914.logging.Logger
 import com.niki914.uikit.base.ComposeMVIViewModel
 import com.niki914.zafiro.app.R
+import com.niki914.zafiro.app.ui.settings.form.buildFormSpec
 import com.niki914.zafiro.repo.XRepo
 import com.niki914.zafiro.settings.model.RuntimeToolValidationOrigin
-import kotlinx.coroutines.CancellationException
+import com.niki914.zafiro.api.util.runCatchingCancellable
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -39,8 +40,18 @@ data class CustomPyToolFormSnapshot(
     val enabled: Boolean,
 )
 
+val CustomPyToolFormSpec = buildFormSpec<CustomPyToolFormSnapshot, String> {
+    field("name", R.string.custom_py_tool_field_name) { it.name }
+    field("code", R.string.custom_py_tool_field_code) { it.code }
+    field("enabled", R.string.custom_py_tool_field_enabled) { it.enabled }
+}
+
 val CustomPyToolFormState.hasUnsavedChanges: Boolean
-    get() = initialSnapshot?.let { it != toSnapshot() } ?: false
+    get() = CustomPyToolFormSpec.hasChanges(initialSnapshot, toSnapshot())
+
+fun CustomPyToolFormState.unsavedFieldLabelRes(): List<Int> {
+    return CustomPyToolFormSpec.dirtyFieldLabelRes(initialSnapshot, toSnapshot())
+}
 
 data class CustomPyToolDeleteConfirmationState(
     val value: String,
@@ -177,8 +188,9 @@ class CustomPyToolSettingsViewModel :
     private suspend fun load() {
         updateState { copy(isLoading = true) }
         val startedAtMs = System.currentTimeMillis()
-        try {
-            val loadedItems = XRepo.customPyTools.list().map { it.toItem() }
+        runCatchingCancellable {
+            XRepo.customPyTools.list().map { it.toItem() }
+        }.onSuccess { loadedItems ->
             Logger.d(
                 LOG_TAG,
                 "load tools=${loadedItems.size} " +
@@ -191,8 +203,7 @@ class CustomPyToolSettingsViewModel :
                     inlineError = null,
                 )
             }
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "load failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -218,13 +229,11 @@ class CustomPyToolSettingsViewModel :
 
     private suspend fun startEdit(index: Int) {
         val item = currentState.items.getOrNull(index) ?: return
-        val tool = try {
+        val tool = runCatchingCancellable {
             XRepo.customPyTools.get(item.name)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "startEdit load failed tool=${item.name} reason=${throwable.message}")
-            null
-        }
+        }.getOrNull()
         if (tool == null) {
             updateState {
                 copy(
@@ -282,7 +291,7 @@ class CustomPyToolSettingsViewModel :
                 inlineError = null,
             )
         }
-        try {
+        runCatchingCancellable {
             // timeoutMs 不在 UI 编辑：编辑时保留原值，新建用默认值
             val previousTool = XRepo.customPyTools.get(
                 formState.previousName ?: formState.name
@@ -298,7 +307,7 @@ class CustomPyToolSettingsViewModel :
             // 毫秒级的失败不该让弹窗闪一下
             XRepo.customPyTools.validate(nextTool)?.let { validation ->
                 handleValidationError(formState, validation)
-                return
+                return@runCatchingCancellable
             }
             // 到这里才真的要起 Python（秒级），弹窗与表单禁用同步开启
             updateState {
@@ -339,7 +348,7 @@ class CustomPyToolSettingsViewModel :
                         },
                     )
                 }
-                return
+                return@runCatchingCancellable
             }
             val validation = XRepo.customPyTools.save(
                 nextTool.copy(
@@ -354,7 +363,7 @@ class CustomPyToolSettingsViewModel :
                             "validation=${validation.field}:${validation.message}"
                 )
                 handleValidationError(formState, validation)
-                return
+                return@runCatchingCancellable
             }
             if (formState.previousName != null &&
                 formState.previousName != nextTool.name
@@ -381,8 +390,7 @@ class CustomPyToolSettingsViewModel :
                 )
             }
             notifySettingsChanged()
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "save failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -452,7 +460,7 @@ class CustomPyToolSettingsViewModel :
         val editingIndex = currentState.formState.editingIndex ?: return
         val currentItem = currentState.items.getOrNull(editingIndex) ?: return
         updateState { copy(isSaving = true) }
-        try {
+        runCatchingCancellable {
             val updatedItems = currentState.items.filterIndexed { index, _ ->
                 index != editingIndex
             }
@@ -468,8 +476,7 @@ class CustomPyToolSettingsViewModel :
             }
             notifySettingsChanged()
             sendEffect(CustomPyToolSettingsEffect.ExitDetail)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(
                 LOG_TAG,
                 "deleteCurrent failed tool=${currentItem.name} reason=${throwable.message}"

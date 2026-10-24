@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.niki914.logging.Logger
 import com.niki914.uikit.base.ComposeMVIViewModel
 import com.niki914.zafiro.app.R
+import com.niki914.zafiro.app.ui.settings.form.buildFormSpec
 import com.niki914.zafiro.repo.RuntimeTextAction
 import com.niki914.zafiro.repo.XRepo
-import kotlinx.coroutines.CancellationException
+import com.niki914.zafiro.api.util.runCatchingCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
@@ -31,8 +32,20 @@ data class TextActionFormSnapshot(
     val runInBackground: Boolean,
 )
 
+val TextActionFormSpec = buildFormSpec<TextActionFormSnapshot, String> {
+    field("name", R.string.text_action_field_name) { it.name }
+    field("prompt", R.string.text_action_field_prompt) { it.prompt }
+    field("enabled", R.string.text_action_field_enabled) { it.enabled }
+    field("requiresScreenshot", R.string.text_action_field_screenshot) { it.requiresScreenshot }
+    field("runInBackground", R.string.text_action_field_background) { it.runInBackground }
+}
+
 val TextActionFormState.hasUnsavedChanges: Boolean
-    get() = initialSnapshot?.let { it != toSnapshot() } ?: false
+    get() = TextActionFormSpec.hasChanges(initialSnapshot, toSnapshot())
+
+fun TextActionFormState.unsavedFieldLabelRes(): List<Int> {
+    return TextActionFormSpec.dirtyFieldLabelRes(initialSnapshot, toSnapshot())
+}
 
 data class TextActionDeleteConfirmationState(
     val value: String,
@@ -154,8 +167,9 @@ class TextActionSettingsViewModel :
     private suspend fun load() {
         updateState { copy(isLoading = true) }
         val startedAtMs = System.currentTimeMillis()
-        try {
-            val loadedItems = XRepo.textActions.list()
+        runCatchingCancellable {
+            XRepo.textActions.list()
+        }.onSuccess { loadedItems ->
             Logger.d(
                 LOG_TAG,
                 "load actions=${loadedItems.size} " +
@@ -168,8 +182,7 @@ class TextActionSettingsViewModel :
                     inlineError = null,
                 )
             }
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "load failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -224,13 +237,13 @@ class TextActionSettingsViewModel :
                 inlineError = null,
             )
         }
-        try {
+        runCatchingCancellable {
             XRepo.textActions.setEnabled(index, enabled)
+        }.onSuccess {
             Logger.i(LOG_TAG, "toggleItemEnabled action=${currentItem.name} enabled=$enabled")
             updateState { copy(isSaving = false) }
             notifySettingsChanged()
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(
                 LOG_TAG,
                 "toggleItemEnabled failed action=${currentItem.name} reason=${throwable.message}"
@@ -298,7 +311,7 @@ class TextActionSettingsViewModel :
                 inlineError = null,
             )
         }
-        try {
+        runCatchingCancellable {
             val previousName = editingIndex?.let { currentState.items.getOrNull(it)?.name }
             val nextAction = RuntimeTextAction(
                 name = trimmedName,
@@ -332,8 +345,7 @@ class TextActionSettingsViewModel :
             }
             notifySettingsChanged()
             sendEffect(TextActionSettingsEffect.ExitDetail)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "save failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -368,7 +380,7 @@ class TextActionSettingsViewModel :
         val editingIndex = currentState.formState.editingIndex ?: return
         val currentItem = currentState.items.getOrNull(editingIndex) ?: return
         updateState { copy(isSaving = true) }
-        try {
+        runCatchingCancellable {
             val updatedItems =
                 currentState.items.filterIndexed { index, _ -> index != editingIndex }
             XRepo.textActions.delete(editingIndex)
@@ -383,8 +395,7 @@ class TextActionSettingsViewModel :
             }
             notifySettingsChanged()
             sendEffect(TextActionSettingsEffect.ExitDetail)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(
                 LOG_TAG,
                 "deleteCurrent failed action=${currentItem.name} reason=${throwable.message}"

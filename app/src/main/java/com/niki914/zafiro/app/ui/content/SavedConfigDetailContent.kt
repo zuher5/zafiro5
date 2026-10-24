@@ -17,7 +17,10 @@ import com.niki914.zafiro.app.ui.model.ConfigureScene
 import com.niki914.zafiro.app.ui.model.ConfigureUiState
 import com.niki914.zafiro.app.ui.model.ConfigureViewModel
 import com.niki914.zafiro.app.ui.model.hasUnsavedChanges
+import com.niki914.zafiro.app.ui.model.unsavedFieldLabelRes
 import com.niki914.zafiro.app.ui.nav.SavedConfigDetailPage
+import com.niki914.zafiro.app.ui.settings.form.EditableSettingsDetailChrome
+import com.niki914.zafiro.app.ui.settings.form.EditableSettingsDetailFormScaffold
 
 /**
  * Saved Configuration 详情页（模板同 McpServerDetailContent）：
@@ -27,6 +30,7 @@ import com.niki914.zafiro.app.ui.nav.SavedConfigDetailPage
 fun SavedConfigDetailContent(
     page: SavedConfigDetailPage,
     onBack: () -> Unit,
+    onOpenPromptEdit: () -> Unit = {},
     onSaveCompleted: () -> Unit = onBack,
 ) {
     val viewModel = pageViewModel<ConfigureViewModel>(
@@ -75,6 +79,7 @@ fun SavedConfigDetailContent(
     EditableSettingsDetailChrome(
         isCreating = page.isCreating,
         hasUnsavedChanges = { uiState.hasUnsavedChanges },
+        unsavedFieldLabelRes = { uiState.unsavedFieldLabelRes() },
         onDiscardChanges = onBack,
         onDelete = if (page.isCreating) null else { { showDeleteConfirmation = true } },
         hasDeleteConfirmation = { showDeleteConfirmation },
@@ -96,6 +101,7 @@ fun SavedConfigDetailContent(
                 viewModel.sendIntent(ConfigureIntent.UpdateSupportsImages(enabled))
             },
             onToggleApiKeyVisibility = { viewModel.sendIntent(ConfigureIntent.ToggleApiKeyVisibility) },
+            onOpenPromptEdit = onOpenPromptEdit,
             onProxyChange = { viewModel.sendIntent(ConfigureIntent.UpdateProxy(it)) },
             onMaxTokensChange = { viewModel.sendIntent(ConfigureIntent.UpdateMaxTokens(it)) },
             onContextWindowChange = { viewModel.sendIntent(ConfigureIntent.UpdateContextWindow(it)) },
@@ -150,6 +156,7 @@ private fun SavedConfigDetailContentBody(
     onThinkingLevelSelected: (String) -> Unit,
     onSupportsImagesChange: (Boolean) -> Unit,
     onToggleApiKeyVisibility: () -> Unit,
+    onOpenPromptEdit: () -> Unit,
     onProxyChange: (String) -> Unit,
     onMaxTokensChange: (String) -> Unit,
     onContextWindowChange: (String) -> Unit,
@@ -182,6 +189,7 @@ private fun SavedConfigDetailContentBody(
             showNameField = true,
             fieldController = fieldController,
             onNameChange = onNameChange,
+            onPromptClick = onOpenPromptEdit,
             onProxyChange = onProxyChange,
         )
 

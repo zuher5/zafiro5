@@ -185,6 +185,7 @@
     <string name="ui_todo_page_description">Fitur ini akan tersedia pada rilis mendatang. Nantikan.</string>
     <string name="unsaved_changes_dialog_title">Perubahan Belum Disimpan</string>
     <string name="unsaved_changes_dialog_text">Keluar tanpa menyimpan?</string>
+    <string name="unsaved_changes_dialog_fields_prefix">Perubahan berikut belum disimpan:</string>
     <string name="unsaved_changes_dialog_confirm_exit">Keluar</string>
     <string name="unsaved_changes_dialog_cancel">Batal</string>
 
@@ -192,6 +193,9 @@
     <string name="ui_settings_configure_description">Konfigurasikan akses model, prompt, dan pengaturan proxy.</string>
     <string name="ui_settings_configure_save">Simpan Konfigurasi</string>
     <string name="ui_settings_configure_prompt_label">Prompt</string>
+    <string name="ui_settings_configure_prompt_state_global">Ikut global</string>
+    <string name="ui_settings_configure_prompt_state_custom">Disesuaikan</string>
+    <string name="config_prompt_editor_description">Set System Prompt khusus untuk konfigurasi ini. Biarkan kosong untuk memakai prompt global. Berlaku setelah beralih ke konfigurasi ini.</string>
     <string name="prompt_editor_description">Edit System Prompt. Perubahan tersimpan berlaku pada percakapan berikutnya.</string>
     <string name="prompt_error_load_failed">Gagal memuat prompt. Kembali dan coba lagi.</string>
     <string name="ui_settings_configure_proxy_label">Proxy</string>
@@ -385,7 +389,7 @@
     <string name="conversation_fork_title">Percabangan · %1$s</string>
     <string name="conversation_rewind_title">Rewind · %1$s</string>
     <!-- Tool display names -->
-    <string name="ui_tool_display_terminal">Terminal</string>
+    <string name="ui_tool_display_py_meta_tools">Alat Python Khusus</string>
     <string name="ui_tool_display_load_skill">Muat Skill</string>
     <string name="ui_tool_display_execute_python">Python</string>
     <string name="ui_tool_display_create_custom_tool">Buat Alat Kustom</string>
@@ -441,6 +445,8 @@
     <string name="ui_settings_runtime_sensitivity_strictest">Paling ketat</string>
     <string name="ui_settings_runtime_sensitivity_off">Nonaktif</string>
     <string name="ui_settings_general_always_show_message_actions">Selalu tampilkan aksi pesan</string>
+    <string name="ui_settings_general_always_show_detailed_tool_output">Selalu tampilkan output detail alat</string>
+    <string name="ui_settings_general_always_show_detailed_tool_output_summary">Output yang sangat besar dapat menyebabkan antarmuka tersendat</string>
     <string name="ui_settings_saved_configuration_title">Konfigurasi tersimpan</string>
     <string name="ui_settings_saved_configuration_delete_title">Hapus konfigurasi</string>
     <string name="ui_settings_saved_configuration_delete_text">Konfigurasi ini akan dihapus dan tidak dapat dipulihkan.</string>

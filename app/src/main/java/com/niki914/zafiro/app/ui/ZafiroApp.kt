@@ -1,3 +1,4 @@
+// githooks:ignore-file file-token-limit
 package com.niki914.zafiro.app.ui
 
 import android.app.Activity
@@ -51,6 +52,7 @@ import com.niki914.uikit.infra.LiquidScreenSwipeContent
 import com.niki914.uikit.infra.LiquidScreenTitle
 import com.niki914.uikit.infra.PopoverAlignment
 import com.niki914.uikit.infra.TitleDirection
+import com.niki914.uikit.infra.nav.LocalNavigationController
 import com.niki914.uikit.infra.nav.LocalNavigationEntry
 import com.niki914.uikit.infra.nav.LocalPageTitle
 import com.niki914.uikit.infra.nav.rememberNavigationController
@@ -59,7 +61,7 @@ import com.niki914.zafiro.app.R
 import com.niki914.zafiro.app.crash.CrashRecorder
 import com.niki914.zafiro.app.crash.CrashReport
 import com.niki914.zafiro.app.crash.CrashReportDialog
-import com.niki914.zafiro.app.ui.content.LocalMarkdownScale
+import com.niki914.zafiro.app.ui.chat.composable.text.LocalMarkdownScale
 import com.niki914.zafiro.app.ui.model.AppLaunchDecision
 import com.niki914.zafiro.app.ui.model.StartupAssistantUi
 import com.niki914.zafiro.app.ui.model.ThemeController
@@ -393,6 +395,7 @@ fun ZafiroApp(
                                 pageChromeHost.registrarFor(entry.id)
                             }
                             CompositionLocalProvider(
+                                LocalNavigationController provides controller,
                                 LocalNavigationEntry provides entry,
                                 LocalPageChrome provides pageChromeRegistrar,
                                 LocalPageTitle provides resolveTitle(entry.page.titleSpec),

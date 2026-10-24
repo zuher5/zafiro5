@@ -32,6 +32,8 @@ SEVERITY = {
     "inline-fqn": "warn",
     "log-api": "block",
     "log-tag": "warn",
+    "uncancellable-run-catching": "block",
+    "bare-catch": "warn",
 }
 
 # Path prefixes that are never checked (shared by incremental and full runs).
@@ -43,8 +45,8 @@ EXCLUDE_PREFIXES = (
 # be, or what it no longer is, is always invalid: comments only describe the
 # current state. Add new keywords here.
 NARRATIVE = re.compile(
-    r"不再|改为|改成|此前|原来|原本|原先|原为|曾经|旧版"
-    r"|\bno longer\b|\bused to\b|\bformerly\b|\bpreviously\b"
+    r"不再|改为|改成|此前|原来|原本|原先|原为|曾经|旧版|解决|修复"
+    r"|\bno longer\b|\bused to\b|\bformerly\b|\bpreviously\b|\bsolve\b|\bfixed\b"
     r"|\brenamed from\b|\bwas renamed\b",
     re.IGNORECASE,
 )
@@ -76,6 +78,12 @@ ANDROID_LOG_CALL = re.compile(r"(?<![\w.])Log\.[dviwe]\s*\(")
 PRINT_CALL = re.compile(r"(?<![\w.])(?:println|print)\s*\(|System\.out\b")
 TAG_DECL = re.compile(r'(?i)(?:val|var)\s+(\w+)\s*(?::\s*[\w<>?.]+\s*)?=\s*"([^"]*)"')
 LOGGER_LITERAL_TAG = re.compile(r'Logger\.[dviwe]\s*\(\s*"([^"]*)"')
+UNCANCELLABLE_RUN_CATCHING = re.compile(
+    r"\b(?:runCatching|mapCatching)\s*(?:[\(\{]|::)|^\s*import\s+[\w.]*\b(?:runCatching|mapCatching)\b"
+)
+BARE_CATCH = re.compile(
+    r"\bcatch\s*\(\s*(?:\w+|_)\s*:\s*(?:[\w.]+\.)?(?:Throwable|Exception)\s*\)"
+)
 
 
 @dataclass(frozen=True)
@@ -142,6 +150,18 @@ def hit_log_tag(line: str, ctx: LineContext) -> bool:
     return False
 
 
+def hit_uncancellable_run_catching(line: str, ctx: LineContext) -> bool:
+    if is_comment(line):
+        return False
+    return UNCANCELLABLE_RUN_CATCHING.search(strip_strings(line)) is not None
+
+
+def hit_bare_catch(line: str, ctx: LineContext) -> bool:
+    if is_comment(line):
+        return False
+    return BARE_CATCH.search(strip_strings(line)) is not None
+
+
 RULES = (
     (
         "monitor-lock",
@@ -172,6 +192,18 @@ RULES = (
         hit_log_tag,
         f"log TAG does not start with {LOG_TAG_PREFIX}",
         f"rename to {LOG_TAG_PREFIX}<ClassName>; or add // githooks:ignore log-tag",
+    ),
+    (
+        "uncancellable-run-catching",
+        hit_uncancellable_run_catching,
+        "用了未处理协程取消的标准库 runCatching / mapCatching",
+        "改用 runCatchingCancellable / mapCatchingCancellable；确实需要生吞取消时加 // githooks:ignore uncancellable-run-catching",
+    ),
+    (
+        "bare-catch",
+        hit_bare_catch,
+        "捕获了泛化异常 (Throwable/Exception)",
+        "建议改用 runCatchingCancellable / tryOrNull，或捕获具体异常类型；确实需要时加 // githooks:ignore bare-catch",
     ),
 )
 
@@ -377,12 +409,15 @@ def print_stat(findings: list[Finding], files_scanned: int) -> int:
         per_module[f.path.split("/")[0]][f.rule] += 1
 
     width = max((len(m) for m in per_module), default=6)
-    print(f"{'module':<{width}}  {'lock':>5} {'comment':>7} {'fqn':>5} {'log':>5} {'tag':>5} {'total':>6}")
+    print(
+        f"{'module':<{width}}  {'lock':>5} {'comment':>7} {'fqn':>5} {'log':>5} {'tag':>5} {'rc':>5} {'catch':>6} {'total':>6}"
+    )
     for module in sorted(per_module, key=lambda m: -sum(per_module[m].values())):
         c = per_module[module]
         print(
             f"{module:<{width}}  {c['monitor-lock']:>5} {c['legacy-comment']:>7}"
-            f" {c['inline-fqn']:>5} {c['log-api']:>5} {c['log-tag']:>5} {sum(c.values()):>6}"
+            f" {c['inline-fqn']:>5} {c['log-api']:>5} {c['log-tag']:>5}"
+            f" {c['uncancellable-run-catching']:>5} {c['bare-catch']:>6} {sum(c.values()):>6}"
         )
     total = sum(sum(c.values()) for c in per_module.values())
     print()

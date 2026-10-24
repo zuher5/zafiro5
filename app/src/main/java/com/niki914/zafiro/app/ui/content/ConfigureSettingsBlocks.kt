@@ -15,12 +15,15 @@ import androidx.compose.ui.res.stringResource
 import com.niki914.okia.message.ThinkingLevel
 import com.niki914.uikit.infra.ActionBarButton
 import com.niki914.uikit.infra.component.SettingExpandableSliderItem
+import com.niki914.uikit.infra.component.SettingNavigationItem
 import com.niki914.uikit.infra.component.SettingToggleItem
 import com.niki914.uikit.infra.component.SettingsGroupCard
 import com.niki914.uikit.infra.component.SettingsItemDivider
 import com.niki914.uikit.infra.component.SettingsListItem
 import com.niki914.zafiro.app.R
 import com.niki914.zafiro.app.ui.model.ConfigureUiState
+import com.niki914.zafiro.app.ui.settings.form.EditableDetailFieldController
+import com.niki914.zafiro.app.ui.settings.form.SettingControlledExpandableTextItem
 import com.niki914.zafiro.settings.model.LlmProtocol
 import kotlin.math.roundToInt
 
@@ -31,6 +34,7 @@ internal fun ConfigureIdentitySettingsBlock(
     fieldController: EditableDetailFieldController<ConfigureEditableField>,
     onNameChange: (String) -> Unit,
     onProxyChange: (String) -> Unit,
+    onPromptClick: (() -> Unit)? = null,
 ) {
     SettingsGroupCard {
         if (showNameField) {
@@ -47,6 +51,19 @@ internal fun ConfigureIdentitySettingsBlock(
                 maxLines = 1,
             )
             SettingsItemDivider()
+            if (onPromptClick != null) {
+                SettingNavigationItem(
+                    title = stringResource(R.string.ui_settings_configure_prompt_label),
+                    currentState = if (uiState.promptInput.isNotBlank()) {
+                        stringResource(R.string.ui_settings_configure_prompt_state_custom)
+                    } else {
+                        stringResource(R.string.ui_settings_configure_prompt_state_global)
+                    },
+                    enabled = !uiState.isSaving,
+                    onClick = onPromptClick,
+                )
+                SettingsItemDivider()
+            }
         }
         SettingControlledExpandableTextItem(
             field = ConfigureEditableField.Proxy,
@@ -314,5 +331,5 @@ internal fun ConfigureProtocolSettingsBlock(
 private data class ThinkingLevelOption(val wire: String, val label: String)
 
 private fun thinkingLevelOptions(): List<ThinkingLevelOption> =
-    listOf(ThinkingLevelOption("", "Provider Default")) +
+    listOf(ThinkingLevelOption("", "Default")) +
             ThinkingLevel.entries.map { ThinkingLevelOption(it.wireValue, it.wireValue) }

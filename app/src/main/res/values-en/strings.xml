@@ -81,7 +81,7 @@
     <string name="ui_home_error_retry_exhausted_title">Automatic retries exhausted</string>
     <string name="ui_home_error_internal_title">Internal error</string>
     <string name="ui_home_retrying_title">Network hiccup, retrying…</string>
-    <string name="ui_home_thinking_title">Thinking</string>
+    <string name="ui_home_thinking_title">Think</string>
     <string name="ui_home_retrying_attempt">Retrying %1$d/%2$d</string>
     <string name="runtime_error_internal">Internal error</string>
     <string name="ui_conversation_history_title">History</string>
@@ -194,6 +194,7 @@
     <string name="ui_todo_page_description">This will be available in a future release. Stay tuned.</string>
     <string name="unsaved_changes_dialog_title">Unsaved Changes</string>
     <string name="unsaved_changes_dialog_text">Exit without saving?</string>
+    <string name="unsaved_changes_dialog_fields_prefix">The following changes are unsaved:</string>
     <string name="unsaved_changes_dialog_confirm_exit">Exit</string>
     <string name="unsaved_changes_dialog_cancel">Cancel</string>
 
@@ -201,7 +202,10 @@
     <string name="ui_settings_configure_description">Configure model access, prompts, and proxy settings.</string>
     <string name="ui_settings_configure_save">Save Configuration</string>
     <string name="ui_settings_configure_prompt_label">Prompt</string>
+    <string name="ui_settings_configure_prompt_state_global">Global fallback</string>
+    <string name="ui_settings_configure_prompt_state_custom">Customized</string>
     <string name="prompt_editor_description">Edit the System Prompt. Saved changes apply in the next conversation.</string>
+    <string name="config_prompt_editor_description">Configure a dedicated System Prompt for this model. Leave empty to fall back to the global prompt. Takes effect upon switching to this configuration.</string>
     <string name="prompt_error_load_failed">Failed to load the prompt. Go back and retry.</string>
     <string name="ui_settings_configure_proxy_label">Proxy</string>
     <string name="ui_settings_configure_proxy_placeholder">For example: http://127.0.0.1:7890</string>
@@ -300,11 +304,11 @@
     <string name="tool_group_android_native_summary">System-native actions: open links, search and launch apps, send notifications</string>
     <string name="tool_group_screen_operation">Screen Operation</string>
     <string name="tool_group_screen_operation_summary">Read and operate the screen via accessibility service or shell</string>
-    <string name="tool_custom_py_tools_entry">Custom Python tools</string>
+    <string name="tool_custom_py_tools_entry">Custom Python Tools</string>
     <string name="tool_custom_py_tools_entry_summary">Parameterized custom Python tools the agent can create, modify, and test-run</string>
 
     <!-- Python Tool Module -->
-    <string name="custom_py_tool_page_title">Python Meta Tools</string>
+    <string name="custom_py_tool_page_title">Custom Python Tools</string>
     <string name="custom_py_tool_page_description">Manage your Custom Python tools.</string>
     <string name="custom_py_tool_page_empty_description">Let your Agent create one, or tap the top right to add a new tool.</string>
     <string name="custom_py_tool_loading">Loading saved Custom Python tools...</string>
@@ -401,11 +405,10 @@
 
     <!-- Feedback templates -->
     <string name="feedback_feature_template">## Feature Suggestion\n\n## Use Case\n\n## Expected Result</string>
-    <string name="feedback_bug_template">## Issue Description\n\n## Steps to Reproduce\n\n## Expected Behavior\n\n## Actual Behavior\n\n## Device Info\n- Android version:\n- Assistant (Breeno or other):\n- Module version:\n\n## More\nYou can attach logs, screenshots, or recordings to help us understand the issue.</string>
+    <string name="feedback_bug_template">## Issue Description\n\n## Steps to Reproduce\n\n## Expected Behavior\n\n## Actual Behavior\n\n## Device Info\n- Android version:\n- Host Assistant:\n- Module version:\n\n## More\nYou can attach logs, screenshots, or recordings to help us understand the issue.</string>
     <string name="conversation_fork_title">Fork · %1$s</string>
     <string name="conversation_rewind_title">Rewind · %1$s</string>
     <!-- Tool display names -->
-    <string name="ui_tool_display_terminal">Terminal</string>
     <string name="ui_tool_display_shell">Shell</string>
     <string name="ui_tool_display_ssh">SSH</string>
     <string name="ui_tool_display_load_skill">Load Skill</string>
@@ -421,6 +424,7 @@
     <string name="ui_tool_display_screen_operation_shell">Screen Operation</string>
     <string name="ui_tool_display_screenshot">Screenshot</string>
     <string name="ui_tool_display_view_image">View Image</string>
+    <string name="ui_tool_display_py_meta_tools">Custom Python Tool</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_confirm_delete">Delete</string>
     <string name="ui_settings_section_general">General</string>
@@ -458,7 +462,7 @@
     <string name="ui_settings_runtime_compaction_threshold_summary">Automatically compact history when context window usage reaches threshold</string>
     <string name="ui_settings_runtime_compaction_off">Off</string>
     <string name="ui_settings_runtime_repetition_detection">Repetition detection</string>
-    <string name="ui_settings_runtime_repetition_summary">Aborts the turn when the model keeps repeating itself; stricter settings react sooner but are likelier to abort content that is not actually a loop</string>
+    <string name="ui_settings_runtime_repetition_summary">Aborts the turn when the model keeps repeating itself. Stricter settings react sooner but may abort non-repeating content.</string>
     <string name="ui_settings_runtime_sensitivity_relaxed">Relaxed</string>
     <string name="ui_settings_runtime_sensitivity_loose">Loose</string>
     <string name="ui_settings_runtime_sensitivity_standard">Standard</string>
@@ -467,6 +471,8 @@
     <string name="ui_settings_runtime_sensitivity_strictest">Strictest</string>
     <string name="ui_settings_runtime_sensitivity_off">Off</string>
     <string name="ui_settings_general_always_show_message_actions">Always show message actions</string>
+    <string name="ui_settings_general_always_show_detailed_tool_output">Always show detailed tool output</string>
+    <string name="ui_settings_general_always_show_detailed_tool_output_summary">Very large output may cause UI stuttering</string>
     <string name="ui_settings_general_voice_assistant_isolated_session">Dedicated voice assistant session</string>
     <string name="ui_settings_general_voice_assistant_isolated_session_summary">Keep voice assistant conversations isolated from main chat history</string>
     <string name="ui_settings_saved_configuration_title">Saved configurations</string>
@@ -485,20 +491,20 @@
     <string name="ui_settings_configure_endpoint_mismatch_cancel_save">Save as is</string>
     <string name="ui_settings_configure_protocol_hint">After switching protocols, confirm the endpoint matches the protocol.</string>
     <string name="ui_settings_configure_thinking_label">Thinking Effort</string>
-    <string name="ui_settings_configure_thinking_hint">Leave as Provider Default to use the provider default behavior; lower it yourself if the provider rejects a high level.</string>
+    <string name="ui_settings_configure_thinking_hint">Follows model defaults by default. Lower effort if rejected by the provider.</string>
     <string name="ui_settings_configure_thinking_start_label">Default</string>
     <string name="ui_settings_configure_thinking_end_label">Max</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">For example: 200000 or 200k</string>
-    <string name="ui_settings_configure_error_max_tokens_invalid">Enter a valid number (k/m/b suffix supported) of at least 256</string>
+    <string name="ui_settings_configure_error_max_tokens_invalid">Enter a valid number of at least 256, supporting k/m/b</string>
     <string name="ui_settings_configure_context_window_label">Context Window</string>
     <string name="ui_settings_configure_context_window_placeholder">For example: 1000000 or 1M</string>
-    <string name="ui_settings_configure_error_context_window_invalid">Enter a valid number (k/m/b suffix supported) of at least 1000</string>
+    <string name="ui_settings_configure_error_context_window_invalid">Enter a valid number of at least 1000, supporting k/m/b</string>
 
     <string name="ui_theme_mode_system">Follow system</string>
     <string name="ui_theme_mode_light">Light</string>
     <string name="ui_theme_mode_dark">Dark</string>
-    <string name="ui_theme_color_dynamic">Dynamic (from wallpaper)</string>
+    <string name="ui_theme_color_dynamic">Dynamic Wallpaper Color</string>
     <string name="ui_theme_color_rose">Rose</string>
     <string name="ui_theme_color_blossom">Blossom</string>
     <string name="ui_theme_color_lavender">Lavender</string>

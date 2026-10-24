@@ -5,8 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.niki914.logging.Logger
 import com.niki914.uikit.base.ComposeMVIViewModel
 import com.niki914.zafiro.app.R
+import com.niki914.zafiro.app.ui.settings.form.buildFormSpec
 import com.niki914.zafiro.repo.XRepo
-import kotlinx.coroutines.CancellationException
+import com.niki914.zafiro.api.util.runCatchingCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -38,8 +39,18 @@ data class ExecutionRuleFormSnapshot(
     val patterns: List<String>,
 )
 
+val ExecutionRuleFormSpec = buildFormSpec<ExecutionRuleFormSnapshot, String> {
+    field("name", R.string.execution_rules_field_name) { it.name }
+    field("enabledMode", R.string.execution_rules_field_enabled_mode) { it.enabledMode }
+    field("patterns", R.string.execution_rules_field_patterns) { it.patterns }
+}
+
 val ExecutionRuleFormState.hasUnsavedChanges: Boolean
-    get() = initialSnapshot?.let { it != toSnapshot() } ?: false
+    get() = ExecutionRuleFormSpec.hasChanges(initialSnapshot, toSnapshot())
+
+fun ExecutionRuleFormState.unsavedFieldLabelRes(): List<Int> {
+    return ExecutionRuleFormSpec.dirtyFieldLabelRes(initialSnapshot, toSnapshot())
+}
 
 data class ExecutionRuleDeleteConfirmationState(
     val value: String,
@@ -154,7 +165,7 @@ class ExecutionRulesSettingsViewModel :
     private suspend fun load() {
         updateState { copy(isLoading = true) }
         val startedAtMs = System.currentTimeMillis()
-        try {
+        runCatchingCancellable {
             val loadedItems = XRepo.executionRules.list().map { it.toItem() }
             Logger.d(
                 LOG_TAG,
@@ -168,8 +179,7 @@ class ExecutionRulesSettingsViewModel :
                     inlineError = null,
                 )
             }
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "load failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -234,13 +244,12 @@ class ExecutionRulesSettingsViewModel :
                 inlineError = null,
             )
         }
-        try {
+        runCatchingCancellable {
             XRepo.executionRules.setEnabledMode(currentItem.id, nextMode)
             Logger.i(LOG_TAG, "toggleItemEnabled ruleId=${currentItem.id} mode=$nextMode")
             updateState { copy(isSaving = false) }
             notifySettingsChanged()
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(
                 LOG_TAG,
                 "toggleItemEnabled failed ruleId=${currentItem.id} reason=${throwable.message}"
@@ -320,7 +329,7 @@ class ExecutionRulesSettingsViewModel :
                 inlineError = null,
             )
         }
-        try {
+        runCatchingCancellable {
             val nextRule = ExecutionRule(
                 id = normalizedFormState.id ?: newRuleId(),
                 name = normalizedFormState.name,
@@ -355,8 +364,7 @@ class ExecutionRulesSettingsViewModel :
             }
             notifySettingsChanged()
             sendEffect(ExecutionRulesSettingsEffect.ExitDetail)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "save failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -391,7 +399,7 @@ class ExecutionRulesSettingsViewModel :
         val currentId = currentState.formState.id ?: return
         val editingIndex = currentState.formState.editingIndex
         updateState { copy(isSaving = true) }
-        try {
+        runCatchingCancellable {
             XRepo.executionRules.delete(currentId)
             Logger.i(LOG_TAG, "deleteCurrent succeeded ruleId=$currentId")
             val updatedItems = if (editingIndex != null) {
@@ -409,8 +417,7 @@ class ExecutionRulesSettingsViewModel :
             }
             notifySettingsChanged()
             sendEffect(ExecutionRulesSettingsEffect.ExitDetail)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "deleteCurrent failed ruleId=$currentId reason=${throwable.message}")
             updateState {
                 copy(

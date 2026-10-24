@@ -4,10 +4,12 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import com.niki914.logging.Logger
 import com.niki914.uikit.base.ComposeMVIViewModel
-import com.niki914.xposed.api.util.xTry
+import com.niki914.zafiro.api.util.tryOrDefault
+import com.niki914.zafiro.api.util.tryOrNull
 import com.niki914.zafiro.app.R
+import com.niki914.zafiro.app.ui.settings.form.buildFormSpec
 import com.niki914.zafiro.repo.XRepo
-import kotlinx.coroutines.CancellationException
+import com.niki914.zafiro.api.util.runCatchingCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -44,8 +46,19 @@ data class McpServerFormSnapshot(
     val headersInputFallback: String,
 )
 
+val McpServerFormSpec = buildFormSpec<McpServerFormSnapshot, String> {
+    field("name", R.string.mcp_field_name) { it.name }
+    field("url", R.string.mcp_field_url) { it.url }
+    field("enabled", R.string.mcp_field_enabled) { it.enabled }
+    field("headers", R.string.mcp_field_headers) { it.headers to it.headersInputFallback }
+}
+
 val McpServerFormState.hasUnsavedChanges: Boolean
-    get() = initialSnapshot?.let { it != toSnapshot() } ?: false
+    get() = McpServerFormSpec.hasChanges(initialSnapshot, toSnapshot())
+
+fun McpServerFormState.unsavedFieldLabelRes(): List<Int> {
+    return McpServerFormSpec.dirtyFieldLabelRes(initialSnapshot, toSnapshot())
+}
 
 data class McpDeleteConfirmationState(
     val value: String,
@@ -153,7 +166,7 @@ class McpSettingsViewModel :
     private suspend fun load() {
         updateState { copy(isLoading = true) }
         val startedAtMs = System.currentTimeMillis()
-        try {
+        runCatchingCancellable {
             val loadedItems = XRepo.mcp.list().map { it.toItem() }
             Logger.d(
                 LOG_TAG,
@@ -167,8 +180,7 @@ class McpSettingsViewModel :
                     inlineError = null,
                 )
             }
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "load failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -239,7 +251,7 @@ class McpSettingsViewModel :
                 inlineError = null,
             )
         }
-        try {
+        runCatchingCancellable {
             XRepo.mcp.setEnabled(currentItem.name, enabled)
             Logger.i(LOG_TAG, "toggleItemEnabled server=${currentItem.name} enabled=$enabled")
             updateState {
@@ -248,8 +260,7 @@ class McpSettingsViewModel :
                 )
             }
             notifySettingsChanged()
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(
                 LOG_TAG,
                 "toggleItemEnabled failed server=${currentItem.name} reason=${throwable.message}"
@@ -332,7 +343,7 @@ class McpSettingsViewModel :
                 inlineError = null,
             )
         }
-        try {
+        runCatchingCancellable {
             val previousName = editingIndex
                 ?.let { currentState.items.getOrNull(it)?.name }
             val nextItem = McpServerItem(
@@ -372,8 +383,7 @@ class McpSettingsViewModel :
             }
             notifySettingsChanged()
             sendEffect(McpSettingsEffect.ExitDetail)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(LOG_TAG, "save failed reason=${throwable.message}")
             updateState {
                 copy(
@@ -408,7 +418,7 @@ class McpSettingsViewModel :
         val editingIndex = currentState.formState.editingIndex ?: return
         val currentItem = currentState.items.getOrNull(editingIndex) ?: return
         updateState { copy(isSaving = true) }
-        try {
+        runCatchingCancellable {
             val updatedItems =
                 currentState.items.filterIndexed { index, _ -> index != editingIndex }
             XRepo.mcp.delete(currentItem.name)
@@ -423,8 +433,7 @@ class McpSettingsViewModel :
             }
             notifySettingsChanged()
             sendEffect(McpSettingsEffect.ExitDetail)
-        } catch (throwable: Throwable) {
-            if (throwable is CancellationException) throw throwable
+        }.onFailure { throwable ->
             Logger.w(
                 LOG_TAG,
                 "deleteCurrent failed server=${currentItem.name} reason=${throwable.message}"
@@ -460,11 +469,8 @@ private fun normalizedHeadersOrError(input: String): McpHeadersParseResult {
     if (input.isBlank()) {
         return McpHeadersParseResult.Success(emptyMap())
     }
-    val element = try {
-        Json.parseToJsonElement(input)
-    } catch (_: Throwable) {
-        return McpHeadersParseResult.Error(R.string.mcp_error_headers_invalid_json)
-    }
+    val element = tryOrNull { Json.parseToJsonElement(input) }
+        ?: return McpHeadersParseResult.Error(R.string.mcp_error_headers_invalid_json)
     val jsonObject = element as? JsonObject
         ?: return McpHeadersParseResult.Error(R.string.mcp_error_headers_not_object)
     val headers = linkedMapOf<String, String>()
@@ -520,12 +526,12 @@ private fun headersToInput(headers: Map<String, String>): String {
 }
 
 private fun isValidUrl(value: String): Boolean {
-    return xTry("McpSettingsState.isValidUrl") {
+    return tryOrDefault(false) {
         val uri = URI(value)
         val scheme = uri.scheme?.lowercase()
         val isHttpScheme = scheme == "http" || scheme == "https"
         isHttpScheme && !uri.host.isNullOrBlank()
-    } ?: false
+    }
 }
 
 private fun firstInvalidFieldEffect(
