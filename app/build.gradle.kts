@@ -23,8 +23,8 @@ android {
         applicationId = "com.niki914.zafiro"
         minSdk = 26
         targetSdk = 34
-        versionName = "1.9.5"
-        versionCode = 22
+        versionName = "1.9.6"
+        versionCode = 23
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
