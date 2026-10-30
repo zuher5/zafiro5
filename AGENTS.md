@@ -110,7 +110,11 @@ AI 对话通常是以 list 的形式存放 messages，同时只会有一个对�
 
 ### 维护者约定与定制特性 (Maintainer Context)
 
-- **Application ID / Package Name**: 必须始终保持为 `com.niki914.zafiro`（不要改成 `com.niki914.zafiro5` 或其他）。当前配置与最新版本为维护者明确指定的目标状态。
+- **Application ID / Package Name**: 必须始终保持基础 ID 为 `com.niki914.zafiro`（不要改成 `com.niki914.zafiro5` 或其他）。当前配置与最新版本为维护者明确指定的目标状态。
+- **Debug 包名后缀隔离 (Release / Debug Coexistence Rule)**:
+  - Debug 构建必须始终配置 `applicationIdSuffix = ".debug"`，实际包名为 `com.niki914.zafiro.debug`。
+  - Release 构建包名为 `com.niki914.zafiro`。
+  - 目的：允许同一台测试机/真机上同时安装 Release 版与 Debug 版共存，避免 `INSTALL_FAILED_DUPLICATE_PERMISSION` 权限声明冲突或签名不一致导致覆盖失败。后续维护或重构严禁移除 debug 的 `.debug` 后缀。
 - **免费模型接入 (Free LLM Providers)**:
   - `KiloCode Free` (`kilo-free`): 直连 `https://api.kilo.ai/api/gateway/chat/completions`，支持空 API Key，默认模型 `kilo-auto/free`。
   - `OpenCode Free` (`opencode-zen-free`): 直连 `https://opencode.ai/zen/v1/chat/completions`，支持空 API Key，默认模型 `mimo-v2.6-flash-free`。必须通过 `OpenCodeFreeSupport` 注入 `<env>` 环境指纹 marker、每周自动重铸 session 保持会话新鲜（防 429 伪限流），并注入 CLI 工具指纹。

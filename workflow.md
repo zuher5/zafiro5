@@ -6,7 +6,9 @@ Dokumen ini meringkas implementasi saat ini agar AI agent lain bisa langsung lan
 
 - Remote: `https://github.com/zuher5/zafiro5`
 - Branch aktif: `feat/swipe-session-actions`
-- Package id / applicationId: `com.niki914.zafiro` (sesuai instruksi maintainer)
+- Base Package ID / applicationId: `com.niki914.zafiro`
+- Debug Package ID: `com.niki914.zafiro.debug` (via `applicationIdSuffix = ".debug"`)
+  - Aturan: Debug APK wajib pakai akhiran `.debug` agar bisa diinstal berdampingan dengan APK Release di HP/device yang sama tanpa error duplikat permission atau beda signature.
 - App name: `Zafiro`
 - Sinkronisasi upstream: merged upstream `v16-1.9.0` (commit `a6256787`)
 
