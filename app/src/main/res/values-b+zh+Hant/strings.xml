@@ -45,8 +45,11 @@
     <string name="ui_tool_status_running">執行中</string>
     <string name="ui_tool_status_success">成功</string>
     <string name="ui_tool_status_failed">失敗</string>
-    <plurals name="ui_tool_chain_count">
-        <item quantity="other">%d 個工具</item>
+    <plurals name="ui_steps_wrapped_count">
+        <item quantity="other">已折疊 %d 個步驟</item>
+    </plurals>
+    <plurals name="ui_steps_collapse_count">
+        <item quantity="other">收起 %d 個步驟</item>
     </plurals>
     <string name="ui_home_attach_sheet_title">加入對話</string>
     <string name="ui_home_attach_photos">照片</string>
@@ -65,6 +68,11 @@
     <string name="ui_home_file_category_archive">壓縮檔</string>
     <string name="ui_home_file_category_apk">安裝包</string>
     <string name="ui_home_file_category_file">檔案</string>
+    <string name="ui_action_view">查看</string>
+    <string name="ui_viewer_copy_all">複製全部</string>
+    <string name="ui_image_unavailable">已失效</string>
+    <string name="ui_viewer_image_unavailable">無法載入圖片</string>
+    <string name="ui_viewer_image_unavailable_desc">圖片檔案不存在或快取已被清理</string>
     <string name="ui_toast_copied">已複製</string>
     <string name="ui_toast_generating">生成中，請稍後</string>
     <string name="ui_toast_empty_input">請輸入內容</string>
@@ -112,6 +120,8 @@
     <string name="ui_conversation_rename_dialog_hint">對話標題</string>
     <string name="ui_conversation_rename_dialog_confirm">確定</string>
     <string name="ui_conversation_rename_dialog_cancel">取消</string>
+    <string name="ui_conversation_search_placeholder">搜尋歷史對話與內容</string>
+    <string name="ui_conversation_search_empty">未找到相關對話</string>
     <string name="ui_time_just_now">剛剛</string>
     <string name="ui_time_minutes_ago">%1$d 分鐘前</string>
     <string name="ui_time_hours_ago">%1$d 小時前</string>
@@ -220,7 +230,7 @@
     <string name="memory_loading">正在讀取記憶…</string>
     <string name="memory_editor_title_create">新增記憶</string>
     <string name="memory_editor_title_edit">編輯記憶</string>
-    <string name="memory_field_content">內容</string>
+    <string name="memory_field_content">輸入內容</string>
     <string name="memory_field_content_hint">例如：使用者的生日是 X 月 Y 日</string>
     <string name="memory_save_action">儲存記憶</string>
     <string name="memory_delete_dialog_title">刪除記憶</string>
@@ -485,6 +495,11 @@
     <string name="host_breeno_display_name">小布助手</string>
     <string name="host_xiaoai_display_name">小愛同學</string>
     <string name="feedback_bug_template">## 問題描述\n\n## 復現步驟\n\n## 預期行為\n\n## 實際行為\n\n## 設備資訊\n- Android 版本：\n- 宿主助理：\n- 模組版本：\n\n## 更多\n可以補充日誌、截圖錄屏等資訊，以便於我們理解</string>
+
+    <string name="ui_settings_theme_style_title">風格</string>
+    <string name="ui_theme_style_liquid">Glass</string>
+    <string name="ui_theme_style_md3">MD3</string>
+    <string name="ui_theme_style_md3e">MD3E</string>
 
     <string name="ui_theme_mode_system">跟隨系統</string>
     <string name="ui_theme_mode_light">淺色</string>

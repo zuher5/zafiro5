@@ -45,9 +45,13 @@
     <string name="ui_tool_status_running">Ejecutando</string>
     <string name="ui_tool_status_success">Completado</string>
     <string name="ui_tool_status_failed">Error</string>
-    <plurals name="ui_tool_chain_count">
-        <item quantity="one">%d herramienta</item>
-        <item quantity="other">%d herramientas</item>
+    <plurals name="ui_steps_wrapped_count">
+        <item quantity="one">%d paso replegado</item>
+        <item quantity="other">%d pasos replegados</item>
+    </plurals>
+    <plurals name="ui_steps_collapse_count">
+        <item quantity="one">contraer %d paso</item>
+        <item quantity="other">contraer %d pasos</item>
     </plurals>
     <string name="ui_home_attach_sheet_title">Añadir a la conversación</string>
     <string name="ui_home_attach_photos">Fotos</string>
@@ -66,6 +70,11 @@
     <string name="ui_home_file_category_archive">Archivo comprimido</string>
     <string name="ui_home_file_category_apk">APK</string>
     <string name="ui_home_file_category_file">Archivo</string>
+    <string name="ui_action_view">Ver</string>
+    <string name="ui_viewer_copy_all">Copiar todo</string>
+    <string name="ui_image_unavailable">No disponible</string>
+    <string name="ui_viewer_image_unavailable">No se puede cargar la imagen</string>
+    <string name="ui_viewer_image_unavailable_desc">El archivo de imagen no existe o se ha borrado la caché</string>
     <string name="ui_toast_copied">Copiado al portapapeles</string>
     <string name="ui_toast_generating">Generando, espere un momento</string>
     <string name="ui_toast_empty_input">Por favor ingrese un mensaje</string>
@@ -113,6 +122,8 @@
     <string name="ui_conversation_rename_dialog_hint">Título de la conversación</string>
     <string name="ui_conversation_rename_dialog_confirm">Guardar</string>
     <string name="ui_conversation_rename_dialog_cancel">Cancelar</string>
+    <string name="ui_conversation_search_placeholder">Buscar en historial y mensajes</string>
+    <string name="ui_conversation_search_empty">No se encontraron conversaciones coincidentes</string>
     <string name="ui_time_just_now">Ahora mismo</string>
     <string name="ui_time_minutes_ago">Hace %1$d m</string>
     <string name="ui_time_hours_ago">Hace %1$d h</string>
@@ -501,6 +512,11 @@
     <string name="ui_settings_configure_context_window_label">Ventana de contexto</string>
     <string name="ui_settings_configure_context_window_placeholder">Por ejemplo: 1000000 o 1M</string>
     <string name="ui_settings_configure_error_context_window_invalid">Introduzca un número válido de al menos 1000, admite k/m/b</string>
+
+    <string name="ui_settings_theme_style_title">Estilo</string>
+    <string name="ui_theme_style_liquid">Glass</string>
+    <string name="ui_theme_style_md3">MD3</string>
+    <string name="ui_theme_style_md3e">MD3E</string>
 
     <string name="ui_theme_mode_system">Según el sistema</string>
     <string name="ui_theme_mode_light">Claro</string>

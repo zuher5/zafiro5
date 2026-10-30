@@ -1,7 +1,5 @@
 package com.niki914.zafiro.app.crash
 
-import android.content.ClipData
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,17 +15,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.niki914.uikit.infra.LiquidDialog
-import com.niki914.uikit.infra.component.MaterialTintLiquidButton
+import com.niki914.uikit.dialog.ZafiroDialog
+import com.niki914.uikit.dialog.ZafiroDialogButton
 import com.niki914.zafiro.app.R
+import com.niki914.zafiro.app.ui.chat.helper.honestCopyToClipboard
 import kotlinx.coroutines.launch
 
 @Composable
@@ -36,12 +34,12 @@ fun CrashReportDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
     val clipboard = LocalClipboard.current
+    val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
-    LiquidDialog(
+    ZafiroDialog(
         visible = true,
         onDismissRequest = onDismiss,
         dismissOnBackgroundTap = false,
@@ -111,35 +109,24 @@ fun CrashReportDialog(
             }
         },
         actions = {
-            MaterialTintLiquidButton(
+            ZafiroDialogButton(
+                text = stringResource(R.string.crash_dialog_close),
+                onClick = onDismiss,
+                isPrimary = false,
+            )
+            ZafiroDialogButton(
                 text = stringResource(R.string.crash_dialog_copy),
                 onClick = {
                     scope.launch {
-                        clipboard.setClipEntry(
-                            ClipEntry(
-                                ClipData.newPlainText(
-                                    null,
-                                    report.formatAsMarkdown()
-                                )
-                            )
+                        honestCopyToClipboard(
+                            text = report.formatAsMarkdown(),
+                            clipboard = clipboard,
+                            hapticFeedback = haptic,
+                            toastRes = R.string.crash_copied_toast,
                         )
                     }
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.crash_copied_toast),
-                        Toast.LENGTH_SHORT,
-                    ).show()
                 },
-                modifier = Modifier.weight(1f),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            )
-            MaterialTintLiquidButton(
-                text = stringResource(R.string.crash_dialog_close),
-                onClick = onDismiss,
-                modifier = Modifier.weight(1f),
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                contentColor = MaterialTheme.colorScheme.onSurface,
+                isPrimary = true,
             )
         },
     )

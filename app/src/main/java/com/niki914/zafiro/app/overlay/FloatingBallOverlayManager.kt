@@ -1,3 +1,4 @@
+// githooks:ignore-file file-token-limit
 package com.niki914.zafiro.app.overlay
 
 import android.content.Context
@@ -310,6 +311,7 @@ object FloatingBallOverlayManager {
                         dynamicColor = !themePrefs.isCatppuccin && themePrefs.seedColor == null,
                         seedColor = seed,
                         isCatppuccin = themePrefs.isCatppuccin,
+                        themeStyle = themePrefs.themeStyle,
                     ) {
                         FloatingBallCollapsedBall(
                             onClick = {
@@ -376,6 +378,7 @@ object FloatingBallOverlayManager {
                         dynamicColor = !themePrefs.isCatppuccin && themePrefs.seedColor == null,
                         seedColor = seed,
                         isCatppuccin = themePrefs.isCatppuccin,
+                        themeStyle = themePrefs.themeStyle,
                     ) {
                         FloatingBallMorphCard(
                             state = uiState.ballState,
@@ -524,6 +527,7 @@ object FloatingBallOverlayManager {
                     dynamicColor = !themePrefs.isCatppuccin && themePrefs.seedColor == null,
                     seedColor = seed,
                     isCatppuccin = themePrefs.isCatppuccin,
+                    themeStyle = themePrefs.themeStyle,
                 ) {
                     val uiState by vm.uiStateFlow.collectAsState()
                     FloatingBallDetailMorphCard(

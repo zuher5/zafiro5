@@ -6,11 +6,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.niki914.zafiro.app.R
 import com.niki914.zafiro.app.ui.chat.composable.TurnItem
 import com.niki914.zafiro.app.ui.chat.composable.bubble.UserBubblePosition
 import com.niki914.zafiro.app.ui.chat.composable.section.CompactedDividerItem
-import com.niki914.zafiro.app.ui.chat.helper.ZafiroToast
+import com.niki914.zafiro.app.ui.helper.ZafiroToast
 import com.niki914.zafiro.app.ui.chat.helper.honestCopyToClipboard
 import com.niki914.zafiro.app.ui.chat.mapper.toTurnUiModel
 import com.niki914.zafiro.app.ui.model.home.ActionSource
@@ -45,6 +47,8 @@ internal fun HomeChatTurnItem(
     alwaysShowDetailed: Boolean = false,
     userToggledKeys: Map<String, Boolean> = emptyMap(),
     onToggleAction: (key: String, nextExpanded: Boolean) -> Unit = { _, _ -> },
+    safeZoneMinHeight: Dp = 0.dp,
+    userMessageMaxHeight: Dp = Dp.Unspecified,
     modifier: Modifier = Modifier,
 ) {
     if (turn.isCompactedDivider) {
@@ -96,6 +100,7 @@ internal fun HomeChatTurnItem(
         userToggledKeys = userToggledKeys,
         onToggleAction = onToggleAction,
         activeThinkingKey = activeThinkingKey,
+        isGenerating = isGenerating && isLastTurn,
     )
 
     TurnItem(
@@ -119,6 +124,8 @@ internal fun HomeChatTurnItem(
         branchIndex = branchIndex,
         branchCount = branchCount,
         onSwitchBranch = onSwitchBranch,
+        safeZoneMinHeight = safeZoneMinHeight,
+        userMessageMaxHeight = userMessageMaxHeight,
         modifier = modifier,
     )
 }

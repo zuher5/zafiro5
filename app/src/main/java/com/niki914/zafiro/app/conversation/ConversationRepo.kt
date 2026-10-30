@@ -466,7 +466,7 @@ object ConversationRepo {
 
     // ── 内部 ────────────────────────────────────────────────────────────────
 
-    private fun dao(): ConversationDao {
+    internal fun dao(): ConversationDao {
         return requireNotNull(database) {
             "ConversationRepo.init(context) must be called before use."
         }.conversationDao()
@@ -485,7 +485,7 @@ object ConversationRepo {
         )
     }
 
-    private fun ConversationEntryEntity.toConversationEntry(): ConversationEntry? {
+    internal fun ConversationEntryEntity.toConversationEntry(): ConversationEntry? {
         val message = runCatching {
             json.decodeFromString(Message.serializer(), messageJson)
         }.getOrNull() ?: return null
@@ -507,7 +507,7 @@ object ConversationRepo {
         )
     }
 
-    private fun ConversationEntity.toSummary(): ConversationSummary {
+    internal fun ConversationEntity.toSummary(): ConversationSummary {
         return ConversationSummary(
             id = id,
             title = title,

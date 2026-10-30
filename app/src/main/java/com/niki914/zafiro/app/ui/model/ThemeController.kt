@@ -8,7 +8,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.niki914.logging.Logger
+import com.niki914.uikit.base.ThemeStyle
 import com.niki914.uikit.base.resolveThemeColorScheme
+import com.niki914.zafiro.api.util.runCatchingCancellable
 import com.niki914.zafiro.app.ui.model.ThemeController.load
 import com.niki914.zafiro.app.ui.model.ThemeController.setMode
 import com.niki914.zafiro.app.ui.model.ThemeController.setSeedColor
@@ -27,12 +29,13 @@ enum class ThemeMode(val storageKey: String) {
     }
 }
 
-/** 主题偏好：深浅色模式 + 种子色（空 = 跟随壁纸动态色）。 */
+/** 主题偏好：深浅色模式 + 种子色（空 = 跟随壁纸动态色）+ 设计语言风格。 */
 data class ThemePrefs(
     val mode: ThemeMode = ThemeMode.Light,
     /** ARGB int；null = 壁纸动态色。 */
     val seedColor: Int? = 0xFF52DBC9.toInt(),
     val isCatppuccin: Boolean = false,
+    val themeStyle: ThemeStyle = ThemeStyle.default(),
 ) {
     fun resolveDarkTheme(systemDark: Boolean): Boolean = when (mode) {
         ThemeMode.System -> systemDark
@@ -42,7 +45,7 @@ data class ThemePrefs(
 }
 
 /**
- * 全局主题状态单一来源：MainActivity 冷启动时 [load]，主题设置页经 [setMode]/[setSeedColor]
+ * 全局主题状态单一来源：MainActivity 冷启动时 [load]，主题设置页经 [setMode]/[setSeedColor]/[setThemeStyle]
  * 更新内存并落盘（调用方用组合作用域 launch），ZafiroApp 据此驱动 BaseTheme。
  *
  * TODO(appstate-reactive): 本对象是手搓的第五个模式 A（内存快照 + 写穿 + 手工 load），
@@ -52,14 +55,30 @@ object ThemeController {
     var prefs by mutableStateOf(ThemePrefs())
         private set
 
+    suspend fun load() {
+        runCatchingCancellable {
+            val rawSeed = XRepo.themeSeedColor()
+            val isCatppuccin = rawSeed.equals("catppuccin", ignoreCase = true)
+            prefs = ThemePrefs(
+                mode = ThemeMode.fromStorageKey(XRepo.themeMode()),
+                seedColor = if (isCatppuccin) null else rawSeed.takeIf { it.isNotBlank() }?.toLongOrNull(16)?.toInt(),
+                isCatppuccin = isCatppuccin,
+                themeStyle = ThemeStyle.fromStorageKey(XRepo.themeStyle()),
+            )
+        }.onFailure {
+            Logger.w("niki914_zafiro_ThemeController", "load failed ${it.message}")
+        }
+    }
+
     internal suspend fun load(state: AppStateSettings) {
-        runCatching {
+        runCatchingCancellable {
             val rawSeed = state.themeSeedColor
             val isCatppuccin = rawSeed.equals("catppuccin", ignoreCase = true)
             prefs = ThemePrefs(
                 mode = ThemeMode.fromStorageKey(state.themeMode),
                 seedColor = if (isCatppuccin) null else rawSeed.takeIf { it.isNotBlank() }?.toLongOrNull(16)?.toInt(),
                 isCatppuccin = isCatppuccin,
+                themeStyle = ThemeStyle.fromStorageKey(state.themeStyle),
             )
         }.onFailure {
             Logger.w("niki914_zafiro_ThemeController", "load failed ${it.message}")
@@ -79,11 +98,22 @@ object ThemeController {
 
     suspend fun setCatppuccin() {
         prefs = prefs.copy(isCatppuccin = true, seedColor = null)
-        runCatching { XRepo.setThemeSeedColor("catppuccin") }
+        runCatchingCancellable { XRepo.setThemeSeedColor("catppuccin") }
             .onFailure {
                 Logger.w(
                     "niki914_zafiro_ThemeController",
-                    "persist catppuccin failed ${it.message}"
+                    "persist catppuccin failed ${it.message}",
+                )
+            }
+    }
+
+    suspend fun setThemeStyle(style: ThemeStyle) {
+        prefs = prefs.copy(themeStyle = style)
+        runCatchingCancellable { XRepo.setThemeStyle(style.storageKey) }
+            .onFailure {
+                Logger.w(
+                    "niki914_zafiro_ThemeController",
+                    "persist theme style failed ${it.message}",
                 )
             }
     }
@@ -114,6 +144,7 @@ object ThemeController {
             darkTheme = isDark,
             dynamicColor = prefs.seedColor == null,
             seedColor = seed,
+            themeStyle = prefs.themeStyle,
         )
         return scheme.primaryContainer.toArgb()
     }
