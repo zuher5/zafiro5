@@ -32,11 +32,39 @@ object OpenCodeFreeSupport {
     const val OPENCODE_PREAMBLE =
         "You are opencode, an interactive CLI tool that helps users with software engineering tasks. Use the instructions below and the tools available to you to assist the user."
 
+    const val ENV_FINGERPRINT_NOTE =
+        "Here is some useful information about the environment you are running in:\n" +
+        "<env>\n" +
+        "  Working directory: /data/data/com.niki914.zafiro\n" +
+        "  Workspace root folder: /data/data/com.niki914.zafiro\n" +
+        "  Is directory a git repo: no\n" +
+        "  Platform: linux\n" +
+        "  Prefer /data/data/com.niki914.zafiro/cache/opencode over generic system temporary directories such as /tmp; it is pre-created and approved for external access.\n" +
+        "</env>"
+
     private val responsesModels = setOf("muse-spark-1.2-contributor-free", "muse-spark-1.3-contributor-free")
 
     // Project id: zen clients send a 40-char hex project hash.
     private val projectId = randomHex(20)
-    private val sessionId = generateSessionId().also { require(sessionRegex.matches(it)) }
+
+    // One stable session per conversation window — shape must match sessionRegex.
+    // Re-mint session weekly so it never exceeds 30-day limit that causes 429.
+    private const val SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60_000L
+    @Volatile
+    private var openCodeSessionMintedAt = System.currentTimeMillis()
+    @Volatile
+    private var openCodeSession = generateSessionId().also { require(sessionRegex.matches(it)) }
+
+    fun currentSessionId(): String {
+        if (System.currentTimeMillis() - openCodeSessionMintedAt > SESSION_MAX_AGE_MS) {
+            val fresh = generateSessionId()
+            if (sessionRegex.matches(fresh)) {
+                openCodeSession = fresh
+                openCodeSessionMintedAt = System.currentTimeMillis()
+            }
+        }
+        return openCodeSession
+    }
 
     /** Transformed request body plus the wire→caller tool-name aliases the
      *  response path must undo (empty when no caller tool collided), and
@@ -69,14 +97,15 @@ object OpenCodeFreeSupport {
         refreshOpenCodeUA()
         val traceId = randomHex(16)
         val spanId = randomHex(8)
+        val activeSession = currentSessionId()
         val headers = mutableMapOf(
             "User-Agent" to getOpenCodeUA(),
             "Authorization" to "Bearer public",
             "x-opencode-client" to "cli",
             "x-opencode-project" to projectId,
-            "x-opencode-session" to sessionId,
-            "x-opencode-session-id" to sessionId,
-            "x-session-affinity" to sessionId,
+            "x-opencode-session" to activeSession,
+            "x-opencode-session-id" to activeSession,
+            "x-session-affinity" to activeSession,
             // Distributed-tracing headers real opencode clients emit.
             "b3" to "$traceId-$spanId-1-$spanId",
             "traceparent" to "00-$traceId-$spanId-01",
@@ -91,10 +120,12 @@ object OpenCodeFreeSupport {
         // Gate: stream=false → 403 even with valid UA/session/tools.
         mutable["stream"] = JsonPrimitive(true)
 
-        injectPreamble(body, mutable)
-
         val model = (body["model"] as? JsonPrimitive)?.content.orEmpty()
-        if (responsesModels.contains(model) || model.contains("muse-spark")) {
+        val isResponses = responsesModels.contains(model) || model.contains("muse-spark")
+
+        injectPreambleAndEnv(body, mutable, isResponses)
+
+        if (isResponses) {
             val maxOutput = body["max_output_tokens"] as? JsonPrimitive
             if (maxOutput == null) {
                 (body["max_completion_tokens"] as? JsonPrimitive)?.let {
@@ -117,28 +148,48 @@ object OpenCodeFreeSupport {
     }
 
     /**
-     * Prepend the OpenCode system-prompt preamble the edge inspects. Existing
-     * first system message is prefixed in place; otherwise a system message is
-     * inserted at the head.
+     * Prepend the OpenCode system-prompt preamble and <env> fingerprint marker.
+     * Existing first system message is prefixed with preamble if missing and
+     * appended with <env> marker if not carrying <env>.
      */
-    private fun injectPreamble(body: JsonObject, mutable: MutableMap<String, JsonElement>) {
+    private fun injectPreambleAndEnv(
+        body: JsonObject,
+        mutable: MutableMap<String, JsonElement>,
+        responses: Boolean,
+    ) {
+        if (responses) {
+            val instructions = (body["instructions"] as? JsonPrimitive)?.content.orEmpty()
+            if (!instructions.contains("<env>")) {
+                val updatedInstructions = if (instructions.isNotBlank()) {
+                    "$instructions\n\n$ENV_FINGERPRINT_NOTE"
+                } else {
+                    ENV_FINGERPRINT_NOTE
+                }
+                mutable["instructions"] = JsonPrimitive(updatedInstructions)
+            }
+            return
+        }
+
         val rawMessages = body["messages"] as? JsonArray ?: return
         val messagesList = rawMessages.toMutableList()
         val firstMsg = messagesList.firstOrNull() as? JsonObject
         val firstRole = (firstMsg?.get("role") as? JsonPrimitive)?.content
         if (firstRole == "system") {
-            val existingContent = (firstMsg["content"] as? JsonPrimitive)?.content.orEmpty()
-            if (!existingContent.startsWith(OPENCODE_PREAMBLE)) {
-                val combinedContent = "$OPENCODE_PREAMBLE\n\n$existingContent"
-                val updatedFirst = firstMsg.toMutableMap()
-                updatedFirst["content"] = JsonPrimitive(combinedContent)
-                messagesList[0] = JsonObject(updatedFirst)
+            var content = (firstMsg["content"] as? JsonPrimitive)?.content.orEmpty()
+            if (!content.startsWith(OPENCODE_PREAMBLE)) {
+                content = "$OPENCODE_PREAMBLE\n\n$content"
             }
+            if (!content.contains("<env>")) {
+                content = "$content\n\n$ENV_FINGERPRINT_NOTE"
+            }
+            val updatedFirst = firstMsg.toMutableMap()
+            updatedFirst["content"] = JsonPrimitive(content)
+            messagesList[0] = JsonObject(updatedFirst)
         } else {
             val sysMsg = JsonObject(
                 mapOf(
                     "role" to JsonPrimitive("system"),
-                    "content" to JsonPrimitive(OPENCODE_PREAMBLE),
+                    "content" to JsonPrimitive("$OPENCODE_PREAMBLE\n\n$ENV_FINGERPRINT_NOTE"),
                 ),
             )
             messagesList.add(0, sysMsg)
