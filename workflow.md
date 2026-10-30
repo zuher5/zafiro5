@@ -6,9 +6,9 @@ Dokumen ini meringkas implementasi saat ini agar AI agent lain bisa langsung lan
 
 - Remote: `https://github.com/zuher5/zafiro5`
 - Branch aktif: `feat/swipe-session-actions`
-- Package id: `com.niki914.zafiro5`
+- Package id / applicationId: `com.niki914.zafiro` (sesuai instruksi maintainer)
 - App name: `Zafiro`
-- Original package tetap: `com.niki914.zafiro`
+- Sinkronisasi upstream: merged upstream `v16-1.9.0` (commit `a6256787`)
 
 ## CI
 
@@ -31,8 +31,9 @@ Perilaku:
 
 - Swipe kanan → rename session.
 - Swipe kiri → delete session.
+- Menggunakan `SwipeToDismissBox` dan tetap terintegrasi dengan Search Bar upstream.
 
-## Free model presets
+## Free model presets (pi-bansos v0.7.2)
 
 Provider yang tersedia di UI:
 
@@ -41,6 +42,7 @@ Provider yang tersedia di UI:
 ```text
 provider id: kilo-free
 endpoint: https://api.kilo.ai/api/gateway/chat/completions
+model: kilo-auto/free
 protocol: openai-chat-completions
 apiKey: kosong
 ```
@@ -50,8 +52,10 @@ apiKey: kosong
 ```text
 provider id: opencode-zen-free
 endpoint: https://opencode.ai/zen/v1/chat/completions
+model: mimo-v2.6-flash-free
 protocol: openai-chat-completions
 apiKey: kosong
+fingerprint: <env> marker injected + weekly session re-mint
 ```
 
 3. `OpenCode PI`
@@ -59,45 +63,43 @@ apiKey: kosong
 ```text
 provider id: opencode-pi
 endpoint: http://127.0.0.1:18080/v1/chat/completions
+model: mimo-v2.6-flash-free
 protocol: openai-chat-completions
 apiKey: kosong
 ```
 
 `OpenCode PI` mengasumsikan `pi` + `pi-bansos` dijalankan di Termux/device yang sama. Ini fallback bila native OpenCode bermasalah.
 
-## Implementasi native OpenCode
+## Implementasi native OpenCode (v0.7.2 Gate Alignment)
 
 File:
 
 ```text
 agent-runtime/src/main/java/com/niki914/zafiro/chat/OpenCodeFreeSupport.kt
-agent-runtime/src/main/java/com/niki914/zafiro/chat/LLMController.kt
 ```
 
-Tujuan: request native Zafiro memenuhi gate free-tier OpenCode Zen.
+Tujuan: request native Zafiro memenuhi gate free-tier OpenCode Zen terbaru tanpa perantara.
 
 Yang diterapkan:
 
-- Header OpenCode:
-  - `User-Agent: opencode/1.18.31`
+- **`<env>` fingerprint marker**:
+  - OpenCode gate menolak prompt tanpa blok `<env>` dengan kode error `429 FreeUsageLimitError` (menyamar sebagai limit kuota).
+  - Diinjeksi otomatis ke system message / instructions.
+- **Session freshness**:
+  - `ses_` timestamp divalidasi OpenCode (menolak usia > 30 hari).
+  - Otomatis di-remint tiap 7 hari (`SESSION_MAX_AGE_MS = 7d`).
+- **Header OpenCode**:
+  - `User-Agent: opencode/1.18.34 ...` (auto-fetch versi live npm)
   - `Authorization: Bearer public`
-  - `x-opencode-client: desktop`
-  - `x-opencode-project`
-  - `x-opencode-session`
-  - `x-opencode-request`
-  - `b3`
-  - `traceparent`
+  - `x-opencode-client: cli`
+  - `x-opencode-project` (hex hash)
+  - `x-opencode-session` / `x-opencode-session-id` / `x-session-affinity`
+  - `b3`, `traceparent`
   - `Accept: text/event-stream`
-
-- Transform request body:
+- **Body Transform**:
   - `stream: true`
-  - inject tools fingerprint OpenCode:
-    - `bash`
-    - `glob`
-    - `grep`
-    - `read`
-    - `edit`
-    - `write`
+  - Fingerprint tool schemas: `read` dan `shell`
+  - Tool nama bertabrakan di-alias `*_pi` lalu dipulihkan di respons.
   - chat completions: `tool_choice: "none"`
   - Responses API:
     - `store: false`

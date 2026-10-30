@@ -108,6 +108,20 @@ AI 对话通常是以 list 的形式存放 messages，同时只会有一个对�
 
 如果身处 lima Linux 环境, 请调用 `host-command-bridge` 来与主机 macOS 环境交互。调试构建额外把同一条日志落到沙箱，如果 logcat 被冲掉了可以用 adb 把日志拉出来看。详情通过调用 `zafiro-qa` 技能来了解
 
+### 维护者约定与定制特性 (Maintainer Context)
+
+- **Application ID / Package Name**: 必须始终保持为 `com.niki914.zafiro`（不要改成 `com.niki914.zafiro5` 或其他）。当前配置与最新版本为维护者明确指定的目标状态。
+- **免费模型接入 (Free LLM Providers)**:
+  - `KiloCode Free` (`kilo-free`): 直连 `https://api.kilo.ai/api/gateway/chat/completions`，支持空 API Key，默认模型 `kilo-auto/free`。
+  - `OpenCode Free` (`opencode-zen-free`): 直连 `https://opencode.ai/zen/v1/chat/completions`，支持空 API Key，默认模型 `mimo-v2.6-flash-free`。必须通过 `OpenCodeFreeSupport` 注入 `<env>` 环境指纹 marker、每周自动重铸 session 保持会话新鲜（防 429 伪限流），并注入 CLI 工具指纹。
+  - `OpenCode PI` (`opencode-pi`): 经 Termux `pi-bansos` 代理的回退通道 (`http://127.0.0.1:18080/v1/chat/completions`)。
+  - 设置页中的 `proxy` 仅支持标准 HTTP/SOCKS 代理；像 Vercel relay 等需要自定义 `x-relay-target` 头的服务不能直接填入普通代理输入框。
+- **会话滑动快捷操作 (Session Swipe Actions)**:
+  - 对话历史列表中每一项封装在 `SwipeToDismissBox` 中：向右滑重命名会话，向左滑删除会话。在进行合并和 UI 重构时必须完整保留该能力。
+- **Upstream 同步基线**:
+  - 已完整合并 upstream `v16-1.9.0`（包含 Room 全文搜索 `ZafiroSearchBar`、Viewer 媒体导航、输入框折叠优化、多主题系统 `BaseTheme` / `ZafiroTopBarLayout`）。
+
+
 ---
 
 ## HARD GATE | MUST FOLLOW
