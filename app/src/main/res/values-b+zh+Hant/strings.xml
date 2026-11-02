@@ -180,6 +180,12 @@
     <string name="ui_settings_about_telegram">Telegram 群組</string>
     <string name="ui_settings_about_feedback_feature">功能建議</string>
     <string name="ui_settings_about_feedback_bug">Bug 回報</string>
+    <string name="ui_settings_about_telemetry_title">診斷與使用情況</string>
+    <string name="ui_settings_about_telemetry_summary">發送匿名診斷數據，協助改進應用穩定性</string>
+    <string name="ui_settings_about_telemetry_dialog_title">診斷與使用情況</string>
+    <string name="ui_settings_about_telemetry_dialog_text">發送匿名診斷與效能數據，協助排查故障並提升穩定性。\n\n絕不收集個人數據、對話內容或敏感憑證。</string>
+    <string name="ui_settings_about_telemetry_dialog_positive">查看說明</string>
+    <string name="ui_settings_about_telemetry_dialog_negative">完成</string>
     <string name="ui_settings_about_version">版本</string>
 
     <string name="ui_settings_storage_description">查看各類快取佔用的空間，點選某一項即可清理。清理不會影響設定、記憶與對話記錄。</string>
@@ -410,6 +416,12 @@
     <string name="ui_settings_general_floating_ball_summary">後台運行時顯示 Agent 狀態與快捷操作</string>
     <string name="ui_settings_general_floating_ball_auto_expand">懸浮球自動展開</string>
     <string name="ui_settings_general_floating_ball_auto_expand_summary">回答結束或需要授權時自動展開懸浮球</string>
+    <string name="ui_settings_floating_ball_enable">啟用懸浮球</string>
+    <string name="ui_settings_floating_ball_auto_expand">自動展開</string>
+    <string name="ui_settings_floating_ball_opacity">貼邊不透明度</string>
+    <string name="ui_settings_floating_ball_opacity_summary">懸浮球貼邊停靠時的透明度</string>
+    <string name="ui_settings_floating_ball_submerged_offset">貼邊收起深度</string>
+    <string name="ui_settings_floating_ball_submerged_offset_summary">停靠時縮進螢幕邊緣的距離</string>
     <string name="ui_settings_general_resident_notification">常駐通知</string>
     <string name="ui_settings_general_resident_notification_summary">在通知欄顯示實時狀態與控制入口</string>
     <string name="ui_settings_general_turn_notification">回合事件提醒</string>
@@ -618,4 +630,34 @@
     <string name="text_action_error_save_failed">儲存動作失敗。</string>
     <string name="text_action_error_delete_failed">刪除動作失敗。</string>
     <string name="crash_startup_copied_toast">堆疊資訊已複製，請提交給開發者</string>
+
+    <string name="ui_settings_masking_rules">資料脫敏</string>
+    <string name="ui_settings_masking_rules_summary">外發請求前脫敏敏感資料</string>
+    <string name="masking_rules_page_description">設定敏感資料脫敏規則。外發請求中符合的內容將被替換為預留位置，本地對話與工具執行仍使用原始資料。</string>
+    <string name="masking_rules_empty_action_hint">點擊右上角以新增第一條脫敏規則。</string>
+    <string name="masking_rules_loading">正在讀取脫敏規則…</string>
+    <string name="masking_rules_editor_title_create">新增脫敏規則</string>
+    <string name="masking_rules_editor_description">敏感資料僅在外發大模型前替換為預留位置。本地聊天展示與工具執行不受影響。</string>
+    <string name="masking_rules_field_name">規則名稱</string>
+    <string name="masking_rules_field_name_hint">例如：API 金鑰</string>
+    <string name="masking_rules_field_enabled">啟用規則</string>
+    <string name="masking_rules_field_kind">標籤類型</string>
+    <string name="masking_rules_field_kind_hint">API_KEY</string>
+    <string name="masking_rules_field_kind_description">預留位置標籤前綴，例如填入 API_KEY 將替換為對應序號預留位置。</string>
+    <string name="masking_rules_field_patterns">比對規則</string>
+    <string name="masking_rules_field_patterns_hint">例如：\bsk-[a-zA-Z0-9_\-]{20,}\b</string>
+    <string name="masking_rules_field_patterns_description">每行輸入一個關鍵字或正則表達式。符合任意一項即觸發脫敏。</string>
+    <string name="masking_rules_save_action">儲存規則</string>
+    <string name="masking_rules_error_name_required">請輸入規則名稱</string>
+    <string name="masking_rules_error_kind_required">請輸入標籤類型</string>
+    <string name="masking_rules_error_kind_invalid">標籤類型不合法</string>
+    <string name="masking_rules_error_patterns_required">請輸入至少一條規則</string>
+    <string name="masking_rules_error_load_failed_generic">讀取脫敏規則失敗</string>
+    <string name="masking_rules_error_load_failed">讀取脫敏規則失敗：%1$s</string>
+    <string name="masking_rules_error_save_failed_generic">儲存脫敏規則失敗</string>
+    <string name="masking_rules_error_save_failed">儲存脫敏規則失敗：%1$s</string>
+    <string name="masking_rules_error_delete_failed_generic">刪除脫敏規則失敗</string>
+    <string name="masking_rules_error_delete_failed">刪除脫敏規則失敗：%1$s</string>
+    <string name="masking_rules_delete_dialog_title">刪除脫敏規則</string>
+    <string name="masking_rules_delete_dialog_text">確定要刪除脫敏規則「%1$s」嗎？此操作不可撤銷。</string>
 </resources>

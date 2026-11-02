@@ -16,6 +16,7 @@
 .env.*.local
 *.md
 !/.agents/skills/**/*.md
+!/docs/**/*.md
 
 ### Android / Gradle
 **/.gradle/
@@ -51,6 +52,5 @@ pnpm-debug.log*
 ### External
 /.as-run/app.run.xml
 /libterm
-packing/
 media/
 nexus-res/

@@ -12,6 +12,8 @@ import com.niki914.zafiro.app.ui.nav.CustomPyToolDetailPage
 import com.niki914.zafiro.app.ui.nav.CustomPyToolsPage
 import com.niki914.zafiro.app.ui.nav.DonePage
 import com.niki914.zafiro.app.ui.nav.ExecutionRuleDetailPage
+import com.niki914.zafiro.app.ui.nav.FloatingBallSettingsPage
+import com.niki914.zafiro.app.ui.nav.MaskingRuleDetailPage
 import com.niki914.zafiro.app.ui.nav.HomePage
 import com.niki914.zafiro.app.ui.nav.MarkdownScalePage
 import com.niki914.zafiro.app.ui.nav.McpServerDetailPage
@@ -35,6 +37,8 @@ import com.niki914.zafiro.app.ui.route.ConfigurePageRoute
 import com.niki914.zafiro.app.ui.route.ConversationHistoryPageRoute
 import com.niki914.zafiro.app.ui.route.DonePageRoute
 import com.niki914.zafiro.app.ui.route.ExecutionRuleDetailRoute
+import com.niki914.zafiro.app.ui.route.FloatingBallSettingsPageRoute
+import com.niki914.zafiro.app.ui.route.MaskingRuleDetailRoute
 import com.niki914.zafiro.app.ui.route.HomePageRoute
 import com.niki914.zafiro.app.ui.route.MarkdownScalePageRoute
 import com.niki914.zafiro.app.ui.route.McpServerDetailRoute
@@ -168,6 +172,11 @@ fun ZafiroPageContent(
             onBack = onPop,
         )
 
+        is MaskingRuleDetailPage -> MaskingRuleDetailRoute(
+            page = page,
+            onBack = onPop,
+        )
+
         is SkillDetailPage -> SkillDetailRoute(
             page = page,
             onBack = onPop,
@@ -191,6 +200,8 @@ fun ZafiroPageContent(
         )
 
         MarkdownScalePage -> MarkdownScalePageRoute()
+
+        FloatingBallSettingsPage -> FloatingBallSettingsPageRoute()
 
         is ViewerPage -> ViewerPageRoute(
             page = page,

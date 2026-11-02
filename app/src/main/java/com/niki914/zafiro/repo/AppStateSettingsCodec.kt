@@ -63,6 +63,9 @@ internal data class AppStateSettings(
     /** 是否启用 Agent 悬浮球。 */
     @SerialName("floating_ball_enabled")
     val floatingBallEnabled: Boolean = false,
+    /** 是否启用匿名体验改善计划数据上报；false = 仅保留基础冷启动与版本可用性统计。 */
+    @SerialName("telemetry_enabled")
+    val telemetryEnabled: Boolean = true,
     /** 是否启用常驻通知栏。 */
     @SerialName("resident_notification_enabled")
     val residentNotificationEnabled: Boolean = false,
@@ -75,6 +78,12 @@ internal data class AppStateSettings(
     /** 屏幕控制知情门是否自动放行；默认关（每次询问）。 */
     @SerialName("screen_control_auto_approved")
     val screenControlAutoApproved: Boolean = false,
+    /** 悬浮球贴边停靠不透明度百分比（10..100，默认 60）。 */
+    @SerialName("floating_ball_opacity_percent")
+    val floatingBallOpacityPercent: Int = 60,
+    /** 悬浮球贴边收起深度（dp，0..35，默认 8）。 */
+    @SerialName("floating_ball_submerged_offset_dp")
+    val floatingBallSubmergedOffsetDp: Int = 8,
     /** 已经向用户弹过更新提示的远端版本号；空串 = 从未弹过。同一版本只提示一次。 */
     @SerialName("last_notified_update_version")
     val lastNotifiedUpdateVersion: String = "",
@@ -126,6 +135,8 @@ internal object AppStateSettingsCodec {
                         fixed.repetitionSensitivity
                     ).wireValue,
                     contextCompactionThresholdPercent = sanitizedCompactionThreshold,
+                    floatingBallOpacityPercent = fixed.floatingBallOpacityPercent.coerceIn(10, 100),
+                    floatingBallSubmergedOffsetDp = fixed.floatingBallSubmergedOffsetDp.coerceIn(0, 35),
                 )
             }
         } catch (_: SerializationException) {

@@ -1,3 +1,4 @@
+// githooks:ignore-file file-token-limit
 package com.niki914.zafiro.runtime.service
 
 import android.app.NotificationChannel
@@ -19,9 +20,12 @@ import com.niki914.zafiro.api.Agent
 import com.niki914.zafiro.api.AgentControl
 import com.niki914.zafiro.api.AgentManager
 import com.niki914.zafiro.api.TurnStart
+import com.niki914.zafiro.api.telemetry.Metrics
 import com.niki914.zafiro.api.model.AgentState
 import com.niki914.zafiro.api.model.ApprovalDecision
 import com.niki914.zafiro.api.model.TurnFailureCode
+import com.niki914.zafiro.api.model.isRunning
+import com.niki914.zafiro.app.MainActivity
 import com.niki914.zafiro.app.notification.ResidentNotificationBuilder
 import com.niki914.zafiro.app.notification.ResidentNotificationManager
 import com.niki914.zafiro.app.notification.TurnNotificationManager
@@ -44,6 +48,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -198,11 +203,21 @@ class AgentRuntimeService : Service() {
             }
             Logger.i(LOG_TAG, "submit accepted queryLength=${q.length}")
 
+            val callingUid = getCallingUid()
+            val callingPackages = packageManager.getPackagesForUid(callingUid)
+            val host = callingPackages?.firstNotNullOfOrNull { HostApp.fromPackageName(it) }
+
             try {
                 cb.asBinder().linkToDeath(deathRecipient, 0)
             } catch (e: Exception) {
                 Logger.e(LOG_TAG, "submit failed linkToDeath error=${e.message}")
                 return
+            }
+
+            when (host) {
+                HostApp.Breeno -> Metrics.takeoverInvoke("breeno")
+                HostApp.XiaoAi -> Metrics.takeoverInvoke("xiaoai")
+                null -> Unit
             }
 
             val isIsolated = runBlocking { XRepo.voiceAssistantIsolatedSession() }
@@ -498,9 +513,9 @@ class AgentRuntimeService : Service() {
                     }
                 }
 
-                turnAgent.status.first { state ->
-                    state is AgentState.Idle
-                }
+                turnAgent.status
+                    .dropWhile { !it.isRunning }
+                    .first { !it.isRunning }
                 conversationJob.cancel()
             }
 

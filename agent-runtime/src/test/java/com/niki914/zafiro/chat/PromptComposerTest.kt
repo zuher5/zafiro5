@@ -97,11 +97,16 @@ class PromptComposerTest {
             )
         )
 
-        assertTrue(result.finalSystemPrompt.contains(PromptComposer.EXECUTION_RULES_GUIDANCE))
+        assertTrue(result.finalSystemPrompt.contains(PromptComposer.HARNESS_RULES_GUIDANCE))
+        assertTrue(result.finalSystemPrompt.contains("# Harness rules"))
+        assertTrue(result.finalSystemPrompt.contains("- Execution:"))
+        assertTrue(result.finalSystemPrompt.contains("- Redaction:"))
+        assertTrue(result.finalSystemPrompt.contains(PromptComposer.TOOL_USE_ENFORCEMENT_GUIDANCE))
+        assertTrue(result.finalSystemPrompt.contains("ui_intent"))
     }
 
     @Test
-    fun compose_omitsExecutionRulesGuidanceWhenNoTools() {
+    fun compose_omitsHarnessRulesGuidanceWhenNoTools() {
         val result = PromptComposer().compose(
             PromptComposerInput(
                 additionalInstructions = "base",
@@ -109,7 +114,7 @@ class PromptComposerTest {
             )
         )
 
-        assertFalse(result.finalSystemPrompt.contains(PromptComposer.EXECUTION_RULES_GUIDANCE))
+        assertFalse(result.finalSystemPrompt.contains(PromptComposer.HARNESS_RULES_GUIDANCE))
     }
 
     @Test

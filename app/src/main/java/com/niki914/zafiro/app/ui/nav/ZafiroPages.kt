@@ -226,6 +226,20 @@ data class TakeoverRuleDetailPage(
         if (isCreating) null else TopBarActionSpec(icon = Icons.Default.Delete, contentDescription = "Delete Button")
 }
 
+data class MaskingRuleDetailPage(
+    val ruleId: String?,
+    val ruleName: String,
+    val ruleIndex: Int,
+    val isCreating: Boolean = false,
+) : ZafiroPage {
+    override val routeKey: String = "masking-rule-detail:${ruleId ?: "new"}:$ruleIndex:$ruleName"
+    override val titleSpec: PageTitleSpec = TextTitle(ruleName)
+    override val leftAction: TopBarActionSpec =
+        TopBarActionSpec(icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back Button")
+    override val rightAction: TopBarActionSpec? =
+        if (isCreating) null else TopBarActionSpec(icon = Icons.Default.Delete, contentDescription = "Delete Button")
+}
+
 data object PromptEditPage : ZafiroPage {
     override val routeKey: String = "prompt-edit"
     override val titleSpec: PageTitleSpec = ResTitle(R.string.ui_settings_configure_prompt_label)
@@ -298,6 +312,15 @@ data object MarkdownScalePage : ZafiroPage {
     override val leftAction: TopBarActionSpec =
         TopBarActionSpec(icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back Button")
     override val rightAction: TopBarActionSpec? = null
+}
+
+data object FloatingBallSettingsPage : ZafiroPage {
+    override val routeKey: String = "floating-ball-settings"
+    override val titleSpec: PageTitleSpec = ResTitle(R.string.ui_settings_general_floating_ball)
+    override val leftAction: TopBarActionSpec =
+        TopBarActionSpec(icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back Button")
+    override val rightAction: TopBarActionSpec? = null
+    override val titleMode: TitleBarMode = TitleBarMode.Collapsible
 }
 
 data class ViewerPage(

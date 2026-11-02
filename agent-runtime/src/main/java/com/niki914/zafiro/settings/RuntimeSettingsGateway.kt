@@ -5,6 +5,7 @@ import com.niki914.zafiro.settings.model.RuntimeCustomPyTool
 import com.niki914.zafiro.settings.model.RuntimeExecutionRule
 import com.niki914.zafiro.settings.model.RuntimeLlmConfig
 import com.niki914.zafiro.settings.model.RuntimeLoadedSkill
+import com.niki914.zafiro.settings.model.RuntimeMaskingRule
 import com.niki914.zafiro.settings.model.RuntimeMcpServer
 import com.niki914.zafiro.settings.model.RuntimeSkillMetadata
 import com.niki914.zafiro.settings.model.RuntimeToolValidation
@@ -58,4 +59,5 @@ interface RuntimeSettingsGateway {
      * 默认 false = 保持每次询问；宿主路径不实现即维持原行为。
      */
     suspend fun isScreenControlAutoApproved(): Boolean = false
+    suspend fun listMaskingRules(): List<RuntimeMaskingRule> = emptyList()
 }
