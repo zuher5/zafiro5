@@ -130,6 +130,11 @@ AI 对话通常是以 list 的形式存放 messages，同时只会有一个对�
   - Android 构建只在 GitHub Actions 执行；本地环境不作为 Gradle、Chaquopy 或签名构建环境，不要在本地运行 Android build。
   - Release 构建使用 `.github/workflows/release.yml` 的 `workflow_dispatch` 或版本 tag 触发；签名构建依赖 GitHub Secrets。
   - 触发 workflow 前必须确认目标 commit 已推送到 GitHub，并保留 workflow run URL 与最终 artifact/release 状态作为验证证据。
+- **构建指令语义 (Release Command Semantics)** — 用户以短语下达构建/发布指令，按字面范围执行，不扩大也不缩小：
+  - **`debug release`**：只构建 Debug APK，不打 tag、不发 Release。Debug 包名带 `.debug` 后缀（`com.niki914.zafiro.debug`，与 Release 共存，见上）。产物为 `Build APK` workflow 的 artifact。
+  - **`tag release`**：执行 Signed Release 并直接打版本 tag（`v<versionName>`）推送，由 CI `Release Build` 构建签名 APK 并创建 GitHub Release，随后设置标题与双语 notes。
+  - **`release`**（单独一词）：两者全做——先出 Debug artifact，再做 Signed Release，Signed Release 照常打 tag。
+  - 用户只说其中一条时严格只做那一条；例如 `debug release` 后不要顺带 tag。tag 前若版本未 bump，先走 `release-new-version` skill 完成版本号与 notes 的确认。
 
 
 ---
