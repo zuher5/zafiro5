@@ -124,6 +124,10 @@ AI 对话通常是以 list 的形式存放 messages，同时只会有一个对�
   - 对话历史列表中每一项封装在 `SwipeToDismissBox` 中：向右滑重命名会话，向左滑删除会话。在进行合并和 UI 重构时必须完整保留该能力。
 - **Upstream 同步基线**:
   - 已完整合并 upstream `v16-1.9.0`（包含 Room 全文搜索 `ZafiroSearchBar`、Viewer 媒体导航、输入框折叠优化、多主题系统 `BaseTheme` / `ZafiroTopBarLayout`）。
+- **构建与发布约束 (GitHub Actions Only)**:
+  - Android 构建只在 GitHub Actions 执行；本地环境不作为 Gradle、Chaquopy 或签名构建环境，不要在本地运行 Android build。
+  - Release 构建使用 `.github/workflows/release.yml` 的 `workflow_dispatch` 或版本 tag 触发；签名构建依赖 GitHub Secrets。
+  - 触发 workflow 前必须确认目标 commit 已推送到 GitHub，并保留 workflow run URL 与最终 artifact/release 状态作为验证证据。
 
 
 ---
