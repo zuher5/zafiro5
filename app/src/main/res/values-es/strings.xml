@@ -11,6 +11,8 @@
     <string name="ui_onboard_configure_title">Configurar modelo</string>
     <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafiro.</string>
     <string name="ui_onboard_configure_next">Siguiente</string>
+    <string name="ui_onboard_existing_backup_lead">¿Ya tienes una copia de seguridad?</string>
+    <string name="ui_onboard_existing_backup_action">Importar datos</string>
     <string name="ui_onboard_configure_endpoint_override_title">Endpoint personalizado</string>
     <string name="ui_onboard_configure_endpoint_override_description_off">Usar endpoint predeterminado</string>
     <string name="ui_onboard_configure_endpoint_override_description_on">Se usará un endpoint personalizado</string>
@@ -232,6 +234,36 @@
     <string name="ui_settings_configure_error_proxy_invalid">La dirección del proxy no es un URI válido</string>
     <string name="ui_settings_mcp_config">Configuración de MCP</string>
 
+    <!-- Context Injection -->
+    <string name="ui_settings_context_injection">Inyección de contexto</string>
+    <string name="ui_settings_context_injection_summary">Adjunta hora, estado del dispositivo y contenido personalizado con mensajes</string>
+    <string name="ui_settings_env_context_description">Adjunta el contexto actual a los mensajes de usuario en cada turno. Colocar contenido que cambia con frecuencia en el prompt del sistema anularía la caché del modelo y aumentaría los costes.</string>
+    <string name="ui_settings_env_context_master_toggle">Habilitar inyección de contexto</string>
+    <string name="ui_settings_env_context_master_summary">Permite proporcionar la hora, información del dispositivo y contenido personalizado al modelo</string>
+    <string name="ui_settings_env_context_group_builtin">Variables integradas</string>
+    <string name="ui_settings_env_context_key_date">Fecha</string>
+    <string name="ui_settings_env_context_key_time">Hora</string>
+    <string name="ui_settings_env_context_key_device">Estado del dispositivo</string>
+    <string name="ui_settings_env_context_group_custom">Variables personalizadas</string>
+    <string name="ui_settings_env_context_empty_custom">No hay variables personalizadas. Toque «+» arriba a la derecha para añadir una.</string>
+    <string name="ui_settings_env_context_variable_title_create">Añadir variable</string>
+    <string name="ui_settings_env_context_variable_description">Añade contexto estático adjunto a los mensajes. El nombre sirve de identificación y el modelo leerá el contenido configurado aquí en cada turno.</string>
+    <string name="ui_settings_env_context_field_name">Nombre</string>
+    <string name="ui_settings_env_context_field_name_hint">Solo letras, números, guiones y guiones bajos</string>
+    <string name="ui_settings_env_context_field_enabled">Habilitar</string>
+    <string name="ui_settings_env_context_field_content">Contenido</string>
+    <string name="ui_settings_env_context_field_content_hint">Introduce el texto que se adjuntará a los mensajes</string>
+    <string name="ui_settings_env_context_save_action">Guardar variable</string>
+    <string name="ui_settings_env_context_delete_dialog_title">Eliminar variable</string>
+    <string name="ui_settings_env_context_delete_dialog_text">¿Seguro que desea eliminar la variable «%1$s»?</string>
+    <string name="ui_settings_env_context_error_key_required">El nombre no puede estar vacío</string>
+    <string name="ui_settings_env_context_error_key_reserved">No se pueden usar nombres reservados: date, time, device</string>
+    <string name="ui_settings_env_context_error_key_duplicate">Este nombre ya existe, elija otro</string>
+    <string name="ui_settings_env_context_error_key_invalid_format">Formato inválido. Solo se admiten caracteres alfanuméricos, guiones y guiones bajos</string>
+    <string name="ui_settings_env_context_error_value_required">El contenido no puede estar vacío</string>
+    <string name="ui_settings_env_context_error_save_failed">Error al guardar: %1$s</string>
+    <string name="ui_settings_env_context_error_delete_failed">Error al eliminar: %1$s</string>
+
     <!-- Memory Module -->
     <string name="memory_page_description">Gestione memorias guardadas. Deslice a la izquierda o derecha para eliminar, o toque para editar. Una vez añadidas, el agente las recordará en todas las conversaciones.</string>
     <string name="memory_page_empty_description">No hay memorias guardadas. Toque el botón superior derecho para añadir la primera.</string>
@@ -441,6 +473,8 @@
     <string name="ui_tool_display_screen_operation_accessibility">Operaciones de pantalla</string>
     <string name="ui_tool_display_screen_operation_shell">Operaciones de pantalla</string>
     <string name="ui_tool_display_screenshot">Captura de pantalla</string>
+    <string name="ui_tool_display_phone_use">Phone Use</string>
+    <string name="ui_tool_display_open">Open</string>
     <string name="ui_tool_display_view_image">Ver imagen</string>
     <string name="ui_tool_display_py_meta_tools">Herramienta personalizada de Python</string>
     <string name="dialog_cancel">Cancelar</string>
@@ -448,6 +482,34 @@
     <string name="ui_settings_section_general">General</string>
     <string name="ui_settings_general">Ajustes generales</string>
     <string name="ui_settings_general_summary">Comportamiento de inicio y ejecución</string>
+    <string name="ui_settings_backup">Copia y restauración</string>
+    <string name="ui_settings_backup_description">Exportar o importar ajustes, chats y reglas</string>
+    <string name="ui_settings_backup_export">Exportar</string>
+    <string name="ui_settings_backup_export_summary">Elige qué guardar en un archivo</string>
+    <string name="ui_settings_backup_import">Importar</string>
+    <string name="ui_settings_backup_import_summary">Restaurar desde un archivo</string>
+    <string name="ui_backup_group_conversations">Chats</string>
+    <string name="ui_backup_group_config">Modelos y ajustes básicos</string>
+    <string name="ui_backup_group_tools">Herramientas</string>
+    <string name="ui_backup_group_skills">Habilidades</string>
+    <string name="ui_backup_group_execution">Reglas de ejecución de comandos</string>
+    <string name="ui_backup_group_masking">Reglas de enmascaramiento</string>
+    <string name="ui_backup_group_takeover">Reglas de control del anfitrión</string>
+    <string name="ui_backup_include_secrets">Incluir secretos</string>
+    <string name="ui_backup_include_secrets_summary">Incluir claves de modelo y credenciales MCP</string>
+    <string name="ui_backup_strategy">Forma de importar</string>
+    <string name="ui_backup_strategy_merge">Combinar</string>
+    <string name="ui_backup_strategy_overwrite">Sobrescribir</string>
+    <string name="ui_backup_restart">Reiniciar ahora</string>
+    <string name="ui_backup_export_done">Exportado</string>
+    <string name="ui_backup_import_invalid">No es un archivo de copia válido</string>
+    <string name="ui_backup_export_failed">Error al exportar</string>
+    <string name="ui_backup_import_failed">Error al importar</string>
+    <string name="ui_backup_data_unchanged">Los datos no se modificaron</string>
+    <string name="ui_backup_failure_copied">Copiado</string>
+    <string name="ui_backup_select_all">Seleccionar todo</string>
+    <string name="ui_backup_select_none">No seleccionar nada</string>
+    <string name="ui_backup_restoring">Restaurando</string>
     <string name="ui_settings_general_group_appearance">Apariencia e idioma</string>
     <string name="ui_settings_general_group_floating_notification">Flotante y notificaciones</string>
     <string name="ui_settings_general_group_conversation">Conversación e interacción</string>
@@ -477,6 +539,8 @@
     <string name="ui_settings_general_retry_summary">Reintentos automáticos tras un error de solicitud</string>
     <string name="ui_settings_general_keep_screen_on">Mantener la pantalla encendida al responder</string>
     <string name="ui_settings_general_keep_screen_on_summary">Mantener la pantalla encendida mientras el agente responde y ejecuta herramientas</string>
+    <string name="ui_settings_general_screen_control_auto_approve">Aprobar el control de pantalla automáticamente</string>
+    <string name="ui_settings_general_screen_control_auto_approve_summary">Omitir la confirmación antes de que el agente lea o toque la pantalla.</string>
     <string name="ui_settings_runtime_control">Control de ejecución</string>
     <string name="ui_settings_runtime_control_summary">Límites, reintentos y detección de repeticiones</string>
     <string name="ui_settings_runtime_group_network">Red</string>
@@ -494,6 +558,7 @@
     <string name="ui_settings_runtime_sensitivity_stricter">Más estricta</string>
     <string name="ui_settings_runtime_sensitivity_strictest">Muy estricta</string>
     <string name="ui_settings_runtime_sensitivity_off">Desactivada</string>
+    <string name="ui_settings_runtime_stop_on_command_deny">Detener el turno al rechazar un comando</string>
     <string name="ui_settings_general_always_show_message_actions">Mostrar siempre las acciones de los mensajes</string>
     <string name="ui_settings_general_always_show_detailed_tool_output">Mostrar siempre la salida detallada de las herramientas</string>
     <string name="ui_settings_general_always_show_detailed_tool_output_summary">Salidas muy extensas pueden causar ralentizaciones en la interfaz</string>

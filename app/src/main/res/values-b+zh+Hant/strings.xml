@@ -11,6 +11,8 @@
     <string name="ui_onboard_configure_title">設定模型連接資訊</string>
     <string name="ui_onboard_configure_description">填寫模型設定，完成後即可開始使用。</string>
     <string name="ui_onboard_configure_next">下一步</string>
+    <string name="ui_onboard_existing_backup_lead">已有備份？</string>
+    <string name="ui_onboard_existing_backup_action">匯入資料</string>
     <string name="ui_onboard_configure_endpoint_override_title">自訂端點</string>
     <string name="ui_onboard_configure_endpoint_override_description_off">使用預設端點</string>
     <string name="ui_onboard_configure_endpoint_override_description_on">將使用自訂端點</string>
@@ -230,6 +232,36 @@
     <string name="ui_settings_configure_error_proxy_invalid">代理位址不是有效的 URI</string>
     <string name="ui_settings_mcp_config">MCP 設定</string>
 
+    <!-- Context Injection -->
+    <string name="ui_settings_context_injection">上下文注入</string>
+    <string name="ui_settings_context_injection_summary">隨訊息附帶時間、設備狀態及自訂內容</string>
+    <string name="ui_settings_env_context_description">每輪隨使用者訊息附帶當前上下文。若將其直接置于系統提示詞中，頻繁變化的內容會破壞模型快取命中並導致費用提高。</string>
+    <string name="ui_settings_env_context_master_toggle">啟用上下文注入</string>
+    <string name="ui_settings_env_context_master_summary">允許將時間、設備資訊與自訂內容提供給模型</string>
+    <string name="ui_settings_env_context_group_builtin">內建變數</string>
+    <string name="ui_settings_env_context_key_date">日期</string>
+    <string name="ui_settings_env_context_key_time">時間</string>
+    <string name="ui_settings_env_context_key_device">設備狀態</string>
+    <string name="ui_settings_env_context_group_custom">自訂變數</string>
+    <string name="ui_settings_env_context_empty_custom">暫無自訂變數。點擊右上角「+」新增。</string>
+    <string name="ui_settings_env_context_variable_title_create">新增變數</string>
+    <string name="ui_settings_env_context_variable_description">新增隨訊息附帶的靜態上下文。名稱用於管理標識，模型在每輪對話中將讀取此處配置的內容。</string>
+    <string name="ui_settings_env_context_field_name">名稱</string>
+    <string name="ui_settings_env_context_field_name_hint">僅支援字母、數字、底線及連字號</string>
+    <string name="ui_settings_env_context_field_enabled">開啟</string>
+    <string name="ui_settings_env_context_field_content">內容</string>
+    <string name="ui_settings_env_context_field_content_hint">輸入要隨訊息附帶的文字</string>
+    <string name="ui_settings_env_context_save_action">儲存變數</string>
+    <string name="ui_settings_env_context_delete_dialog_title">刪除變數</string>
+    <string name="ui_settings_env_context_delete_dialog_text">確定要刪除變數「%1$s」嗎？</string>
+    <string name="ui_settings_env_context_error_key_required">名稱不能為空</string>
+    <string name="ui_settings_env_context_error_key_reserved">不可使用系統保留名稱：date、time、device</string>
+    <string name="ui_settings_env_context_error_key_duplicate">該名稱已存在，請更換</string>
+    <string name="ui_settings_env_context_error_key_invalid_format">名稱格式不合規，僅支援字母、數字、底線及連字號</string>
+    <string name="ui_settings_env_context_error_value_required">內容不能為空</string>
+    <string name="ui_settings_env_context_error_save_failed">儲存失敗：%1$s</string>
+    <string name="ui_settings_env_context_error_delete_failed">刪除失敗：%1$s</string>
+
     <!-- Memory Module -->
     <string name="memory_page_description">管理記憶。你可以左右滑動以刪除，點擊以編輯單條記憶。新增後，Agent 即使在新對話中也會記得這些內容。</string>
     <string name="memory_page_empty_description">目前沒有已儲存的記憶。點擊右上角以新增第一條記憶。</string>
@@ -402,6 +434,8 @@
     <string name="ui_tool_display_screen_operation_accessibility">螢幕操作</string>
     <string name="ui_tool_display_screen_operation_shell">螢幕操作</string>
     <string name="ui_tool_display_screenshot">擷取螢幕</string>
+    <string name="ui_tool_display_phone_use">Phone Use</string>
+    <string name="ui_tool_display_open">Open</string>
     <string name="ui_tool_display_view_image">檢視圖片</string>
     <string name="ui_tool_display_py_meta_tools">自訂 Python 工具</string>
     <string name="dialog_cancel">取消</string>
@@ -409,6 +443,34 @@
     <string name="ui_settings_section_general">一般</string>
     <string name="ui_settings_general">通用設定</string>
     <string name="ui_settings_general_summary">啟動與運行行為</string>
+    <string name="ui_settings_backup">備份與還原</string>
+    <string name="ui_settings_backup_description">匯出或匯入設定、對話和規則</string>
+    <string name="ui_settings_backup_export">匯出</string>
+    <string name="ui_settings_backup_export_summary">選擇內容，儲存成檔案</string>
+    <string name="ui_settings_backup_import">匯入</string>
+    <string name="ui_settings_backup_import_summary">從備份檔案還原</string>
+    <string name="ui_backup_group_conversations">對話</string>
+    <string name="ui_backup_group_config">模型與基本設定</string>
+    <string name="ui_backup_group_tools">工具</string>
+    <string name="ui_backup_group_skills">技能</string>
+    <string name="ui_backup_group_execution">命令執行規則</string>
+    <string name="ui_backup_group_masking">脫敏規則</string>
+    <string name="ui_backup_group_takeover">宿主接管規則</string>
+    <string name="ui_backup_include_secrets">包含密鑰</string>
+    <string name="ui_backup_include_secrets_summary">包含模型密鑰和 MCP 憑證</string>
+    <string name="ui_backup_strategy">匯入方式</string>
+    <string name="ui_backup_strategy_merge">合併</string>
+    <string name="ui_backup_strategy_overwrite">覆蓋</string>
+    <string name="ui_backup_restart">立即重新啟動</string>
+    <string name="ui_backup_export_done">已匯出</string>
+    <string name="ui_backup_import_invalid">不是有效的備份檔案</string>
+    <string name="ui_backup_export_failed">匯出失敗</string>
+    <string name="ui_backup_import_failed">匯入失敗</string>
+    <string name="ui_backup_data_unchanged">資料未修改</string>
+    <string name="ui_backup_failure_copied">已複製</string>
+    <string name="ui_backup_select_all">全選</string>
+    <string name="ui_backup_select_none">全不選</string>
+    <string name="ui_backup_restoring">正在還原</string>
     <string name="ui_settings_general_group_appearance">外觀與語言</string>
     <string name="ui_settings_general_group_floating_notification">懸浮與通知</string>
     <string name="ui_settings_general_group_conversation">對話與互動</string>
@@ -438,6 +500,8 @@
     <string name="ui_settings_general_retry_summary">請求失敗後的自動重試</string>
     <string name="ui_settings_general_keep_screen_on">回應期間保持螢幕常亮</string>
     <string name="ui_settings_general_keep_screen_on_summary">回應與工具執行期間保持螢幕常亮</string>
+    <string name="ui_settings_general_screen_control_auto_approve">自動允許螢幕控制</string>
+    <string name="ui_settings_general_screen_control_auto_approve_summary">略過 Agent 讀取或點擊螢幕前的確認。</string>
     <string name="ui_settings_runtime_control">執行控制</string>
     <string name="ui_settings_runtime_control_summary">上限、重試與複讀偵測</string>
     <string name="ui_settings_runtime_group_network">網路</string>
@@ -455,6 +519,7 @@
     <string name="ui_settings_runtime_sensitivity_stricter">更嚴格</string>
     <string name="ui_settings_runtime_sensitivity_strictest">極嚴</string>
     <string name="ui_settings_runtime_sensitivity_off">關閉</string>
+    <string name="ui_settings_runtime_stop_on_command_deny">拒絕命令後停止本回合</string>
     <string name="ui_settings_general_always_show_message_actions">總是顯示訊息操作</string>
     <string name="ui_settings_general_always_show_detailed_tool_output">總是展示工具詳細輸出</string>
     <string name="ui_settings_general_always_show_detailed_tool_output_summary">輸出內容過大可能會導致介面卡頓</string>

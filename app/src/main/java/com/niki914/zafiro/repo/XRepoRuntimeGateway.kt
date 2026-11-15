@@ -91,6 +91,7 @@ class XRepoRuntimeGateway(
             // 空串/旧格式的 0 = 未设置：用户 > 云端 > 默认
             maxTokens = maxTokens,
             contextWindowTokens = contextWindowLimit.first,
+            envContext = doc.envContext,
         )
     }
 
@@ -170,8 +171,6 @@ class XRepoRuntimeGateway(
         return repo.executionRules.list()
     }
 
-    override suspend fun isScreenControlAutoApproved(): Boolean =
-        repo.screenControlAutoApproved()
     override suspend fun listMaskingRules(): List<RuntimeMaskingRule> {
         return repo.maskingRules.list()
     }

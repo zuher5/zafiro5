@@ -50,6 +50,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -98,6 +99,7 @@ fun SettingCardItem(
     highlightPulseDurationMillis: Int = 500,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
+    hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.ContextClick,
 ) {
     val isExpandable = expandableSlot !is SettingExpandableSlot.None
 
@@ -139,9 +141,12 @@ fun SettingCardItem(
 
     var trailingActionBounds by remember { mutableStateOf<Rect?>(null) }
 
-    // 箭头旋转动画：展开时顺时针旋转 90°
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    // 箭头旋转动画：展开时旋转至朝下（LTR 顺时针 90°，RTL 逆时针 90°）
     val animatedChevronRotation by animateFloatAsState(
-        targetValue = if (isExpanded) 90f else 0f,
+        targetValue = if (isExpanded) {
+            if (isRtl) -90f else 90f
+        } else 0f,
         animationSpec = tween(
             durationMillis = SettingsTokens.ArrowAnimationDurationMs,
             easing = FastOutSlowInEasing,
@@ -169,6 +174,7 @@ fun SettingCardItem(
             highlightPulseDurationMillis = highlightPulseDurationMillis,
             onClick = effectiveOnClick,
             onLongClick = onLongClick,
+            hapticFeedbackType = hapticFeedbackType,
             onTrailingActionClick = trailingAction,
             trailingActionBoundsInWindow = if (trailingAction != null) trailingActionBounds else null,
         ) {

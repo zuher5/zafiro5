@@ -67,6 +67,7 @@ private fun settingsSections(): List<SettingsSectionDefinition> {
             groups = listOf(
                 ZafiroSettingsGroup.ModelConfig,
                 ZafiroSettingsGroup.Memory,
+                ZafiroSettingsGroup.ContextInjection,
                 ZafiroSettingsGroup.RuntimeControl,
             ),
         ),
@@ -74,6 +75,7 @@ private fun settingsSections(): List<SettingsSectionDefinition> {
             titleRes = R.string.ui_settings_section_general,
             groups = listOf(
                 ZafiroSettingsGroup.Theme,
+                ZafiroSettingsGroup.Backup,
                 ZafiroSettingsGroup.GeneralSettings,
             ),
         ),

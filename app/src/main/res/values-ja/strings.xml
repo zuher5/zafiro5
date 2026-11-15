@@ -11,6 +11,8 @@
     <string name="ui_onboard_configure_title">モデル連携情報の設定</string>
     <string name="ui_onboard_configure_description">モデル設定を入力すると、すぐに利用を開始できます。</string>
     <string name="ui_onboard_configure_next">次へ</string>
+    <string name="ui_onboard_existing_backup_lead">バックアップはありますか？</string>
+    <string name="ui_onboard_existing_backup_action">データを読み込む</string>
     <string name="ui_onboard_configure_endpoint_override_title">カスタムエンドポイント</string>
     <string name="ui_onboard_configure_endpoint_override_description_off">デフォルトのエンドポイントを使用</string>
     <string name="ui_onboard_configure_endpoint_override_description_on">カスタムエンドポイントを使用</string>
@@ -230,6 +232,36 @@
     <string name="ui_settings_configure_error_proxy_invalid">プロキシアドレスが有効な URI ではありません</string>
     <string name="ui_settings_mcp_config">MCP 設定</string>
 
+    <!-- Context Injection -->
+    <string name="ui_settings_context_injection">コンテキスト注入</string>
+    <string name="ui_settings_context_injection_summary">メッセージに時間、端末状態、カスタム内容を添付</string>
+    <string name="ui_settings_env_context_description">毎ターンのユーザーメッセージに現在のコンテキストを添付します。頻繁に変化する内容をシステムプロンプトに置くと、キャッシュヒットが損なわれコストが増加します。</string>
+    <string name="ui_settings_env_context_master_toggle">コンテキスト注入を有効化</string>
+    <string name="ui_settings_env_context_master_summary">時間、端末情報、カスタム内容のモデルへの提供を許可</string>
+    <string name="ui_settings_env_context_group_builtin">組み込み変数</string>
+    <string name="ui_settings_env_context_key_date">日付</string>
+    <string name="ui_settings_env_context_key_time">時刻</string>
+    <string name="ui_settings_env_context_key_device">端末ステータス</string>
+    <string name="ui_settings_env_context_group_custom">カスタム変数</string>
+    <string name="ui_settings_env_context_empty_custom">カスタム変数はまだありません。右上の「+」をタップして追加してください。</string>
+    <string name="ui_settings_env_context_variable_title_create">変数を追加</string>
+    <string name="ui_settings_env_context_variable_description">メッセージに添付する静的コンテキストを追加します。名前は管理用の識別子であり、モデルは各ターンでここで設定された内容を読み取ります。</string>
+    <string name="ui_settings_env_context_field_name">名前</string>
+    <string name="ui_settings_env_context_field_name_hint">半角英数字、アンダースコア、ハイフンのみ</string>
+    <string name="ui_settings_env_context_field_enabled">有効</string>
+    <string name="ui_settings_env_context_field_content">内容</string>
+    <string name="ui_settings_env_context_field_content_hint">メッセージに添付するテキストを入力</string>
+    <string name="ui_settings_env_context_save_action">変数を保存</string>
+    <string name="ui_settings_env_context_delete_dialog_title">変数を削除</string>
+    <string name="ui_settings_env_context_delete_dialog_text">変数「%1$s」を削除してもよろしいですか？</string>
+    <string name="ui_settings_env_context_error_key_required">名前を入力してください</string>
+    <string name="ui_settings_env_context_error_key_reserved">予約された名前は使用できません：date、time、device</string>
+    <string name="ui_settings_env_context_error_key_duplicate">この名前は既に存在します</string>
+    <string name="ui_settings_env_context_error_key_invalid_format">形式が無効です。半角英数字、アンダースコア、ハイフンのみ使用できます</string>
+    <string name="ui_settings_env_context_error_value_required">内容を入力してください</string>
+    <string name="ui_settings_env_context_error_save_failed">保存に失敗しました：%1$s</string>
+    <string name="ui_settings_env_context_error_delete_failed">削除に失敗しました：%1$s</string>
+
     <!-- Memory Module -->
     <string name="memory_page_description">メモリを管理します。左右にスワイプして削除、タップして単一のメモリを編集できます。追加された内容は、新しい会話でも Agent に記憶されます。</string>
     <string name="memory_page_empty_description">保存されたメモリはありません。右上のボタンをタップして最初のメモリを追加してください。</string>
@@ -439,6 +471,8 @@
     <string name="ui_tool_display_screen_operation_accessibility">画面操作</string>
     <string name="ui_tool_display_screen_operation_shell">画面操作</string>
     <string name="ui_tool_display_screenshot">スクリーンショット</string>
+    <string name="ui_tool_display_phone_use">Phone Use</string>
+    <string name="ui_tool_display_open">Openく</string>
     <string name="ui_tool_display_view_image">画像を表示</string>
     <string name="ui_tool_display_py_meta_tools">カスタム Python ツール</string>
     <string name="dialog_cancel">キャンセル</string>
@@ -446,6 +480,34 @@
     <string name="ui_settings_section_general">一般</string>
     <string name="ui_settings_general">一般設定</string>
     <string name="ui_settings_general_summary">起動と実行時の動作</string>
+    <string name="ui_settings_backup">バックアップと復元</string>
+    <string name="ui_settings_backup_description">設定、会話、ルールを書き出すか読み込む</string>
+    <string name="ui_settings_backup_export">書き出す</string>
+    <string name="ui_settings_backup_export_summary">内容を選んでファイルに保存</string>
+    <string name="ui_settings_backup_import">読み込む</string>
+    <string name="ui_settings_backup_import_summary">バックアップファイルから復元</string>
+    <string name="ui_backup_group_conversations">会話</string>
+    <string name="ui_backup_group_config">モデルと基本設定</string>
+    <string name="ui_backup_group_tools">ツール</string>
+    <string name="ui_backup_group_skills">スキル</string>
+    <string name="ui_backup_group_execution">コマンド実行ルール</string>
+    <string name="ui_backup_group_masking">マスキングルール</string>
+    <string name="ui_backup_group_takeover">ホスト引き継ぎルール</string>
+    <string name="ui_backup_include_secrets">シークレットを含める</string>
+    <string name="ui_backup_include_secrets_summary">モデルの鍵と MCP の資格情報を含める</string>
+    <string name="ui_backup_strategy">読み込み方</string>
+    <string name="ui_backup_strategy_merge">統合</string>
+    <string name="ui_backup_strategy_overwrite">上書き</string>
+    <string name="ui_backup_restart">今すぐ再起動</string>
+    <string name="ui_backup_export_done">書き出しました</string>
+    <string name="ui_backup_import_invalid">有効なバックアップファイルではありません</string>
+    <string name="ui_backup_export_failed">書き出しに失敗しました</string>
+    <string name="ui_backup_import_failed">読み込みに失敗しました</string>
+    <string name="ui_backup_data_unchanged">データは変更されていません</string>
+    <string name="ui_backup_failure_copied">コピーしました</string>
+    <string name="ui_backup_select_all">すべて選択</string>
+    <string name="ui_backup_select_none">すべて解除</string>
+    <string name="ui_backup_restoring">復元しています</string>
     <string name="ui_settings_general_group_appearance">外観と言語</string>
     <string name="ui_settings_general_group_floating_notification">フローティングと通知</string>
     <string name="ui_settings_general_group_conversation">会話と操作</string>
@@ -475,6 +537,8 @@
     <string name="ui_settings_general_retry_summary">リクエスト失敗後の自動リトライ</string>
     <string name="ui_settings_general_keep_screen_on">回答中は画面をオンに保つ</string>
     <string name="ui_settings_general_keep_screen_on_summary">エージェントの応答とツール実行中は画面をオフにしません</string>
+    <string name="ui_settings_general_screen_control_auto_approve">画面制御を自動承認</string>
+    <string name="ui_settings_general_screen_control_auto_approve_summary">Agent が画面を読み取る・タップする前の確認を省略します。</string>
     <string name="ui_settings_runtime_control">実行制御</string>
     <string name="ui_settings_runtime_control_summary">上限・再試行・繰り返し検出</string>
     <string name="ui_settings_runtime_group_network">ネットワーク</string>
@@ -492,6 +556,7 @@
     <string name="ui_settings_runtime_sensitivity_stricter">より厳しい</string>
     <string name="ui_settings_runtime_sensitivity_strictest">最も厳しい</string>
     <string name="ui_settings_runtime_sensitivity_off">オフ</string>
+    <string name="ui_settings_runtime_stop_on_command_deny">コマンド拒否後にターンを止める</string>
     <string name="ui_settings_general_always_show_message_actions">メッセージ操作を常に表示</string>
     <string name="ui_settings_general_always_show_detailed_tool_output">ツールの詳細出力を常に表示</string>
     <string name="ui_settings_general_always_show_detailed_tool_output_summary">出力が非常に大きい場合、画面のかくつきの原因となることがあります</string>

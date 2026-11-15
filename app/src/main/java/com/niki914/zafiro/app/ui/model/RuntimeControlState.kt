@@ -16,6 +16,8 @@ data class RuntimeControlUiState(
     val idleTimeoutSeconds: Long = 60L,
     val retryMaxAttempts: Int = 3,
     val keepScreenOn: Boolean = true,
+    val screenControlAutoApproved: Boolean = false,
+    val stopRoundOnCommandDeny: Boolean = true,
     val repetitionSensitivity: RepetitionSensitivity = RepetitionSensitivity.DEFAULT,
     val compactionThresholdPercent: Int = 70,
     val activeDialog: RuntimeControlDialog? = null,
@@ -31,6 +33,8 @@ sealed interface RuntimeControlIntent {
     data class SelectRetryMaxAttempts(val attempts: Int) : RuntimeControlIntent
     data class ChangeRetryMaxAttempts(val attempts: Int) : RuntimeControlIntent
     data class ToggleKeepScreenOn(val enabled: Boolean) : RuntimeControlIntent
+    data class ToggleScreenControlAutoApproved(val enabled: Boolean) : RuntimeControlIntent
+    data class ToggleStopRoundOnCommandDeny(val enabled: Boolean) : RuntimeControlIntent
     data class SelectRepetitionSensitivity(val sensitivity: RepetitionSensitivity) :
         RuntimeControlIntent
     data class SelectCompactionThreshold(val percent: Int) : RuntimeControlIntent
@@ -56,6 +60,10 @@ class RuntimeControlViewModel :
                 selectRetryMaxAttempts(intent.attempts)
 
             is RuntimeControlIntent.ToggleKeepScreenOn -> toggleKeepScreenOn(intent.enabled)
+            is RuntimeControlIntent.ToggleScreenControlAutoApproved ->
+                toggleScreenControlAutoApproved(intent.enabled)
+            is RuntimeControlIntent.ToggleStopRoundOnCommandDeny ->
+                toggleStopRoundOnCommandDeny(intent.enabled)
             is RuntimeControlIntent.SelectRepetitionSensitivity ->
                 selectRepetitionSensitivity(intent.sensitivity)
             is RuntimeControlIntent.ChangeCompactionThreshold ->
@@ -71,6 +79,8 @@ class RuntimeControlViewModel :
             val idleTimeoutSeconds = XRepo.llmIdleTimeoutSeconds()
             val retryMaxAttempts = XRepo.llmRetryMaxAttempts()
             val keepScreenOn = XRepo.keepScreenOn()
+            val screenControlAutoApproved = XRepo.screenControlAutoApproved()
+            val stopRoundOnCommandDeny = XRepo.stopRoundOnCommandDeny()
             val repetitionSensitivity = XRepo.repetitionSensitivity()
             val compactionThresholdPercent = XRepo.contextCompactionThresholdPercent()
             updateState {
@@ -78,6 +88,8 @@ class RuntimeControlViewModel :
                     idleTimeoutSeconds = idleTimeoutSeconds,
                     retryMaxAttempts = retryMaxAttempts,
                     keepScreenOn = keepScreenOn,
+                    screenControlAutoApproved = screenControlAutoApproved,
+                    stopRoundOnCommandDeny = stopRoundOnCommandDeny,
                     repetitionSensitivity = repetitionSensitivity,
                     compactionThresholdPercent = compactionThresholdPercent,
                     isLoading = false,
@@ -102,6 +114,16 @@ class RuntimeControlViewModel :
     private suspend fun toggleKeepScreenOn(enabled: Boolean) {
         updateState { copy(keepScreenOn = enabled) }
         XRepo.setKeepScreenOn(enabled)
+    }
+
+    private suspend fun toggleScreenControlAutoApproved(enabled: Boolean) {
+        updateState { copy(screenControlAutoApproved = enabled) }
+        XRepo.setScreenControlAutoApproved(enabled)
+    }
+
+    private suspend fun toggleStopRoundOnCommandDeny(enabled: Boolean) {
+        updateState { copy(stopRoundOnCommandDeny = enabled) }
+        XRepo.setStopRoundOnCommandDeny(enabled)
     }
 
     private suspend fun selectRepetitionSensitivity(sensitivity: RepetitionSensitivity) {

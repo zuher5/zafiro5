@@ -14,6 +14,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import com.niki914.zafiro.settings.model.RuntimeCustomPyTool as CustomPyTool
+import com.niki914.zafiro.settings.model.RuntimeEnvContextConfig
 import com.niki914.zafiro.settings.model.RuntimeExecutionRule as ExecutionRule
 import com.niki914.zafiro.settings.model.RuntimeExecutionRuleEnabledMode as ExecutionRuleEnabledMode
 import com.niki914.zafiro.settings.model.RuntimeMaskingRule as MaskingRule
@@ -67,6 +68,23 @@ class SettingsDomainCodecsTest {
         val parsed = LlmConfigsSettingsCodec.encode(document).let(LlmConfigsSettingsCodec::parse)
 
         assertEquals(document, parsed)
+    }
+
+    @Test
+    fun llmConfigsDocumentWithEnvContextRoundTripKeepsAllFields() {
+        val document = LlmConfigsDocument(
+            activeId = "cfg-a",
+            prompt = "global prompt",
+            envContext = RuntimeEnvContextConfig(
+                enabled = true,
+                keys = setOf("date", "time", "device", "role"),
+                variables = mapOf("role" to "Developer"),
+            ),
+        )
+
+        val parsed = LlmConfigsSettingsCodec.encode(document).let(LlmConfigsSettingsCodec::parse)
+
+        assertEquals(document.envContext, parsed.envContext)
     }
 
     @Test
@@ -361,12 +379,29 @@ class SettingsDomainCodecsTest {
     }
 
     @Test
+    fun appStateStopRoundOnCommandDenyRoundTripsUnderItsDiskKey() {
+        val json = AppStateSettingsCodec.encode(AppStateSettings(stopRoundOnCommandDeny = true))
+        assertTrue(jsonObject(json)["stop_round_on_command_deny"]!!.jsonPrimitive.boolean)
+        assertTrue(AppStateSettingsCodec.parse(json).stopRoundOnCommandDeny)
+    }
+
+    @Test
     fun appStateFloatingBallAutoExpandDefaultsEnabledAndRoundTrips() {
         assertTrue(AppStateSettingsCodec.parse("""{}""").floatingBallAutoExpand)
 
         val json = AppStateSettingsCodec.encode(AppStateSettings(floatingBallAutoExpand = false))
         assertFalse(jsonObject(json)["floating_ball_auto_expand"]!!.jsonPrimitive.boolean)
         assertFalse(AppStateSettingsCodec.parse(json).floatingBallAutoExpand)
+    }
+
+    @Test
+    fun appStateScreenControlAutoApprovedDefaultsDisabledAndRoundTrips() {
+        assertFalse(AppStateSettingsCodec.parse("""{}""").screenControlAutoApproved)
+
+        val json =
+            AppStateSettingsCodec.encode(AppStateSettings(screenControlAutoApproved = true))
+        assertTrue(jsonObject(json)["screen_control_auto_approved"]!!.jsonPrimitive.boolean)
+        assertTrue(AppStateSettingsCodec.parse(json).screenControlAutoApproved)
     }
 
     @Test

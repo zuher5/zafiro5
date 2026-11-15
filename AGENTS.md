@@ -56,7 +56,11 @@ State 与 Effect 的区别是持久与一次性，分界的判据是「换个时
 
 ### UI 框架 / ui-kit
 
-导航、导航栏、弹窗、设置项都用 ui-kit 里既定的那套，不要另起一套。业务组件统一使用 ui-kit 导出的 Zafiro* 基础元器件（ZafiroDialog 等），底层实现了多种主题分流。实现涉及导航、ViewModel、弹窗的业务前 MUST 调研已有代码作为参考
+导航、导航栏、弹窗、设置项都用 ui-kit 里既定的那套，不要另起一套。实现涉及导航、ViewModel、弹窗的业务前 MUST 调研已有代码作为参考
+
+#### 风格
+
+业务组件统一使用 ui-kit 导出的 Zafiro* 基础元器件（ZafiroDialog 等），底层实现了多种主题分流。现存的 UI 风格有：LiquidGlass、Material3、Material3Expressive。其中 LiquidGlass 是一种设计语言，和 Material 是一样的，它使用 `kyant0:backdrop` UI 库实现，因此任何 UI 必须使用了 backdrop API 才能命名为 Liquid 或 Backdrop
 
 #### 导航
 
@@ -102,7 +106,7 @@ AI 对话通常是以 list 的形式存放 messages，同时只会有一个对�
 
 ### IPC
 
-目前来说，Zafiro Agent 的对话功能是限定在主进程之内的，虽然有一个宿主的业务，Agent 相关的调用逻辑依然用 Binder 包裹在主进程之内
+Zafiro Agent 的对话功能是限定在主进程之内的，虽然有一个宿主的业务，Agent 相关的调用逻辑依然用 Binder 包裹在主进程之内
 
 项目通过 Chaquopy 实现 Python 能力支持，在单独的 py 进程中运行代码
 
@@ -144,6 +148,7 @@ AI 对话通常是以 list 的形式存放 messages，同时只会有一个对�
 ### 共识
 
 - 若某项功能实现难度高（难度评分超过 6/10）且 ROI 较低，在着手开发前应先与用户协商功能范围
+- 对话有可能被压缩。如果见到以 XML 格式承载的对话摘要类信息说明对话已经被压缩，如任务有沉淀如 PLAN、CR 等文档，需要重读以确保对齐
 - 提交信息和 PR 标题均使用英文，采用 `feat: did something` 这样的格式；标题简洁明了，不带模块名，补充说明写在正文中。PR 使用 gh CLI 完成
 - 搜索用 `rg`，不要 `grep -r`。 `rg` 默认读 `.gitignore`，自动排除 `**/build/`；`grep -r` 会扫到 build 与 `.git`
 

@@ -34,6 +34,7 @@ import com.niki914.zafiro.settings.model.RuntimeAgentProfile as AgentProfile
 import com.niki914.zafiro.settings.model.RuntimeAgentValidation as AgentValidation
 import com.niki914.zafiro.settings.model.RuntimeBuiltinToolSetting as BuiltinToolSetting
 import com.niki914.zafiro.settings.model.RuntimeCustomPyTool as CustomPyTool
+import com.niki914.zafiro.settings.model.RuntimeEnvContextConfig
 import com.niki914.zafiro.settings.model.RuntimeExecutionRule as ExecutionRule
 import com.niki914.zafiro.settings.model.RuntimeExecutionRuleEnabledMode as ExecutionRuleEnabledMode
 import com.niki914.zafiro.settings.model.RuntimeMaskingRule as MaskingRule
@@ -99,6 +100,7 @@ object XRepo {
         turnNotificationEnabledField.flow.value = false
         floatingBallAutoExpandField.flow.value = true
         screenControlAutoApprovedField.flow.value = false
+        stopRoundOnCommandDenyField.flow.value = true
         floatingBallOpacityPercentField.flow.value = 60
         floatingBallSubmergedOffsetDpField.flow.value = 8
         languageTagField.flow.value = ""
@@ -415,6 +417,19 @@ object XRepo {
 
     suspend fun setKeepScreenOn(value: Boolean) = keepScreenOnField.set(value)
 
+    /** 拒绝命令后停止本回合。app 以外经 XSettings.stopRoundOnCommandDeny 读。 */
+    private val stopRoundOnCommandDenyField = ReactiveAppStateField(
+        default = true,
+        select = { stopRoundOnCommandDeny },
+        update = { copy(stopRoundOnCommandDeny = it) },
+    )
+    val stopRoundOnCommandDenySetting: MutableStateFlow<Boolean>
+        get() = stopRoundOnCommandDenyField.flow
+
+    suspend fun stopRoundOnCommandDeny(): Boolean = stopRoundOnCommandDenyField.get()
+
+    suspend fun setStopRoundOnCommandDeny(value: Boolean) = stopRoundOnCommandDenyField.set(value)
+
     /** 消息操作行常显开关的进程内热更新通道：读时回填初值，写时同步。 */
     private val alwaysShowMessageActionsField = ReactiveAppStateField(
         default = true,
@@ -581,7 +596,7 @@ object XRepo {
 
     /**
      * 屏幕控制知情门自动放行开关的进程内热更新通道。
-     * AccessibilityController 在 ensureService 里经 gateway 读，默认 false = 保持每次询问。
+     * PhoneScreenAccess 经 XSettings 读，默认 false = 保持每次询问。
      */
     private val screenControlAutoApprovedField = ReactiveAppStateField(
         default = false,
@@ -891,6 +906,32 @@ class LlmConfigsApi internal constructor(
             val doc = LlmConfigsSettingsCodec.parse(json)
             if (doc.prompt == normalizedPrompt) return@updateJson json
             LlmConfigsSettingsCodec.encode(doc.copy(prompt = normalizedPrompt))
+        }
+        bumpRevision()
+    }
+
+    suspend fun envContext(): RuntimeEnvContextConfig = document().envContext
+
+    suspend fun saveEnvContext(config: RuntimeEnvContextConfig) {
+        val sanitizedConfig = config.copy(
+            keys = config.keys.map { it.trim() }.filter { it.isNotBlank() }.toSet(),
+            variables = config.variables
+                .mapNotNull { (k, v) ->
+                    val trimmed = k.trim()
+                    if (trimmed.isNotBlank() &&
+                        trimmed != RuntimeEnvContextConfig.KEY_DATE &&
+                        trimmed != RuntimeEnvContextConfig.KEY_TIME &&
+                        trimmed != RuntimeEnvContextConfig.KEY_DEVICE
+                    ) {
+                        trimmed to v.trim()
+                    } else null
+                }
+                .toMap()
+        )
+        repo.updateJson(StoreDescriptorRegistry.LLM_CONFIGS_ID) { json ->
+            val doc = LlmConfigsSettingsCodec.parse(json)
+            if (doc.envContext == sanitizedConfig) return@updateJson json
+            LlmConfigsSettingsCodec.encode(doc.copy(envContext = sanitizedConfig))
         }
         bumpRevision()
     }

@@ -27,6 +27,8 @@ KNOWN_LOCALES = (
     "values-in",
     "values-ja",
     "values-ru",
+    "values-ar",
+    "values-fa",
 )
 
 RE_ALLOWED_PARENS = re.compile(
