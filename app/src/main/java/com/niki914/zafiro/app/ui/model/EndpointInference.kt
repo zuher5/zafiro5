@@ -19,7 +19,7 @@ internal object EndpointInference {
         return host == "api.deepseek.com" || host.endsWith(".deepseek.com")
     }
 
-    /** 免费层对话端点在 opencode.ai/inference/*；模型目录查询走 /inference/v1/models。 */
+    /** 免费层对话端点在 opencode.ai/inference 前缀下；模型目录查询走 /inference/v1/models。 */
     private fun isOpenCodeInferenceEndpoint(endpoint: String): Boolean {
         val host = endpoint.substringAfter("://").substringBefore('/').lowercase()
         val isOpenCodeHost = host == "opencode.ai" || host.endsWith(".opencode.ai")
