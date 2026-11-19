@@ -1,11 +1,13 @@
 package com.niki914.zafiro.chat
 
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonObject
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.security.SecureRandom
@@ -13,57 +15,37 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * OpenCode Zen free-tier fingerprint helpers (v3 wire gate / 9router #5381).
+ * OpenCode free-tier wire identity (ported from azrinaldi/opencode-free-bridge).
  *
- * Ported from zuher5/opencode-to-api and pi-bansos v0.8.1.
- * - Format UA: `opencode/dev/${version}/opencode` with live npm tracking.
- * - Headers: `x-opencode-client: opencode`, `x-opencode-request: generateRequestId()`, `X-Session-Id: session`.
- * - Body: `prompt_cache_key` bound to session, <env> environment block, exact `read` + `shell` tools.
- * - Additive Token Budgeting: headroom `max(requested, 1024) + 4096` for reasoning models to prevent
- *   empty response truncation (finish_reason: "length").
- * - Session rotation: `burnSessionId()` on quota exhaustion or 429.
+ * Semua nilai identitas diturunkan dinamis, tidak pernah di-hardcode sebagai
+ * kebenaran: versi/channel/nama CLI dari update API, endpoint chat/responses
+ * dan daftar model gratis dari katalog models.opencode.ai. Nilai statis hanya
+ * fallback saat jaringan belum menjawab. Anchors yang terukur membentuk 403
+ * gate (dari bridge): User-Agent berbentuk `opencode/<channel>/<ver>/<name>`,
+ * session headers lengkap, dan minimal ada tool bernama `read` — semuanya
+ * dipin di sini supaya perubahan gate tidak bisa lolos begitu saja.
  */
 object OpenCodeFreeSupport {
+    private const val LOG_TAG = "niki914_zafiro_OpenCodeFreeSupport"
+
     private val random = SecureRandom()
-    private const val UA_FALLBACK = "opencode/dev/0.0.0-dev-202610272228/opencode"
-    private val uaVersionRegex = Regex("""^opencode\/(?:dev\/)?[\w.-]+\/opencode$""")
     private const val UA_ENV = "BANSOS_OPENCODE_UA"
     private const val BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     private const val HEX_DIGITS = "0123456789abcdef"
     private val sessionRegex = Regex("""^ses_[0-9a-f]{12}[0-9A-Za-z]{14}$""")
 
+    private const val UPDATE_API_URL = "https://opencode.ai/update/api/latest/cli/npm"
+    private const val CATALOG_URL = "https://models.opencode.ai/api.json"
+
+    /** Fallback mengikuti state gate saat ini (update API 2026-11: 2.3.2/latest/cli). */
+    private const val FALLBACK_UA = "opencode/latest/2.3.2/cli"
+    private const val FALLBACK_CLIENT = "cli"
+    private const val FALLBACK_INFERENCE_PREFIX = "/inference/openai/v1"
+
     const val MIN_ANSWER_TOKENS = 1024
     const val THINKING_BUDGET = 4096
     const val MIN_PLAIN_TOKENS = 512
     const val MAX_OUTPUT_TOKENS = 131_072
-
-    val reasoningModels = setOf(
-        "deepseek-v4.1-flash-free",
-        "beam-free",
-        "crouton-alpha-free",
-        "iceman-free",
-        "inkling-2-small-free",
-        "mimo-v2.6-flash-free",
-        "nemotron-3.5-lightning-free",
-        "big-pickle",
-        "flint-40b-free",
-        "glm-5.3-flash-free",
-        "nemotron-3.5-super-vl-free",
-    )
-
-    val modelCeilings = mapOf(
-        "beam-free" to 131_072,
-        "crouton-alpha-free" to 270_000,
-        "iceman-free" to 131_072,
-        "inkling-2-small-free" to 131_072,
-        "mimo-v2.6-flash-free" to 32_000,
-        "nemotron-3.5-lightning-free" to 262_144,
-        "big-pickle" to 32_000,
-        "deepseek-v4.1-flash-free" to 64_000,
-        "flint-40b-free" to 65_536,
-        "glm-5.3-flash-free" to 32_000,
-        "nemotron-3.5-super-vl-free" to 131_072,
-    )
 
     const val ENV_FINGERPRINT_NOTE =
         "Here is some useful information about the environment you are running in:\n" +
@@ -75,13 +57,161 @@ object OpenCodeFreeSupport {
         "  Prefer /data/data/com.niki914.zafiro/cache/opencode over generic system temporary directories such as /tmp; it is pre-created and approved for external access.\n" +
         "</env>"
 
-    private val responsesModels = setOf("muse-spark-1.2-contributor-free", "muse-spark-1.3-contributor-free")
+    private val json = Json { ignoreUnknownKeys = true }
 
-    // Project id: zen clients send a 40-char hex project hash.
+    // ── Identity (update API derivation) ─────────────────────────────────────
+
+    private const val IDENTITY_TTL_MS = 15 * 60 * 1000L
+
+    /** CLI wire identity: UA + client value, diturunkan dari update API. */
+    private class Identity(
+        val userAgent: String,
+        val client: String,
+    )
+
+    @Volatile
+    private var identity = Identity(userAgent = FALLBACK_UA, client = FALLBACK_CLIENT)
+    @Volatile
+    private var identityFetchedAtMs = 0L
+    @Volatile
+    private var identityStale = false
+    private val identityFetchStarted = AtomicBoolean(false)
+
+    private val fetchClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .build()
+    }
+
+    fun getOpenCodeUA(): String {
+        val override = System.getenv(UA_ENV)?.trim()
+        if (!override.isNullOrEmpty()) {
+            return if (override.startsWith("opencode/")) override else "opencode/$override"
+        }
+        return identity.userAgent
+    }
+
+    private fun clientValue(): String {
+        val override = System.getenv(UA_ENV)?.trim()
+        if (!override.isNullOrEmpty()) return FALLBACK_CLIENT
+        return identity.client
+    }
+
+    /** 403 / 426 → identitas bisa usang: tandai stale, request berikutnya refresh. */
+    fun markIdentityStale() {
+        identityStale = true
+    }
+
+    /**
+     * Refresh identitas + katalog dari update API / katalog upstream.
+     * Fire-and-forget: tidak pernah memblokir pemanggil; gagal jaringan
+     * mempertahankan nilai terakhir (fallback statis saat proses muda).
+     */
+    fun refreshIdentityIfNeeded() {
+        if (!System.getenv(UA_ENV).isNullOrBlank()) return
+        val now = System.currentTimeMillis()
+        val fresh = now - identityFetchedAtMs < IDENTITY_TTL_MS
+        if (!identityStale && fresh) return
+        if (!identityFetchStarted.compareAndSet(false, true)) return
+        identityStale = false
+        Thread {
+            try {
+                refreshFromUpdateApi()
+                refreshFromCatalog()
+            } catch (_: Exception) {
+                // offline / upstream unreachable — keep last known identity
+            } finally {
+                identityFetchedAtMs = System.currentTimeMillis()
+                identityFetchStarted.set(false)
+            }
+        }.apply { isDaemon = true }.start()
+    }
+
+    private fun refreshFromUpdateApi() {
+        val body = fetchText(UPDATE_API_URL) ?: return
+        val root = runCatching { json.parseToJsonElement(body).jsonObject }.getOrNull() ?: return
+        val version = root.stringOf("version")?.takeIf { Regex("""^\d+\.\d+\.\d+$""").matches(it) }
+        val channel = root.stringOf("channel")?.takeIf(String::isNotBlank) ?: "latest"
+        val name = root.stringOf("name")?.takeIf(String::isNotBlank) ?: "cli"
+        if (version != null) {
+            identity = Identity(
+                userAgent = "opencode/$channel/$version/$name",
+                client = name,
+            )
+        }
+    }
+
+    // ── Catalog (endpoints + free model facts) ───────────────────────────────
+
+    private class Catalog(
+        /** Path prefix permukaan inference, mis. `/inference/openai/v1`. */
+        val inferencePrefix: String,
+        val modelCeilings: Map<String, Int>,
+        val reasoningModels: Set<String>,
+    )
+
+    @Volatile
+    private var catalog = Catalog(
+        inferencePrefix = FALLBACK_INFERENCE_PREFIX,
+        modelCeilings = FALLBACK_MODEL_CEILINGS,
+        reasoningModels = FALLBACK_REASONING_MODELS,
+    )
+
+    /** Path prefix endpoint chat/responses aktif di upstream (dinamis dari katalog). */
+    fun inferencePathPrefix(): String = catalog.inferencePrefix
+
+    fun currentModelCeilings(): Map<String, Int> = catalog.modelCeilings
+
+    fun currentReasoningModels(): Set<String> = catalog.reasoningModels
+
+    private fun refreshFromCatalog() {
+        val body = fetchText(CATALOG_URL) ?: return
+        val root = runCatching { json.parseToJsonElement(body).jsonObject }.getOrNull() ?: return
+        val oc = root["opencode"] as? JsonObject ?: return
+        val ceilings = HashMap<String, Int>()
+        val reasoning = HashSet<String>()
+        val models = oc["models"] as? JsonObject ?: return
+        for ((id, element) in models) {
+            val model = element as? JsonObject ?: continue
+            val cost = model["cost"] as? JsonObject
+            val inputCost = (cost?.get("input") as? JsonPrimitive)?.intOrNull
+            if (inputCost != null && inputCost != 0) continue
+            if (model.stringOf("status") == "deprecated") continue
+            (model["limit"] as? JsonObject)?.let { limit ->
+                (limit["output"] as? JsonPrimitive)?.intOrNull?.takeIf { it > 0 }
+                    ?.let { ceilings[id] = it }
+            }
+            if (model["reasoning"] == JsonPrimitive(true)) reasoning += id
+        }
+        val api = oc.stringOf("api")?.takeIf(String::isNotBlank)
+        val prefix = api
+            ?.takeIf { it.startsWith("https://") && it.removeSuffix("/").substringAfter("//").substringBefore('/').endsWith("opencode.ai") }
+            ?.let { "/" + it.removeSuffix("/").substringAfter("//").substringAfter('/').trim('/') }
+            ?.takeIf { it.isNotBlank() }
+        catalog = Catalog(
+            inferencePrefix = prefix ?: FALLBACK_INFERENCE_PREFIX,
+            modelCeilings = if (ceilings.isEmpty()) FALLBACK_MODEL_CEILINGS else ceilings,
+            reasoningModels = if (reasoning.isEmpty()) FALLBACK_REASONING_MODELS else reasoning,
+        )
+    }
+
+    private fun fetchText(url: String): String? = runCatching {
+        fetchClient.newCall(Request.Builder().url(url).get().build()).execute().use { response ->
+            if (!response.isSuccessful) return null
+            response.body?.string()
+        }
+    }.getOrNull()
+
+    private fun JsonObject.stringOf(key: String): String? =
+        (this[key] as? JsonPrimitive)?.contentOrNull
+
+    // ── Session ──────────────────────────────────────────────────────────────
+
+    // Project id: 40-char hex, satu per proses (stabil seperti CLI per project).
     private val projectId = randomHex(20)
 
-    // One stable session per conversation window — shape must match sessionRegex.
-    // Re-mint session weekly so it never exceeds 30-day limit that causes 429.
+    // Re-mint mingguan supaya tidak melewati batas umur session 30 hari (429).
     private const val SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60_000L
     @Volatile
     private var openCodeSessionMintedAt = System.currentTimeMillis()
@@ -90,26 +220,50 @@ object OpenCodeFreeSupport {
 
     fun currentSessionId(): String {
         if (System.currentTimeMillis() - openCodeSessionMintedAt > SESSION_MAX_AGE_MS) {
-            val fresh = generateSessionId()
-            if (sessionRegex.matches(fresh)) {
-                openCodeSession = fresh
-                openCodeSessionMintedAt = System.currentTimeMillis()
-            }
+            mintSession()
         }
         return openCodeSession
     }
 
-    /** Burns the current session and re-mints a fresh one immediately (used on quota 429). */
+    /** Burns the current session and re-mints a fresh one (quota / gate 403). */
     fun burnSessionId(): String {
+        mintSession()
+        return openCodeSession
+    }
+
+    private fun mintSession() {
         val fresh = generateSessionId()
         if (sessionRegex.matches(fresh)) {
             openCodeSession = fresh
             openCodeSessionMintedAt = System.currentTimeMillis()
         }
-        return openCodeSession
     }
 
-    /** Calculates additive token headroom for reasoning models to prevent truncated output. */
+    // ── Gate headers ─────────────────────────────────────────────────────────
+
+    /**
+     * The 7 gate headers upstream's own request builder sets, exactly. Header
+     * di luar daftar ini tidak pernah dikirim CLI — `x-opencode-request` cuma
+     * untuk surface katalog lama, `Connection: close` merusak keep-alive.
+     */
+    fun headers(): Map<String, String> {
+        refreshIdentityIfNeeded()
+        val activeSession = currentSessionId()
+        return linkedMapOf(
+            "User-Agent" to getOpenCodeUA(),
+            "Authorization" to "Bearer public",
+            "x-opencode-client" to clientValue(),
+            "x-opencode-project" to projectId,
+            "x-opencode-session" to activeSession,
+            "x-opencode-session-id" to activeSession,
+            "x-session-affinity" to activeSession,
+            "X-Session-Id" to activeSession,
+        )
+    }
+
+    // ── Token budgeting ──────────────────────────────────────────────────────
+
+    /** Additive headroom untuk reasoning model agar tidak kosong finish_reason=length. */
     fun effectiveMaxTokens(requested: Int?, model: String, isReasoning: Boolean): Int {
         val wanted = requested ?: MAX_OUTPUT_TOKENS
         val effective = if (isReasoning) {
@@ -117,58 +271,20 @@ object OpenCodeFreeSupport {
         } else {
             maxOf(wanted, MIN_PLAIN_TOKENS)
         }
-        val ceiling = modelCeilings[model] ?: MAX_OUTPUT_TOKENS
+        val ceiling = currentModelCeilings()[model] ?: MAX_OUTPUT_TOKENS
         return minOf(effective, ceiling)
     }
 
+    // ── Body transform ───────────────────────────────────────────────────────
+
     /** Transformed request body plus the wire→caller tool-name aliases the
      *  response path must undo (empty when no caller tool collided), and
-     *  whether muse-class models target the `/responses` surface. */
+     *  whether this model targets the `/responses` surface. */
     data class TransformResult(
         val body: JsonObject,
         val toolAliases: Map<String, String>,
         val responsesPath: Boolean,
     )
-
-    // Live UA resolution — offline-safe, never blocks.
-    private val uaClient by lazy {
-        OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .build()
-    }
-    private val uaRefreshed = AtomicBoolean(false)
-
-    @Volatile
-    private var liveUaVersion: String? = null
-
-    /**
-     * Fingerprint headers (v3 wire gate).
-     */
-    fun headers(includeRequestId: Boolean = true): Map<String, String> {
-        refreshOpenCodeUA()
-        val traceId = randomHex(16)
-        val spanId = randomHex(8)
-        val activeSession = currentSessionId()
-        val headers = mutableMapOf(
-            "User-Agent" to getOpenCodeUA(),
-            "Authorization" to "Bearer public",
-            "x-opencode-client" to "opencode",
-            "x-opencode-project" to projectId,
-            "x-opencode-session" to activeSession,
-            "x-opencode-session-id" to activeSession,
-            "x-session-affinity" to activeSession,
-            "X-Session-Id" to activeSession,
-            "b3" to "$traceId-$spanId-1-$spanId",
-            "traceparent" to "00-$traceId-$spanId-01",
-            "Accept" to "text/event-stream",
-            "Connection" to "close",
-        )
-        if (includeRequestId) {
-            headers["x-opencode-request"] = generateRequestId()
-        }
-        return headers
-    }
 
     fun transform(body: JsonObject): TransformResult {
         val mutable = body.toMutableMap()
@@ -180,8 +296,8 @@ object OpenCodeFreeSupport {
         mutable["prompt_cache_key"] = JsonPrimitive(activeSession)
 
         val model = (body["model"] as? JsonPrimitive)?.content.orEmpty()
-        val isResponses = responsesModels.contains(model) || model.contains("muse-spark")
-        val isReasoning = reasoningModels.contains(model) ||
+        val isResponses = model.contains("muse-spark")
+        val isReasoning = currentReasoningModels().contains(model) ||
             (body["reasoning_effort"] as? JsonPrimitive)?.contentOrNull.let { it != null && it != "none" }
 
         val requestedTokens = (body["max_tokens"] as? JsonPrimitive)?.intOrNull
@@ -252,49 +368,10 @@ object OpenCodeFreeSupport {
         mutable["messages"] = JsonArray(messagesList)
     }
 
-    fun getOpenCodeUA(): String {
-        val override = System.getenv(UA_ENV)?.trim()
-        if (!override.isNullOrEmpty()) {
-            return if (override.startsWith("opencode/")) override else "opencode/$override"
-        }
-        val live = liveUaVersion
-        if (live != null && uaVersionRegex.matches(live)) {
-            return live
-        }
-        return UA_FALLBACK
-    }
-
-    /** Fire-and-forget: track the live opencode-ai npm version so the gate never
-     *  sees a stale UA. Failure keeps the pinned fallback. */
-    fun refreshOpenCodeUA() {
-        if (!System.getenv(UA_ENV).isNullOrBlank()) return
-        if (!uaRefreshed.compareAndSet(false, true)) return
-        Thread {
-            try {
-                val request = Request.Builder()
-                    .url("https://registry.npmjs.org/opencode-ai/latest")
-                    .build()
-                uaClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) return@use
-                    val body = response.body?.string().orEmpty()
-                    val version = Regex("\"version\"\\s*:\\s*\"([\\w.-]+)\"")
-                        .find(body)?.groupValues?.get(1)
-                    if (version != null) {
-                        val candidate = "opencode/dev/$version/opencode"
-                        if (uaVersionRegex.matches(candidate)) {
-                            liveUaVersion = candidate
-                        }
-                    }
-                }
-            } catch (_: Exception) {
-                // offline / npm unreachable — pinned fallback keeps working
-            }
-        }.apply { isDaemon = true }.start()
-    }
-
     /**
      * Alias caller tools that collide with a real opencode tool name to `*_pi`,
-     * or tools containing "terminal" to `run_command*`, then append the exact `read` + `shell` pair.
+     * or tools containing "terminal" to `run_command*`, then append the exact
+     * `read` + `shell` pair (gate anchor: minimal `read` harus ada).
      */
     private fun ensureChatFingerprintTools(body: JsonObject): Pair<JsonArray, Map<String, String>> {
         val existing = body["tools"] as? JsonArray
@@ -379,11 +456,6 @@ object OpenCodeFreeSupport {
         return "ses_${timeHexFrom(current.inv())}${unstableRandom()}"
     }
 
-    private fun generateRequestId(timestamp: Long = System.currentTimeMillis()): String {
-        val current = (timestamp shl 12) + 1
-        return "msg_${timeHexFrom(current)}${unstableRandom()}"
-    }
-
     private fun timeHexFrom(value: Long): String {
         val chars = CharArray(12)
         for (i in 0..5) {
@@ -413,4 +485,34 @@ object OpenCodeFreeSupport {
         }
         return String(chars)
     }
+
+    // ── Fallback model facts (katalog 2026-11; dikoreksi otomatis saat fetch) ──
+
+    private val FALLBACK_REASONING_MODELS: Set<String> = setOf(
+        "deepseek-v4.1-flash-free",
+        "beam-free",
+        "iceman-free",
+        "mimo-v2.6-flash-free",
+        "nemotron-3.5-lightning-free",
+        "big-pickle",
+        "flint-40b-free",
+        "hy4-flash-free",
+        "longcat-2.5-free",
+        "tidepool-alpha-free",
+        "nemotron-3.5-super-vl-free",
+    )
+
+    private val FALLBACK_MODEL_CEILINGS: Map<String, Int> = mapOf(
+        "beam-free" to 131_072,
+        "iceman-free" to 131_072,
+        "mimo-v2.6-flash-free" to 32_000,
+        "nemotron-3.5-lightning-free" to 262_144,
+        "big-pickle" to 32_000,
+        "deepseek-v4.1-flash-free" to 32_000,
+        "flint-40b-free" to 65_536,
+        "hy4-flash-free" to 65_536,
+        "longcat-2.5-free" to 262_144,
+        "tidepool-alpha-free" to 131_072,
+        "nemotron-3.5-super-vl-free" to 131_072,
+    )
 }

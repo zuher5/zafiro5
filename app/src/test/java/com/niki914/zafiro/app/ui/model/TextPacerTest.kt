@@ -8,7 +8,7 @@ class TextPacerTest {
 
     @Test
     fun `base speed floor for tiny backlog`() {
-        val advanced = TextPacer.advance(current = 0f, target = 7f, elapsedSeconds = 0.05f)
+        val advanced = TextPacer.advance(current = 0f, target = 7f, elapsedSeconds = 0.1f)
         assertEquals(
             TextPacer.BASE_CHARS_PER_SECOND * TextPacer.MAX_FRAME_SECONDS,
             advanced,
@@ -18,7 +18,7 @@ class TextPacerTest {
 
     @Test
     fun `catches up when backlog builds and stays under cap`() {
-        val advanced = TextPacer.advance(current = 0f, target = 2000f, elapsedSeconds = 0.05f)
+        val advanced = TextPacer.advance(current = 0f, target = 2000f, elapsedSeconds = 0.1f)
         assertEquals(
             TextPacer.MAX_CHARS_PER_SECOND * TextPacer.MAX_FRAME_SECONDS,
             advanced,

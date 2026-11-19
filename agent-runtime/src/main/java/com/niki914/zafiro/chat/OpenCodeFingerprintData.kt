@@ -106,6 +106,8 @@ internal object OpenCodeFingerprintData {
                         "name" to JsonPrimitive(name),
                         "description" to JsonPrimitive(description),
                         "parameters" to parameters,
+                        // CLI 在每个 tool 上都带 `strict: false`，属于 wire shape 的一部分
+                        "strict" to JsonPrimitive(false),
                     ),
                 ),
             ),
@@ -118,6 +120,7 @@ internal object OpenCodeFingerprintData {
                 "name" to JsonPrimitive(name),
                 "description" to JsonPrimitive(description),
                 "parameters" to parameters,
+                "strict" to JsonPrimitive(false),
             ),
         )
 

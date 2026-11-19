@@ -262,7 +262,9 @@ private data object CommandCodeSpec : ProviderSpec {
 private data object OpenCodeFreeSpec : ProviderSpec {
     override val id: String = "opencode-zen-free"
     override val brandName: String = "OpenCode Free"
-    override val officialEndpoint: String = "https://opencode.ai/inference/v1/chat/completions"
+    // Permukaan chat aktif upstream: /inference/openai/v1 (katalog models.opencode.ai,
+    // field `api`). /zen/v1 dan /inference/v1 sudah 403/404.
+    override val officialEndpoint: String = "https://opencode.ai/inference/openai/v1/chat/completions"
     override val exampleModelId: String = "deepseek-v4.1-flash-free"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"

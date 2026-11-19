@@ -316,6 +316,13 @@ internal class OkiaSessionAssembler(
                     if (msg.contains("429") || msg.contains("FreeUsageLimitError", ignoreCase = true) || msg.contains("quota", ignoreCase = true)) {
                         OpenCodeFreeSupport.burnSessionId()
                     }
+                    // Gate 403: session/identitas bisa usang — refresh untuk request
+                    // berikutnya (reactive, bridge-style). Tidak auto-retry di sini:
+                    // upstream menekan per-IP, retry storm hanya memperpanjang hukuman.
+                    if (msg.contains("403") || msg.contains("FreeTierError", ignoreCase = true)) {
+                        OpenCodeFreeSupport.burnSessionId()
+                        OpenCodeFreeSupport.markIdentityStale()
+                    }
                 }
                 restoreToolAlias(event)
             }
@@ -344,19 +351,27 @@ internal class OkiaSessionAssembler(
             }
         }
 
-        // Free-tier chat lives on /inference/v1 (the /zen/v1 path 403s);
-        // muse-class models use the sibling /responses surface.
+        // Permukaan inference upstream berpindah-pindah (/zen/v1 → /inference/v1 →
+        // /inference/openai/v1): prefix aktif diturunkan dari katalog, semua varian
+        // lama dipetakan ke sana. Model muse-class memakai permukaan /responses.
         private fun rewriteUrl(url: String, responsesPath: Boolean): String {
-            val inference = if (url.contains("zen/v1", ignoreCase = true)) {
-                url.replace("zen/v1", "inference/v1", ignoreCase = true)
-            } else {
-                url
+            val schemeEnd = url.indexOf("://")
+            val originEnd = url.indexOf('/', schemeEnd + 3)
+            if (schemeEnd < 0 || originEnd < 0) return url
+            val origin = url.substring(0, originEnd)
+            var path = url.substring(originEnd)
+            val legacyPrefixes = listOf("/zen/v1", "/inference/v1", "/inference/openai/v1")
+            val matched = legacyPrefixes.firstOrNull { path.startsWith(it, ignoreCase = true) }
+            if (matched != null) {
+                path = OpenCodeFreeSupport.inferencePathPrefix() + path.substring(matched.length)
             }
-            if (!responsesPath) return inference
-            return if (inference.contains("/responses", ignoreCase = true)) {
-                inference
-            } else {
-                inference.replace("/chat/completions", "/responses", ignoreCase = true)
+            if (!responsesPath) return origin + path
+            return when {
+                path.contains("/responses", ignoreCase = true) -> origin + path
+                path.contains("/chat/completions", ignoreCase = true) ->
+                    origin + path.replace("/chat/completions", "/responses", ignoreCase = true)
+
+                else -> origin + path.trimEnd('/') + "/responses"
             }
         }
 

@@ -17,11 +17,13 @@ import com.niki914.zafiro.settings.model.RuntimeTakeoverTarget
 import com.niki914.zafiro.settings.model.TAKEOVER_FIELD_NAME
 import com.niki914.zafiro.settings.model.TAKEOVER_FIELD_PATTERNS
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
@@ -118,49 +120,55 @@ object XRepo {
         return appContext ?: context
     }
 
-    internal suspend fun readJson(storeId: String): String {
-        val startedAtMs = System.currentTimeMillis()
-        val json = store.readJson(context(), storeId)
-        Logger.d(
-            LOG_TAG,
-            "readJson storeId=$storeId jsonLength=${json.length} " +
-                    "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
-        )
-        return json
-    }
-
-    internal suspend fun writeJson(storeId: String, json: String): Boolean {
-        val startedAtMs = System.currentTimeMillis()
-        val result = writeMutex.withLock {
-            writeJsonLocked(context(), storeId, json)
+    // 所有 store I/O 必须落在 IO 池：调用方遍布各 ViewModel 的 Main 协程，
+    // 在这里单点切换（ConfigPersistence 的文件读写是同步实现），否则
+    // 每次草稿落盘 / 设置读取都是主线程磁盘 I/O。
+    internal suspend fun readJson(storeId: String): String =
+        withContext(Dispatchers.IO) {
+            val startedAtMs = System.currentTimeMillis()
+            val json = store.readJson(context(), storeId)
+            Logger.d(
+                LOG_TAG,
+                "readJson storeId=$storeId jsonLength=${json.length} " +
+                        "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
+            )
+            json
         }
-        Logger.i(
-            LOG_TAG,
-            "writeJson storeId=$storeId result=$result jsonLength=${json.length} " +
-                    "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
-        )
-        return result
-    }
 
-    internal suspend fun updateJson(storeId: String, transform: (String) -> String): Boolean {
-        val startedAtMs = System.currentTimeMillis()
-        val result = writeMutex.withLock {
-            val context = context()
-            val latest = store.readJson(context, storeId)
-            writeJsonLocked(context, storeId, transform(latest))
+    internal suspend fun writeJson(storeId: String, json: String): Boolean =
+        withContext(Dispatchers.IO) {
+            val startedAtMs = System.currentTimeMillis()
+            val result = writeMutex.withLock {
+                writeJsonLocked(context(), storeId, json)
+            }
+            Logger.i(
+                LOG_TAG,
+                "writeJson storeId=$storeId result=$result jsonLength=${json.length} " +
+                        "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
+            )
+            result
         }
-        Logger.d(
-            LOG_TAG,
-            "updateJson storeId=$storeId result=$result " +
-                    "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
-        )
-        return result
-    }
+
+    internal suspend fun updateJson(storeId: String, transform: (String) -> String): Boolean =
+        withContext(Dispatchers.IO) {
+            val startedAtMs = System.currentTimeMillis()
+            val result = writeMutex.withLock {
+                val context = context()
+                val latest = store.readJson(context, storeId)
+                writeJsonLocked(context, storeId, transform(latest))
+            }
+            Logger.d(
+                LOG_TAG,
+                "updateJson storeId=$storeId result=$result " +
+                        "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
+            )
+            result
+        }
 
     internal suspend fun updateJsonOrFalse(
         storeId: String,
         transform: (String) -> String?
-    ): Boolean {
+    ): Boolean = withContext(Dispatchers.IO) {
         val startedAtMs = System.currentTimeMillis()
         val result = writeMutex.withLock {
             val context = context()
@@ -173,7 +181,7 @@ object XRepo {
             "updateJsonOrFalse storeId=$storeId result=$result " +
                     "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
         )
-        return result
+        result
     }
 
     private suspend fun writeJsonLocked(context: Context, storeId: String, json: String): Boolean {
@@ -183,61 +191,62 @@ object XRepo {
         return true
     }
 
-    suspend fun tryPutDefaultSettings(): Boolean {
-        val startedAtMs = System.currentTimeMillis()
-        val result = writeMutex.withLock {
-            val context = context()
-            val appState = AppStateSettingsCodec.parse(
-                store.readJson(
-                    context,
-                    StoreDescriptorRegistry.APP_STATE_ID
-                )
-            )
-            if (appState.onboardingCompleted) {
-                return@withLock false
-            }
-            writeJsonLocked(
-                context,
-                StoreDescriptorRegistry.LLM_CONFIGS_ID,
-                LlmConfigsSettingsCodec.encode(
-                    LlmConfigsDocument(
-                        prompt = LocalSettingsDefaults.DEFAULT_SYSTEM_PROMPT.trimIndent(),
+    suspend fun tryPutDefaultSettings(): Boolean =
+        withContext(Dispatchers.IO) {
+            val startedAtMs = System.currentTimeMillis()
+            val result = writeMutex.withLock {
+                val context = context()
+                val appState = AppStateSettingsCodec.parse(
+                    store.readJson(
+                        context,
+                        StoreDescriptorRegistry.APP_STATE_ID
                     )
-                ),
+                )
+                if (appState.onboardingCompleted) {
+                    return@withLock false
+                }
+                writeJsonLocked(
+                    context,
+                    StoreDescriptorRegistry.LLM_CONFIGS_ID,
+                    LlmConfigsSettingsCodec.encode(
+                        LlmConfigsDocument(
+                            prompt = LocalSettingsDefaults.DEFAULT_SYSTEM_PROMPT.trimIndent(),
+                        )
+                    ),
+                )
+                writeJsonLocked(
+                    context,
+                    StoreDescriptorRegistry.AGENT_MAIN_MEMORY_ID,
+                    MemorySettingsCodec.encodeMemories(
+                        LocalSettingsDefaults.defaultMemories(context),
+                        System.currentTimeMillis()
+                    ),
+                )
+                writeJsonLocked(
+                    context,
+                    StoreDescriptorRegistry.AGENT_REGISTRY_ID,
+                    AgentSettingsCodec.encodeRegistry(listOf(defaultMainAgentProfile(System.currentTimeMillis()))),
+                )
+                writeJsonLocked(
+                    context,
+                    StoreDescriptorRegistry.TOOLS_PY_ID,
+                    ToolSettingsCodec.encodeCustomPyTools(seedPyToolDefaults(context)),
+                )
+                writeJsonLocked(
+                    context,
+                    StoreDescriptorRegistry.RULES_EXECUTION_ID,
+                    RuleSettingsCodec.encodeExecutionRules(LocalSettingsDefaults.defaultExecutionRules),
+                )
+                true
+            }
+            Logger.i(
+                LOG_TAG,
+                "tryPutDefaultSettings result=$result " +
+                        "reason=${if (result) "initialized" else "alreadyOnboarded"} " +
+                        "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
             )
-            writeJsonLocked(
-                context,
-                StoreDescriptorRegistry.AGENT_MAIN_MEMORY_ID,
-                MemorySettingsCodec.encodeMemories(
-                    LocalSettingsDefaults.defaultMemories(context),
-                    System.currentTimeMillis()
-                ),
-            )
-            writeJsonLocked(
-                context,
-                StoreDescriptorRegistry.AGENT_REGISTRY_ID,
-                AgentSettingsCodec.encodeRegistry(listOf(defaultMainAgentProfile(System.currentTimeMillis()))),
-            )
-            writeJsonLocked(
-                context,
-                StoreDescriptorRegistry.TOOLS_PY_ID,
-                ToolSettingsCodec.encodeCustomPyTools(seedPyToolDefaults(context)),
-            )
-            writeJsonLocked(
-                context,
-                StoreDescriptorRegistry.RULES_EXECUTION_ID,
-                RuleSettingsCodec.encodeExecutionRules(LocalSettingsDefaults.defaultExecutionRules),
-            )
-            true
+            result
         }
-        Logger.i(
-            LOG_TAG,
-            "tryPutDefaultSettings result=$result " +
-                    "reason=${if (result) "initialized" else "alreadyOnboarded"} " +
-                    "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
-        )
-        return result
-    }
 
     /**
      * 启动时补齐缺失的 seed py tools（按 name 判缺）。

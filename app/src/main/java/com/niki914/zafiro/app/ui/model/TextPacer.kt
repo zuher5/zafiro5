@@ -103,8 +103,14 @@ internal class TextPacer(
         internal const val BASE_CHARS_PER_SECOND = 36f
         internal const val MAX_CHARS_PER_SECOND = 240f
         internal const val CATCH_UP_SECONDS = 0.20f
-        internal const val MAX_FRAME_SECONDS = 0.05f
+        internal const val MAX_FRAME_SECONDS = 0.1f
         internal const val STALL_SNAP_MS = 250L
-        internal const val FRAME_MS = 50L
+
+        /**
+         * 帧间隔 100ms：放出的每帧都会触发末块重组与 Markdown 重解析（开销随文本
+         * 增长），50ms 帧率下长回答会以 20fps 的频率重解析全文。100ms 下单位步长
+         * 翻倍，视觉节奏几乎不变，解析频率减半。
+         */
+        internal const val FRAME_MS = 100L
     }
 }

@@ -67,6 +67,12 @@ object ToolPresentation {
     /** 多工具链头部图标：堆叠层。 */
     val Multi = Icons.Filled.Layers
 
+    // 重映射以流式频率重放同一批工具块：按 (name, argumentsJson) 记忆化 JSON
+    // 解析结果。键即参数原文，条目数有界于会话内工具数；超限整体清空。
+    private const val PARSE_CACHE_MAX = 512
+    private val subtitleCache = HashMap<String, String?>()
+    private val inputCache = HashMap<String, String?>()
+
     fun iconSourceForTool(name: String): IconSource = when {
         name in PHONE_USE_TOOLS || name == "screenshot" -> IconSource.Vector(Phone)
         name in OPEN_TOOLS -> IconSource.Vector(OpenInNew)
@@ -126,6 +132,15 @@ object ToolPresentation {
      */
     fun subtitleOf(name: String, argumentsJson: String?): String? {
         if (argumentsJson.isNullOrBlank()) return null
+        val key = "$name\u0000$argumentsJson"
+        if (subtitleCache.size > PARSE_CACHE_MAX) subtitleCache.clear()
+        subtitleCache[key]?.let { return it }
+        val computed = computeSubtitle(name, argumentsJson)
+        subtitleCache[key] = computed
+        return computed
+    }
+
+    private fun computeSubtitle(name: String, argumentsJson: String): String? {
         val args = tryOrNull {
             Json.parseToJsonElement(argumentsJson).jsonObject
         } ?: return null
@@ -162,6 +177,15 @@ object ToolPresentation {
      */
     fun inputOf(name: String, argumentsJson: String?): String? {
         if (argumentsJson.isNullOrBlank()) return null
+        val key = "$name\u0000$argumentsJson"
+        if (inputCache.size > PARSE_CACHE_MAX) inputCache.clear()
+        inputCache[key]?.let { return it }
+        val computed = computeInputOf(name, argumentsJson)
+        inputCache[key] = computed
+        return computed
+    }
+
+    private fun computeInputOf(name: String, argumentsJson: String): String? {
         val args = tryOrNull {
             Json.parseToJsonElement(argumentsJson).jsonObject
         } ?: return null

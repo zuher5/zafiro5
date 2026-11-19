@@ -56,7 +56,7 @@ internal object ModelCatalogApi {
                     }
                 }
                 if (isOpenCodeZen) {
-                    for ((name, value) in OpenCodeFreeSupport.headers(includeRequestId = true)) {
+                    for ((name, value) in OpenCodeFreeSupport.headers()) {
                         header(name, value)
                     }
                 }

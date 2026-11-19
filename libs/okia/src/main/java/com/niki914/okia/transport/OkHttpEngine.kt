@@ -16,7 +16,6 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -209,7 +208,9 @@ class OkHttpEngine(
             .writeTimeout(timeouts.writeMs, TimeUnit.MILLISECONDS)
             .proxySelector(proxySelector())
         if (requestUrl.contains("opencode.ai", ignoreCase = true)) {
-            builder.protocols(listOf(Protocol.HTTP_1_1))
+            // TLS 1.3/1.2 + Bun 的 17 套件 ClientHello。默认协议（h2+http/1.1）
+            // 保留——强制 HTTP/1.1 会把 ALPN 扩展从 ClientHello 里去掉，指纹
+            // 直接少一个扩展；CLI 本身就是 ALPN [h2, http/1.1]。
             builder.connectionSpecs(listOf(OPENCODE_CONNECTION_SPEC, ConnectionSpec.CLEARTEXT))
         }
         return builder.build()

@@ -16,7 +16,9 @@ import com.niki914.zafiro.api.model.FileRef
 import com.niki914.zafiro.api.model.isRunning
 import com.niki914.zafiro.app.conversation.ConversationBranchTree
 import com.niki914.zafiro.app.conversation.ConversationFormatter
+import com.niki914.zafiro.app.conversation.ConversationSummary
 import com.niki914.zafiro.app.conversation.ForkKind
+import com.niki914.zafiro.app.conversation.TurnBranchState
 import com.niki914.zafiro.app.ui.home.composer.suggestion.BuiltinSlashCommand
 import com.niki914.zafiro.app.ui.home.composer.suggestion.SlashCategory
 import com.niki914.zafiro.app.ui.home.composer.suggestion.SlashSuggestion
@@ -39,12 +41,15 @@ import com.niki914.zafiro.api.util.runCatchingCancellable
 import com.niki914.zafiro.api.util.tryOrDefault
 import com.niki914.zafiro.api.util.tryIgnore
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import kotlin.coroutines.resume
@@ -123,6 +128,21 @@ class HomeChatViewModel internal constructor(
     /** 正在节流的思考块。 */
     private var pacedThinkingBlockId: String? = null
     private var conversationBeingLoaded: String? = null
+
+    // ── 流式重映射合并与分支缓存（见 applyConversation / applyConversationNow） ──
+    private var lastApplyAtMs = 0L
+
+    @Volatile
+    private var pendingApply: Conversation? = null
+
+    @Volatile
+    private var pendingAnimateTail = true
+    private val applyMutex = Mutex()
+    private var branchCacheId: String? = null
+    private var branchCacheTurnCount = -1
+    private var branchCacheFamily: List<ConversationSummary> = emptyList()
+    private var branchCacheTurnBranches: Map<Long, TurnBranchState> = emptyMap()
+    private var lastLoggedTurnCount = -1
 
     init {
         observeAgent()
@@ -391,6 +411,23 @@ class HomeChatViewModel internal constructor(
      */
     private suspend fun applyConversation(conversation: Conversation, animateTail: Boolean = true) {
         if (conversationBeingLoaded != null && conversation.id?.value != conversationBeingLoaded) return
+        // 流式 delta 的发射频率远超显示帧率：全量重映射（含分支查询与 mapper）合并到
+        // [REMAP_COALESCE_MS] 一帧。collectLatest 会取消上一个等待中的 apply，最新发射
+        // 总是先落 pending；持锁者等满窗口后只重映射 pending —— 重映射频率封顶 1/窗口。
+        pendingApply = conversation
+        pendingAnimateTail = animateTail
+        applyMutex.withLock {
+            val elapsed = System.currentTimeMillis() - lastApplyAtMs
+            if (elapsed < REMAP_COALESCE_MS) delay(REMAP_COALESCE_MS - elapsed)
+            lastApplyAtMs = System.currentTimeMillis()
+            val latest = pendingApply ?: return@withLock
+            pendingApply = null
+            applyConversationNow(latest, pendingAnimateTail)
+        }
+    }
+
+    private suspend fun applyConversationNow(conversation: Conversation, animateTail: Boolean = true) {
+        if (conversationBeingLoaded != null && conversation.id?.value != conversationBeingLoaded) return
         val isLoadedConversation = conversation.id?.value == conversationBeingLoaded
         val target = conversation.toHomeTurns().toMutableList()
         val loaded = !animateTail || isLoadedConversation
@@ -458,19 +495,32 @@ class HomeChatViewModel internal constructor(
             else -> currentState.currentConversationTitle
         }
         val isFirstConversationAssignment = currentState.currentConversationId == null && id != null
-        val family = if (!id.isNullOrBlank()) {
-            tryOrDefault(emptyList()) { conversations.branchGroup(id) }
+        // 分支族与翻页分支状态只随会话身份和回合数变化，与 delta 内容无关：
+        // 按 (id, turns.size) 缓存，流式期间同一回合内直接复用，不再每帧查 Room
+        val family: List<ConversationSummary>
+        val turnBranches: Map<Long, TurnBranchState>
+        if (branchCacheId == id && branchCacheTurnCount == conversation.turns.size) {
+            family = branchCacheFamily
+            turnBranches = branchCacheTurnBranches
         } else {
-            emptyList()
-        }
-        val turnBranches = if (!id.isNullOrBlank()) {
-            ConversationBranchTree.computeTurnBranches(
-                currentConversationId = id,
-                turns = conversation.turns,
-                family = family,
-            )
-        } else {
-            emptyMap()
+            family = if (!id.isNullOrBlank()) {
+                tryOrDefault(emptyList()) { conversations.branchGroup(id) }
+            } else {
+                emptyList()
+            }
+            turnBranches = if (!id.isNullOrBlank()) {
+                ConversationBranchTree.computeTurnBranches(
+                    currentConversationId = id,
+                    turns = conversation.turns,
+                    family = family,
+                )
+            } else {
+                emptyMap()
+            }
+            branchCacheId = id
+            branchCacheTurnCount = conversation.turns.size
+            branchCacheFamily = family
+            branchCacheTurnBranches = turnBranches
         }
         updateState {
             copy(
@@ -482,7 +532,12 @@ class HomeChatViewModel internal constructor(
                 userToggledKeys = if (id != currentConversationId) emptyMap() else userToggledKeys,
             )
         }
-        Logger.i(LOG_TAG, "applyConversation done id=$id turnsCount=${target.size}")
+        // 流式期间每个 delta 都会走到这里：只在回合数变化时记一条，否则日志
+        // 会在主线程上以 delta 频率写 logcat（debug 构建还落文件）
+        if (target.size != lastLoggedTurnCount) {
+            lastLoggedTurnCount = target.size
+            Logger.i(LOG_TAG, "applyConversation done id=$id turnsCount=${target.size}")
+        }
         if (isFirstConversationAssignment && !currentState.boundConfigId.isNullOrBlank()) {
             val assignedId = id!!
             val boundConfig = currentState.boundConfigId!!
@@ -1082,6 +1137,13 @@ class HomeChatViewModel internal constructor(
     companion object {
         private const val LOG_TAG = "niki914_zafiro_HomeChatState"
         private const val DRAFT_SAVE_DEBOUNCE_MS = 350L
+
+        /**
+         * 流式重映射的合并窗口：窗口内连续 delta 只做一次全量重映射
+         * （分支 Room 查询 + mapper + 全页状态拷贝），显示帧率封顶 1/窗口，
+         * 与 [TextPacer] 的放出节奏同量级。
+         */
+        private const val REMAP_COALESCE_MS = 50L
 
         /** switchTo（载入历史 + 重建引擎会话）的上限；超时销毁半载 agent 并失败返回。 */
         const val LOAD_AGENT_GRACE_MS = 15_000L
