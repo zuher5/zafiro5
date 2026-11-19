@@ -547,7 +547,6 @@ object ConversationRepo {
         if (ext !in IMAGE_EXTENSIONS) return false
         return name.all { char -> char.isLetterOrDigit() || char == '.' || char == '_' || char == '-' }
     }
-    }
 
     /** 分支组内全部会话 id（删除前需逐个销毁运行中的 Agent）。 */
     suspend fun branchGroupIds(id: String): List<String> {
