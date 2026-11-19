@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.intOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.security.SecureRandom
@@ -12,22 +13,53 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * OpenCode Zen free-tier fingerprint helpers.
+ * OpenCode Zen free-tier fingerprint helpers (v3 wire gate / 9router #5381).
  *
- * Ported from pi-bansos 0.6.3. The v2 gate (2026-10-14) requires real OpenCode
- * client headers and opencode's own `read` + `shell` tool schemas; the inference
- * surface rejects `x-opencode-request`. Missing any one → 403 FreeTierError. A
- * caller tool that shadows a real opencode tool name is aliased `*_pi` on the
- * wire and restored from the response.
+ * Ported from zuher5/opencode-to-api and pi-bansos v0.8.1.
+ * - Format UA: `opencode/dev/${version}/opencode` with live npm tracking.
+ * - Headers: `x-opencode-client: opencode`, `x-opencode-request: generateRequestId()`, `X-Session-Id: session`.
+ * - Body: `prompt_cache_key` bound to session, <env> environment block, exact `read` + `shell` tools.
+ * - Additive Token Budgeting: headroom `max(requested, 1024) + 4096` for reasoning models to prevent
+ *   empty response truncation (finish_reason: "length").
+ * - Session rotation: `burnSessionId()` on quota exhaustion or 429.
  */
 object OpenCodeFreeSupport {
     private val random = SecureRandom()
-    private const val UA_FALLBACK = "1.19.0"
-    private val uaVersionRegex = Regex("""^\d+\.\d+\.\d+$""")
+    private const val UA_FALLBACK = "opencode/dev/0.0.0-dev-202610272228/opencode"
+    private val uaVersionRegex = Regex("""^opencode\/(?:dev\/)?[\w.-]+\/opencode$""")
     private const val UA_ENV = "BANSOS_OPENCODE_UA"
     private const val BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     private const val HEX_DIGITS = "0123456789abcdef"
     private val sessionRegex = Regex("""^ses_[0-9a-f]{12}[0-9A-Za-z]{14}$""")
+
+    const val MIN_ANSWER_TOKENS = 1024
+    const val THINKING_BUDGET = 4096
+    const val MIN_PLAIN_TOKENS = 512
+    const val MAX_OUTPUT_TOKENS = 131_072
+
+    val reasoningModels = setOf(
+        "deepseek-v4.1-flash-free",
+        "beam-free",
+        "crouton-alpha-free",
+        "iceman-free",
+        "inkling-2-small-free",
+        "mimo-v2.6-flash-free",
+        "nemotron-3.5-lightning-free",
+        "big-pickle",
+        "flint-40b-free",
+    )
+
+    val modelCeilings = mapOf(
+        "beam-free" to 131_072,
+        "crouton-alpha-free" to 270_000,
+        "iceman-free" to 131_072,
+        "inkling-2-small-free" to 131_072,
+        "mimo-v2.6-flash-free" to 32_000,
+        "nemotron-3.5-lightning-free" to 262_144,
+        "big-pickle" to 32_000,
+        "deepseek-v4.1-flash-free" to 64_000,
+        "flint-40b-free" to 65_536,
+    )
 
     const val OPENCODE_PREAMBLE =
         "You are opencode, an interactive CLI tool that helps users with software engineering tasks. Use the instructions below and the tools available to you to assist the user."
@@ -66,6 +98,28 @@ object OpenCodeFreeSupport {
         return openCodeSession
     }
 
+    /** Burns the current session and re-mints a fresh one immediately (used on quota 429). */
+    fun burnSessionId(): String {
+        val fresh = generateSessionId()
+        if (sessionRegex.matches(fresh)) {
+            openCodeSession = fresh
+            openCodeSessionMintedAt = System.currentTimeMillis()
+        }
+        return openCodeSession
+    }
+
+    /** Calculates additive token headroom for reasoning models to prevent truncated output. */
+    fun effectiveMaxTokens(requested: Int?, model: String, isReasoning: Boolean): Int {
+        val wanted = requested ?: MAX_OUTPUT_TOKENS
+        val effective = if (isReasoning) {
+            maxOf(wanted, MIN_ANSWER_TOKENS) + THINKING_BUDGET
+        } else {
+            maxOf(wanted, MIN_PLAIN_TOKENS)
+        }
+        val ceiling = modelCeilings[model] ?: MAX_OUTPUT_TOKENS
+        return minOf(effective, ceiling)
+    }
+
     /** Transformed request body plus the wire→caller tool-name aliases the
      *  response path must undo (empty when no caller tool collided), and
      *  whether muse-class models target the `/responses` surface. */
@@ -76,8 +130,6 @@ object OpenCodeFreeSupport {
     )
 
     // Live UA resolution — offline-safe, never blocks.
-    // Precedence: env override > in-process live version > disk cache > pinned.
-    // The gate has rejected stale UA versions before; auto-refresh keeps us off that cliff.
     private val uaClient by lazy {
         OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
@@ -90,10 +142,9 @@ object OpenCodeFreeSupport {
     private var liveUaVersion: String? = null
 
     /**
-     * Fingerprint headers. [includeRequestId] is only true for the `/zen/v1`
-     * catalog call: the inference surface rejects `x-opencode-request`.
+     * Fingerprint headers (v3 wire gate).
      */
-    fun headers(includeRequestId: Boolean = false): Map<String, String> {
+    fun headers(includeRequestId: Boolean = true): Map<String, String> {
         refreshOpenCodeUA()
         val traceId = randomHex(16)
         val spanId = randomHex(8)
@@ -101,17 +152,19 @@ object OpenCodeFreeSupport {
         val headers = mutableMapOf(
             "User-Agent" to getOpenCodeUA(),
             "Authorization" to "Bearer public",
-            "x-opencode-client" to "cli",
+            "x-opencode-client" to "opencode",
             "x-opencode-project" to projectId,
             "x-opencode-session" to activeSession,
             "x-opencode-session-id" to activeSession,
             "x-session-affinity" to activeSession,
-            // Distributed-tracing headers real opencode clients emit.
+            "X-Session-Id" to activeSession,
             "b3" to "$traceId-$spanId-1-$spanId",
             "traceparent" to "00-$traceId-$spanId-01",
             "Accept" to "text/event-stream",
         )
-        if (includeRequestId) headers["x-opencode-request"] = generateRequestId()
+        if (includeRequestId) {
+            headers["x-opencode-request"] = generateRequestId()
+        }
         return headers
     }
 
@@ -120,20 +173,24 @@ object OpenCodeFreeSupport {
         // Gate: stream=false → 403 even with valid UA/session/tools.
         mutable["stream"] = JsonPrimitive(true)
 
+        val activeSession = currentSessionId()
+        // v3 wire: prompt_cache_key bound to session directly in body
+        mutable["prompt_cache_key"] = JsonPrimitive(activeSession)
+
         val model = (body["model"] as? JsonPrimitive)?.content.orEmpty()
         val isResponses = responsesModels.contains(model) || model.contains("muse-spark")
+        val isReasoning = reasoningModels.contains(model) ||
+            (body["reasoning_effort"] as? JsonPrimitive)?.contentOrNull.let { it != null && it != "none" }
+
+        val requestedTokens = (body["max_tokens"] as? JsonPrimitive)?.intOrNull
+            ?: (body["max_completion_tokens"] as? JsonPrimitive)?.intOrNull
+            ?: (body["max_output_tokens"] as? JsonPrimitive)?.intOrNull
+        val budgetedTokens = effectiveMaxTokens(requestedTokens, model, isReasoning)
 
         injectPreambleAndEnv(body, mutable, isResponses)
 
         if (isResponses) {
-            val maxOutput = body["max_output_tokens"] as? JsonPrimitive
-            if (maxOutput == null) {
-                (body["max_completion_tokens"] as? JsonPrimitive)?.let {
-                    mutable["max_output_tokens"] = it
-                } ?: (body["max_tokens"] as? JsonPrimitive)?.let {
-                    mutable["max_output_tokens"] = it
-                }
-            }
+            mutable["max_output_tokens"] = JsonPrimitive(budgetedTokens)
             mutable.remove("max_tokens")
             mutable.remove("max_completion_tokens")
             mutable["store"] = JsonPrimitive(false)
@@ -142,6 +199,7 @@ object OpenCodeFreeSupport {
             return TransformResult(JsonObject(mutable), emptyMap(), responsesPath = true)
         }
 
+        mutable["max_tokens"] = JsonPrimitive(budgetedTokens)
         val (tools, aliases) = ensureChatFingerprintTools(body)
         mutable["tools"] = tools
         return TransformResult(JsonObject(mutable), aliases, responsesPath = false)
@@ -149,8 +207,6 @@ object OpenCodeFreeSupport {
 
     /**
      * Prepend the OpenCode system-prompt preamble and <env> fingerprint marker.
-     * Existing first system message is prefixed with preamble if missing and
-     * appended with <env> marker if not carrying <env>.
      */
     private fun injectPreambleAndEnv(
         body: JsonObject,
@@ -202,8 +258,11 @@ object OpenCodeFreeSupport {
         if (!override.isNullOrEmpty()) {
             return if (override.startsWith("opencode/")) override else "opencode/$override"
         }
-        val version = liveUaVersion?.takeIf { uaVersionRegex.matches(it) } ?: UA_FALLBACK
-        return "opencode/$version ai-sdk/provider-utils/4.0.23 runtime/bun/1.3.14"
+        val live = liveUaVersion
+        if (live != null && uaVersionRegex.matches(live)) {
+            return live
+        }
+        return UA_FALLBACK
     }
 
     /** Fire-and-forget: track the live opencode-ai npm version so the gate never
@@ -219,10 +278,13 @@ object OpenCodeFreeSupport {
                 uaClient.newCall(request).execute().use { response ->
                     if (!response.isSuccessful) return@use
                     val body = response.body?.string().orEmpty()
-                    val version = Regex("\"version\"\\s*:\\s*\"(\\d+\\.\\d+\\.\\d+)\"")
+                    val version = Regex("\"version\"\\s*:\\s*\"([\\w.-]+)\"")
                         .find(body)?.groupValues?.get(1)
-                    if (version != null && uaVersionRegex.matches(version)) {
-                        liveUaVersion = version
+                    if (version != null) {
+                        val candidate = "opencode/dev/$version/opencode"
+                        if (uaVersionRegex.matches(candidate)) {
+                            liveUaVersion = candidate
+                        }
                     }
                 }
             } catch (_: Exception) {
@@ -233,8 +295,7 @@ object OpenCodeFreeSupport {
 
     /**
      * Alias caller tools that collide with a real opencode tool name to `*_pi`,
-     * then append the exact `read` + `shell` pair the gate requires. Returns the
-     * aliased array plus the wire→caller map for restoring names downstream.
+     * or tools containing "terminal" to `run_command*`, then append the exact `read` + `shell` pair.
      */
     private fun ensureChatFingerprintTools(body: JsonObject): Pair<JsonArray, Map<String, String>> {
         val existing = body["tools"] as? JsonArray
@@ -242,14 +303,22 @@ object OpenCodeFreeSupport {
             return OpenCodeFingerprintData.chatTools to emptyMap()
         }
         val aliases = mutableMapOf<String, String>()
+        var runCommandCount = 0
         val tools = existing.map { tool ->
             val name = toolNameOf(tool)
-            if (name.isEmpty() || name.lowercase() !in OpenCodeFingerprintData.opencodeToolNames) {
+            val lower = name.lowercase()
+            if (name.isEmpty()) {
                 tool
-            } else {
+            } else if (lower in OpenCodeFingerprintData.opencodeToolNames) {
                 val alias = "${name}_pi"
                 aliases[alias] = name
                 renameTool(tool, alias)
+            } else if (lower.contains("terminal")) {
+                val alias = if (runCommandCount++ == 0) "run_command" else "run_command_$runCommandCount"
+                aliases[alias] = name
+                renameTool(tool, alias)
+            } else {
+                tool
             }
         }.toMutableList()
 
@@ -306,7 +375,6 @@ object OpenCodeFreeSupport {
         return (fn["name"] as? JsonPrimitive)?.contentOrNull?.trim().orEmpty()
     }
 
-    // One stable session per process — shape must match sessionRegex.
     private fun generateSessionId(timestamp: Long = System.currentTimeMillis()): String {
         val current = (timestamp shl 12) + 1
         return "ses_${timeHexFrom(current.inv())}${unstableRandom()}"

@@ -549,8 +549,6 @@
     <string name="ui_settings_configure_protocol_hint">Setelah mengganti protokol, pastikan endpoint sesuai dengan protokol.</string>
     <string name="ui_settings_configure_thinking_label">Upaya Berpikir</string>
     <string name="ui_settings_configure_thinking_hint">Biarkan Default Penyedia, atau turunkan jika penyedia menolak tingkat tinggi.</string>
-    <string name="ui_settings_configure_thinking_start_label">Default</string>
-    <string name="ui_settings_configure_thinking_end_label">Maks</string>
     <string name="ui_settings_configure_max_tokens_label">Token Maksimum</string>
     <string name="ui_settings_configure_max_tokens_placeholder">Contoh: 200000 atau 200k</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">Masukkan bilangan bulat minimal 256</string>
@@ -623,8 +621,6 @@
     <string name="ui_onboard_preferences_notification_desc">Tampilkan status langsung agent di bilah notifikasi</string>
     <string name="ui_onboard_preferences_file_title">Akses File</string>
     <string name="ui_onboard_preferences_file_desc">Izinkan Agent membaca dan menulis file di luar sandbox</string>
-    <string name="ui_onboard_preferences_granted">Diizinkan</string>
-    <string name="ui_onboard_preferences_grant_action">Ketuk untuk mengizinkan</string>
     <string name="ui_onboard_preferences_security_group">Aturan Eksekusi</string>
     <string name="ui_onboard_preferences_security_hint">Perintah yang memerlukan konfirmasi sebelum dijalankan</string>
     <string name="ui_onboard_preferences_rule_add_action">Tambah aturan</string>
@@ -744,4 +740,75 @@
     <string name="masking_rules_error_delete_failed">Gagal menghapus aturan penyamaran: %1$s</string>
     <string name="masking_rules_delete_dialog_title">Hapus aturan penyamaran</string>
     <string name="masking_rules_delete_dialog_text">Yakin ingin menghapus aturan penyamaran \"%1$s\"? Tindakan ini tidak dapat dibatalkan.</string>
+
+    <!-- BYOK & Model Additions -->
+    <string name="ui_onboard_provider_pick_byok_hint">Apa itu BYOK?</string>
+    <string name="ui_provider_official_and_relay_summary">Relay resmi &amp; pihak ketiga</string>
+    <string name="ui_onboard_configure_model_add_button">Tambah model</string>
+    <string name="ui_onboard_configure_model_add_title">Tambah model yang tersedia</string>
+    <string name="ui_onboard_configure_model_add_placeholder">Masukkan ID model, mis. gpt-4o</string>
+    <string name="ui_onboard_configure_model_catalog_refresh">Segarkan katalog model</string>
+
+    <!-- Viewer -->
+    <string name="ui_viewer_refresh">Segarkan</string>
+    <string name="ui_viewer_open_in_browser">Buka di browser</string>
+    <string name="ui_viewer_copy_link">Salin tautan</string>
+    <string name="ui_viewer_copy_path">Salin jalur file</string>
+    <string name="ui_toast_no_compactable_history">Tidak ada riwayat percakapan untuk dikompres</string>
+    <string name="ui_backup_inspecting">Memvalidasi…</string>
+
+    <!-- Home Model Switch Sheet -->
+    <string name="ui_home_model_sheet_title">Konfigurasi Saat Ini</string>
+    <string name="ui_home_model_sheet_section_config">Konfigurasi</string>
+    <string name="ui_home_model_sheet_section_thinking">Tingkat Berpikir</string>
+    <string name="ui_home_model_sheet_section_model">Model</string>
+
+    <!-- Theme Styles & Parts -->
+    <string name="ui_theme_style_custom">Kustom</string>
+    <string name="ui_theme_style_unified">Gaya Seragam</string>
+    <string name="ui_theme_group_controls">Kontrol</string>
+    <string name="ui_theme_group_layout">Tata Letak &amp; Navigasi</string>
+    <string name="ui_theme_group_system">Animasi &amp; Sistem</string>
+    <string name="ui_theme_part_button">Tombol</string>
+    <string name="ui_theme_part_switch">Sakelar</string>
+    <string name="ui_theme_part_slider">Penggeser</string>
+    <string name="ui_theme_part_text_field">Kolom Teks</string>
+    <string name="ui_theme_part_loading">Indikator Memuat</string>
+    <string name="ui_theme_part_top_bar_buttons">Tombol Bilah Atas</string>
+    <string name="ui_theme_part_top_bar_plate">Lempeng Bilah Atas</string>
+    <string name="ui_theme_part_composer">Kotak Input Chat</string>
+    <string name="ui_theme_part_search">Bilah Pencarian</string>
+    <string name="ui_theme_part_page_scroll">Gulir Halaman</string>
+    <string name="ui_theme_part_dialog">Dialog</string>
+    <string name="ui_theme_part_menu">Menu Dropdown</string>
+    <string name="ui_theme_part_settings">Kartu Pengaturan</string>
+    <string name="ui_theme_preview_primary_btn">Utama</string>
+    <string name="ui_theme_preview_tonal_btn">Tonal</string>
+    <string name="ui_theme_preview_loading_hint">Memproses…</string>
+    <string name="ui_theme_preview_input_hint">Contoh input…</string>
+
+    <!-- Quick Prompts / Slash Commands -->
+    <string name="ui_settings_quick_prompts">Prompt Cepat</string>
+    <string name="ui_settings_quick_prompts_summary">Konfigurasi prompt slash dan cuplikan untuk input chat</string>
+    <string name="quick_prompt_page_description">Sarankan dan perluas prompt preset secara cepat dengan mengetik / di kolom pesan.</string>
+    <string name="quick_prompt_page_empty_description">Ketuk tombol di kanan atas untuk menambahkan prompt cepat pertama Anda.</string>
+    <string name="quick_prompt_loading">Memuat prompt cepat…</string>
+    <string name="quick_prompt_editor_title_create">Prompt Cepat Baru</string>
+    <string name="quick_prompt_save_action">Simpan Prompt</string>
+    <string name="quick_prompt_field_name">Kunci Pemicu</string>
+    <string name="quick_prompt_field_name_hint">mis. btw</string>
+    <string name="quick_prompt_field_name_description">Dicuplik dengan / diikuti kunci ini. Spasi dan karakter khusus tidak diizinkan.</string>
+    <string name="quick_prompt_field_prompt">Konten Prompt</string>
+    <string name="quick_prompt_field_prompt_hint">Konten yang akan menggantikan atau diperluas</string>
+    <string name="quick_prompt_field_enabled">Diaktifkan</string>
+    <string name="quick_prompt_delete_dialog_title">Hapus Prompt Cepat</string>
+    <string name="quick_prompt_delete_dialog_text">Hapus prompt \"%1$s\"? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="quick_prompt_error_name_required">Kunci pemicu wajib diisi.</string>
+    <string name="quick_prompt_error_name_invalid">Kunci pemicu tidak boleh mengandung spasi atau karakter khusus.</string>
+    <string name="quick_prompt_error_name_duplicate">Prompt dengan kunci pemicu ini sudah ada.</string>
+    <string name="quick_prompt_error_name_reserved">Kunci pemicu tidak boleh menggunakan perintah atau kata kunci sistem yang dicadangkan.</string>
+    <string name="quick_prompt_error_prompt_required">Konten prompt wajib diisi.</string>
+    <string name="quick_prompt_error_load_failed">Gagal memuat prompt cepat.</string>
+    <string name="quick_prompt_error_save_failed">Gagal menyimpan prompt cepat.</string>
+    <string name="quick_prompt_error_delete_failed">Gagal menghapus prompt cepat.</string>
 </resources>

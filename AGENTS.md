@@ -127,13 +127,13 @@ Zafiro Agent 的对话功能是限定在主进程之内的，虽然有一个宿�
   - 目的：允许同一台测试机/真机上同时安装 Release 版与 Debug 版共存，避免 `INSTALL_FAILED_DUPLICATE_PERMISSION` 权限声明冲突或签名不一致导致覆盖失败。后续维护或重构严禁移除 debug 的 `.debug` 后缀。
 - **免费模型接入 (Free LLM Providers)**:
   - `KiloCode Free` (`kilo-free`): 直连 `https://api.kilo.ai/api/gateway/chat/completions`，支持空 API Key，默认模型 `kilo-auto/free`。
-  - `OpenCode Free` (`opencode-zen-free`): 直连 `https://opencode.ai/zen/v1/chat/completions`，支持空 API Key，默认模型 `mimo-v2.6-flash-free`。必须通过 `OpenCodeFreeSupport` 注入 `<env>` 环境指纹 marker、每周自动重铸 session 保持会话新鲜（防 429 伪限流），并注入 CLI 工具指纹。
-  - `OpenCode PI` (`opencode-pi`): 经 Termux `pi-bansos` 代理的回退通道 (`http://127.0.0.1:18080/v1/chat/completions`)。
+  - `OpenCode Free` (`opencode-zen-free`): 直连 `https://opencode.ai/inference/v1/chat/completions`，支持空 API Key，默认模型 `deepseek-v4.1-flash-free`。通过 `OpenCodeFreeSupport` 注入 v3 wire gate (`opencode/dev/.../opencode` UA, `x-opencode-client: opencode`, `prompt_cache_key`, `<env>` 环境指纹, verbatim `read`+`shell` schema, 429 自动 session rotation `burnSessionId()`)，并应用 additive token budgeting (`max(requested, 1024) + 4096`) 防止 reasoning 模型输出截断；底层通过 OkHttp JA4 cipher suites (`5b57614c22b0`) 绕过 edge 限流。
+  - `OpenCode PI` (`opencode-pi`): 经 Termux `pi-bansos` 或 `opencode-to-api` 代理的回退通道 (`http://127.0.0.1:18080/v1/chat/completions`)。
   - 设置页中的 `proxy` 仅支持标准 HTTP/SOCKS 代理；像 Vercel relay 等需要自定义 `x-relay-target` 头的服务不能直接填入普通代理输入框。
 - **会话滑动快捷操作 (Session Swipe Actions)**:
   - 对话历史列表中每一项封装在 `SwipeToDismissBox` 中：向右滑重命名会话，向左滑删除会话。在进行合并和 UI 重构时必须完整保留该能力。
 - **Upstream 同步基线**:
-  - 已完整合并 upstream `v16-1.9.0`（包含 Room 全文搜索 `ZafiroSearchBar`、Viewer 媒体导航、输入框折叠优化、多主题系统 `BaseTheme` / `ZafiroTopBarLayout`）。
+  - 已完整合并 upstream `v20-2.0.0`（包含 Room 全文搜索 `ZafiroSearchBar`、Viewer 媒体与 Web 预览、Slash Suggestions、Quick Prompts、HomeModelSwitchSheet、Orphan Image Cleanup、输入框折叠优化、多主题系统 `BaseTheme` / `ZafiroTopBarLayout` / UI styles）。
 - **构建与发布约束 (GitHub Actions Only)**:
   - Android 构建只在 GitHub Actions 执行；本地环境不作为 Gradle、Chaquopy 或签名构建环境，不要在本地运行 Android build。
   - Release 构建使用 `.github/workflows/release.yml` 的 `workflow_dispatch` 或版本 tag 触发；签名构建依赖 GitHub Secrets。

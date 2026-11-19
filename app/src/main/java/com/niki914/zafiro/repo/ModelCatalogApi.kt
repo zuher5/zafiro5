@@ -40,7 +40,7 @@ internal object ModelCatalogApi {
     ): ModelCatalog = withContext(Dispatchers.IO) {
         // OpenCode Zen gate rejects a bare client: catalog scan must carry the
         // same fingerprint as inference or it 403s.
-        val isOpenCodeZen = modelsUrl.contains("opencode.ai/zen", ignoreCase = true)
+        val isOpenCodeZen = modelsUrl.contains("opencode.ai", ignoreCase = true)
         val request = Request.Builder()
             .url(modelsUrl)
             .get()

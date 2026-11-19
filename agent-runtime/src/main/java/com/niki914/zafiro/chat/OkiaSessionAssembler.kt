@@ -310,7 +310,15 @@ internal class OkiaSessionAssembler(
         }
 
         override fun parseStream(rawSseLines: Flow<SseLine>): Flow<ProtocolEvent> =
-            base.parseStream(rawSseLines).map(::restoreToolAlias)
+            base.parseStream(rawSseLines).map { event ->
+                if (event is ProtocolEvent.Error) {
+                    val msg = event.cause.message.orEmpty()
+                    if (msg.contains("429") || msg.contains("FreeUsageLimitError", ignoreCase = true) || msg.contains("quota", ignoreCase = true)) {
+                        OpenCodeFreeSupport.burnSessionId()
+                    }
+                }
+                restoreToolAlias(event)
+            }
 
         /** Undo the `*_pi` aliasing so the loop sees Zafiro's own tool names. */
         private fun restoreToolAlias(event: ProtocolEvent): ProtocolEvent {
