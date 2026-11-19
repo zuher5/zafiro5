@@ -151,6 +151,36 @@ object OpenCodeFreeSupport {
         val reasoningModels: Set<String>,
     )
 
+    // Fallback model facts (katalog 2026-11; dikoreksi otomatis saat fetch).
+    // Dideklarasikan sebelum `catalog` — inisialisasi properti object berurutan.
+    private val FALLBACK_REASONING_MODELS: Set<String> = setOf(
+        "deepseek-v4.1-flash-free",
+        "beam-free",
+        "iceman-free",
+        "mimo-v2.6-flash-free",
+        "nemotron-3.5-lightning-free",
+        "big-pickle",
+        "flint-40b-free",
+        "hy4-flash-free",
+        "longcat-2.5-free",
+        "tidepool-alpha-free",
+        "nemotron-3.5-super-vl-free",
+    )
+
+    private val FALLBACK_MODEL_CEILINGS: Map<String, Int> = mapOf(
+        "beam-free" to 131_072,
+        "iceman-free" to 131_072,
+        "mimo-v2.6-flash-free" to 32_000,
+        "nemotron-3.5-lightning-free" to 262_144,
+        "big-pickle" to 32_000,
+        "deepseek-v4.1-flash-free" to 32_000,
+        "flint-40b-free" to 65_536,
+        "hy4-flash-free" to 65_536,
+        "longcat-2.5-free" to 262_144,
+        "tidepool-alpha-free" to 131_072,
+        "nemotron-3.5-super-vl-free" to 131_072,
+    )
+
     @Volatile
     private var catalog = Catalog(
         inferencePrefix = FALLBACK_INFERENCE_PREFIX,
@@ -485,34 +515,4 @@ object OpenCodeFreeSupport {
         }
         return String(chars)
     }
-
-    // ── Fallback model facts (katalog 2026-11; dikoreksi otomatis saat fetch) ──
-
-    private val FALLBACK_REASONING_MODELS: Set<String> = setOf(
-        "deepseek-v4.1-flash-free",
-        "beam-free",
-        "iceman-free",
-        "mimo-v2.6-flash-free",
-        "nemotron-3.5-lightning-free",
-        "big-pickle",
-        "flint-40b-free",
-        "hy4-flash-free",
-        "longcat-2.5-free",
-        "tidepool-alpha-free",
-        "nemotron-3.5-super-vl-free",
-    )
-
-    private val FALLBACK_MODEL_CEILINGS: Map<String, Int> = mapOf(
-        "beam-free" to 131_072,
-        "iceman-free" to 131_072,
-        "mimo-v2.6-flash-free" to 32_000,
-        "nemotron-3.5-lightning-free" to 262_144,
-        "big-pickle" to 32_000,
-        "deepseek-v4.1-flash-free" to 32_000,
-        "flint-40b-free" to 65_536,
-        "hy4-flash-free" to 65_536,
-        "longcat-2.5-free" to 262_144,
-        "tidepool-alpha-free" to 131_072,
-        "nemotron-3.5-super-vl-free" to 131_072,
-    )
 }
