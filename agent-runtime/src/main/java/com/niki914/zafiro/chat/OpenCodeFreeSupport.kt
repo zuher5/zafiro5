@@ -47,6 +47,8 @@ object OpenCodeFreeSupport {
         "nemotron-3.5-lightning-free",
         "big-pickle",
         "flint-40b-free",
+        "glm-5.3-flash-free",
+        "nemotron-3.5-super-vl-free",
     )
 
     val modelCeilings = mapOf(
@@ -59,10 +61,9 @@ object OpenCodeFreeSupport {
         "big-pickle" to 32_000,
         "deepseek-v4.1-flash-free" to 64_000,
         "flint-40b-free" to 65_536,
+        "glm-5.3-flash-free" to 32_000,
+        "nemotron-3.5-super-vl-free" to 131_072,
     )
-
-    const val OPENCODE_PREAMBLE =
-        "You are opencode, an interactive CLI tool that helps users with software engineering tasks. Use the instructions below and the tools available to you to assist the user."
 
     const val ENV_FINGERPRINT_NOTE =
         "Here is some useful information about the environment you are running in:\n" +
@@ -161,6 +162,7 @@ object OpenCodeFreeSupport {
             "b3" to "$traceId-$spanId-1-$spanId",
             "traceparent" to "00-$traceId-$spanId-01",
             "Accept" to "text/event-stream",
+            "Connection" to "close",
         )
         if (includeRequestId) {
             headers["x-opencode-request"] = generateRequestId()
@@ -206,7 +208,7 @@ object OpenCodeFreeSupport {
     }
 
     /**
-     * Prepend the OpenCode system-prompt preamble and <env> fingerprint marker.
+     * Ensure the <env> fingerprint marker is present in system prompt (matches opencode-to-api).
      */
     private fun injectPreambleAndEnv(
         body: JsonObject,
@@ -232,11 +234,8 @@ object OpenCodeFreeSupport {
         val firstRole = (firstMsg?.get("role") as? JsonPrimitive)?.content
         if (firstRole == "system") {
             var content = (firstMsg["content"] as? JsonPrimitive)?.content.orEmpty()
-            if (!content.startsWith(OPENCODE_PREAMBLE)) {
-                content = "$OPENCODE_PREAMBLE\n\n$content"
-            }
             if (!content.contains("<env>")) {
-                content = "$content\n\n$ENV_FINGERPRINT_NOTE"
+                content = if (content.isNotBlank()) "$content\n\n$ENV_FINGERPRINT_NOTE" else ENV_FINGERPRINT_NOTE
             }
             val updatedFirst = firstMsg.toMutableMap()
             updatedFirst["content"] = JsonPrimitive(content)
@@ -245,7 +244,7 @@ object OpenCodeFreeSupport {
             val sysMsg = JsonObject(
                 mapOf(
                     "role" to JsonPrimitive("system"),
-                    "content" to JsonPrimitive("$OPENCODE_PREAMBLE\n\n$ENV_FINGERPRINT_NOTE"),
+                    "content" to JsonPrimitive(ENV_FINGERPRINT_NOTE),
                 ),
             )
             messagesList.add(0, sysMsg)

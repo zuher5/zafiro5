@@ -37,7 +37,8 @@ internal object OpenCodeFingerprintData {
             "output is large, the full result is saved to a file and a truncated preview is " +
             "returned. Rely on automatic truncation unless filtering the output is more useful. " +
             "Commands accept an optional timeout, background commands have no timeout by default. " +
-            "Background commands return immediately, and you will be notified when they complete."
+            "Background commands return immediately, and you will be notified when they complete. " +
+            "DO NOT poll for completion."
 
     private val readParameters = JsonObject(
         mapOf(

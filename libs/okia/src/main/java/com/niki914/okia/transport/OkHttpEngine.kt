@@ -16,6 +16,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -208,6 +209,7 @@ class OkHttpEngine(
             .writeTimeout(timeouts.writeMs, TimeUnit.MILLISECONDS)
             .proxySelector(proxySelector())
         if (requestUrl.contains("opencode.ai", ignoreCase = true)) {
+            builder.protocols(listOf(Protocol.HTTP_1_1))
             builder.connectionSpecs(listOf(OPENCODE_CONNECTION_SPEC, ConnectionSpec.CLEARTEXT))
         }
         return builder.build()
