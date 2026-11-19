@@ -222,6 +222,25 @@ interface ConversationDao {
     @Query("UPDATE conversation SET title = :title, title_edited = 1 WHERE id = :id")
     suspend fun renameConversation(id: String, title: String): Int
 
+    /** 查询指定分支组内所有包含图片缓存引用的消息 JSON。用于删除前收集待清理图片候选。 */
+    @Query(
+        """
+        SELECT message_json FROM conversation_entry
+        WHERE conversation_id IN (SELECT id FROM conversation WHERE root_id = :rootId OR id = :rootId)
+          AND message_json LIKE '%image_cache%'
+        """,
+    )
+    suspend fun listBranchGroupImageEntries(rootId: String): List<String>
+
+    /** 查询全库所有包含图片缓存引用的消息 JSON。用于判定图片是否已被完全孤立。 */
+    @Query(
+        """
+        SELECT message_json FROM conversation_entry
+        WHERE message_json LIKE '%image_cache%'
+        """,
+    )
+    suspend fun listAllImageMessageJsons(): List<String>
+
     @Query("UPDATE conversation SET title = :title, title_edited = 1 WHERE root_id = :rootId")
     suspend fun renameBranchGroup(rootId: String, title: String): Int
 

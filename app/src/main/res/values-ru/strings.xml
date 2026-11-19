@@ -5,6 +5,8 @@
     <string name="ui_onboard_startup_demo_button">Начать</string>
     <string name="ui_onboard_provider_pick_title">Выберите провайдера</string>
     <string name="ui_onboard_provider_pick_description">Начните здесь, чтобы подключить свою модель.\nЧтобы продолжить, выберите провайдера.</string>
+    <string name="ui_onboard_provider_pick_byok_hint">Что такое BYOK?</string>
+    <string name="ui_provider_official_and_relay_summary">Официальный API и сторонние реле</string>
     <string name="ui_onboard_configure_title">Настройка доступа к модели</string>
     <string name="ui_onboard_configure_description">Введите параметры модели, чтобы начать.</string>
     <string name="ui_onboard_configure_next">Далее</string>
@@ -19,6 +21,10 @@
     <string name="ui_onboard_configure_model_placeholder">Введите ID модели</string>
     <string name="ui_onboard_configure_model_example">Например: %1$s</string>
     <string name="ui_onboard_configure_model_catalog_open">Выбрать модель</string>
+    <string name="ui_onboard_configure_model_add_button">Добавить модель</string>
+    <string name="ui_onboard_configure_model_add_title">Добавить доступную модель</string>
+    <string name="ui_onboard_configure_model_add_placeholder">Введите ID модели, напр. gpt-4o</string>
+    <string name="ui_onboard_configure_model_catalog_refresh">Обновить каталог моделей</string>
     <string name="ui_onboard_configure_model_catalog_title">Выбрать модель</string>
     <string name="ui_onboard_configure_model_catalog_search_placeholder">Поиск моделей</string>
     <string name="ui_onboard_configure_model_catalog_empty">Подходящих моделей нет</string>
@@ -73,6 +79,10 @@
     <string name="ui_home_file_category_file">Файл</string>
     <string name="ui_action_view">Просмотр</string>
     <string name="ui_viewer_copy_all">Скопировать все</string>
+    <string name="ui_viewer_refresh">Обновить</string>
+    <string name="ui_viewer_open_in_browser">Открыть в браузере</string>
+    <string name="ui_viewer_copy_link">Скопировать ссылку</string>
+    <string name="ui_viewer_copy_path">Скопировать путь к файлу</string>
     <string name="ui_image_unavailable">Недоступно</string>
     <string name="ui_viewer_image_unavailable">Не удалось загрузить изображение</string>
     <string name="ui_viewer_image_unavailable_desc">Файл изображения не существует или кеш был очищен</string>
@@ -80,6 +90,7 @@
     <string name="ui_toast_generating">Идёт генерация, подождите</string>
     <string name="ui_toast_empty_input">Пожалуйста, введите сообщение</string>
     <string name="ui_toast_round_busy">Предыдущий раунд ещё выполняется; подождите или остановите его</string>
+    <string name="ui_toast_no_compactable_history">Нет истории диалога для сжатия</string>
     <string name="ui_home_error_retry_body">Попробуйте позже.</string>
     <string name="ui_home_error_config_required_title">Настройки модели заполнены не полностью</string>
     <string name="ui_home_error_config_required_body">Заполните настройки модели.</string>
@@ -331,9 +342,9 @@
     <string name="tool_group_dev_tools">Инструменты разработчика</string>
     <string name="tool_group_dev_tools_summary">Выполнение команд Shell и кода Python на устройстве</string>
     <string name="tool_group_android_native">Системные возможности Android</string>
-    <string name="tool_group_android_native_summary">Системные действия: открытие ссылок, поиск и запуск приложений, отправка уведомлений</string>
+    <string name="tool_group_android_native_summary">Системные действия: поиск приложений, отправка уведомлений, просмотр изображений</string>
     <string name="tool_group_screen_operation">Управление экраном</string>
-    <string name="tool_group_screen_operation_summary">Чтение экрана и действия на нём через службу специальных возможностей или shell</string>
+    <string name="tool_group_screen_operation_summary">Набор навыков для работы с экраном</string>
     <string name="tool_custom_py_tools_entry">Свои инструменты на Python</string>
     <string name="tool_custom_py_tools_entry_summary">Ваши python-инструменты с параметрами: агент может создавать, изменять и запускать их для проверки</string>
     <string name="custom_py_tool_page_title">Свои инструменты на Python</string>
@@ -470,6 +481,7 @@
     <string name="ui_backup_select_all">Выбрать все</string>
     <string name="ui_backup_select_none">Снять выбор</string>
     <string name="ui_backup_restoring">Восстановление</string>
+    <string name="ui_backup_inspecting">Проверка…</string>
     <string name="ui_settings_general_group_appearance">Оформление и язык</string>
     <string name="ui_settings_general_group_floating_notification">Плавающий шар и уведомления</string>
     <string name="ui_settings_general_group_conversation">Диалог и взаимодействие</string>
@@ -541,8 +553,10 @@
     <string name="ui_settings_configure_protocol_hint">После смены протокола проверьте, что адрес соответствует протоколу.</string>
     <string name="ui_settings_configure_thinking_label">Уровень размышлений</string>
     <string name="ui_settings_configure_thinking_hint">По умолчанию используется поведение модели. Уменьшите уровень, если провайдер отклоняет запрос.</string>
-    <string name="ui_settings_configure_thinking_start_label">Default</string>
-    <string name="ui_settings_configure_thinking_end_label">Max</string>
+    <string name="ui_home_model_sheet_title">Текущая конфигурация</string>
+    <string name="ui_home_model_sheet_section_config">Конфигурация</string>
+    <string name="ui_home_model_sheet_section_thinking">Интенсивность размышлений</string>
+    <string name="ui_home_model_sheet_section_model">Модель</string>
     <string name="ui_settings_configure_max_tokens_label">Максимум токенов</string>
     <string name="ui_settings_configure_max_tokens_placeholder">Например: 200000 или 200k</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">Введите корректное число не меньше 256, поддерживаются k/m/b</string>
@@ -553,6 +567,43 @@
     <string name="ui_theme_style_liquid">Glass</string>
     <string name="ui_theme_style_md3">MD3</string>
     <string name="ui_theme_style_md3e">MD3E</string>
+    <string name="ui_theme_style_custom">Пользовательский</string>
+    <string name="ui_theme_style_unified">Единый стиль</string>
+
+    <string name="ui_theme_group_controls">Элементы управления</string>
+    <string name="ui_theme_group_layout">Макет и навигация</string>
+    <string name="ui_theme_group_system">Анимации и система</string>
+
+    <string name="ui_theme_part_button">Кнопки</string>
+
+    <string name="ui_theme_part_switch">Переключатель</string>
+
+    <string name="ui_theme_part_slider">Ползунок</string>
+
+    <string name="ui_theme_part_text_field">Текстовое поле</string>
+
+    <string name="ui_theme_part_loading">Индикатор загрузки</string>
+
+    <string name="ui_theme_part_top_bar_buttons">Кнопки панели навигации</string>
+
+    <string name="ui_theme_part_top_bar_plate">Фон панели навигации</string>
+
+    <string name="ui_theme_part_composer">Поле ввода чата</string>
+
+    <string name="ui_theme_part_search">Панель поиска</string>
+
+    <string name="ui_theme_part_page_scroll">Прокрутка страницы</string>
+
+    <string name="ui_theme_part_dialog">Диалоги</string>
+
+    <string name="ui_theme_part_menu">Выпадающее меню</string>
+
+    <string name="ui_theme_part_settings">Карточки настроек</string>
+
+    <string name="ui_theme_preview_primary_btn">Основная</string>
+    <string name="ui_theme_preview_tonal_btn">Тональная</string>
+    <string name="ui_theme_preview_loading_hint">Обработка…</string>
+    <string name="ui_theme_preview_input_hint">Введите текст…</string>
 
     <string name="ui_theme_mode_system">Как в системе</string>
     <string name="ui_theme_mode_light">Светлая</string>
@@ -594,8 +645,6 @@
     <string name="ui_onboard_preferences_notification_desc">Показывать состояние агента в шторке уведомлений</string>
     <string name="ui_onboard_preferences_file_title">Доступ к файлам</string>
     <string name="ui_onboard_preferences_file_desc">Разрешить агенту читать и записывать файлы вне песочницы приложения</string>
-    <string name="ui_onboard_preferences_granted">Разрешено</string>
-    <string name="ui_onboard_preferences_grant_action">Нажмите, чтобы разрешить</string>
     <string name="ui_onboard_preferences_security_group">Правила выполнения</string>
     <string name="ui_onboard_preferences_security_hint">Команды, требующие подтверждения перед выполнением</string>
     <string name="ui_onboard_preferences_rule_add_action">Добавить правило</string>
@@ -644,6 +693,29 @@
     <string name="text_action_menu_label">Спросить у Zafiro</string>
     <string name="ui_settings_actions">Действия с текстом</string>
     <string name="ui_settings_actions_summary">Настройка действий для выделенного текста</string>
+    <string name="ui_settings_quick_prompts">Быстрые подсказки</string>
+    <string name="ui_settings_quick_prompts_summary">Настройка фраз и шаблонов, вызываемых через / в поле ввода</string>
+    <string name="quick_prompt_page_description">Быстро находите и вставляйте сохраненные подсказки, набрав / в поле ввода.</string>
+    <string name="quick_prompt_page_empty_description">Нажмите плюс в правом верхнем углу, чтобы добавить первую подсказку.</string>
+    <string name="quick_prompt_loading">Загрузка подсказок…</string>
+    <string name="quick_prompt_editor_title_create">Новая подсказка</string>
+    <string name="quick_prompt_save_action">Сохранить подсказку</string>
+    <string name="quick_prompt_field_name">Ключ вызова</string>
+    <string name="quick_prompt_field_name_hint">например: btw</string>
+    <string name="quick_prompt_field_name_description">Срабатывает при вводе / с этим ключом. Пробелы и специальные символы запрещены.</string>
+    <string name="quick_prompt_field_prompt">Текст подсказки</string>
+    <string name="quick_prompt_field_prompt_hint">Текст для вставки или замены</string>
+    <string name="quick_prompt_field_enabled">Включено</string>
+    <string name="quick_prompt_delete_dialog_title">Удалить подсказку</string>
+    <string name="quick_prompt_delete_dialog_text">Удалить подсказку «%1$s»? Это действие нельзя отменить.</string>
+    <string name="quick_prompt_error_name_required">Введите ключ вызова.</string>
+    <string name="quick_prompt_error_name_invalid">Ключ вызова не должен содержать пробелы или специальные символы.</string>
+    <string name="quick_prompt_error_name_duplicate">Подсказка с таким ключом уже существует.</string>
+    <string name="quick_prompt_error_name_reserved">Ключ не может использовать системные команды или ключевые слова.</string>
+    <string name="quick_prompt_error_prompt_required">Введите текст подсказки.</string>
+    <string name="quick_prompt_error_load_failed">Не удалось загрузить подсказки.</string>
+    <string name="quick_prompt_error_save_failed">Не удалось сохранить подсказку.</string>
+    <string name="quick_prompt_error_delete_failed">Не удалось удалить подсказку.</string>
     <string name="text_action_page_description">Действия выполняются над текстом, выделенным в других приложениях.</string>
     <string name="text_action_page_empty_description">Нажмите в правом верхнем углу, чтобы добавить первое действие.</string>
     <string name="text_action_loading">Загрузка действий…</string>

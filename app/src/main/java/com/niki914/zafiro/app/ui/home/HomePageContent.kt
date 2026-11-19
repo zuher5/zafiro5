@@ -40,7 +40,7 @@ import com.niki914.zafiro.app.ui.helper.ZafiroToast
 import com.niki914.zafiro.app.ui.home.dialog.ScreenControlConsentDialog
 import com.niki914.zafiro.app.ui.home.dialog.ToolPermissionDialog
 import com.niki914.zafiro.app.ui.home.dialog.UpdateAvailableDialog
-import com.niki914.zafiro.app.ui.home.header.HomeConfigPopover
+import com.niki914.zafiro.app.ui.home.header.HomeModelSwitchSheet
 import com.niki914.zafiro.app.ui.home.header.HomeTitleConfigChip
 import com.niki914.zafiro.app.ui.home.header.HomeTopBarContribution
 import com.niki914.zafiro.app.ui.model.home.FileAttachReason
@@ -99,6 +99,7 @@ fun HomePageContent(
 
                 HomeChatEffect.EmptyInputAttempted -> ZafiroToast.show(R.string.ui_toast_empty_input)
                 HomeChatEffect.RoundBusy -> ZafiroToast.show(R.string.ui_toast_round_busy)
+                HomeChatEffect.NoCompactableHistory -> ZafiroToast.show(R.string.ui_toast_no_compactable_history)
             }
         }
     }
@@ -281,8 +282,10 @@ fun HomePageContent(
         }
     }
 
-    LaunchedEffect(Unit) {
-        latestViewModel.sendIntent(HomeChatIntent.RefreshConfigs)
+    LaunchedEffect(isCurrentPage) {
+        if (isCurrentPage) {
+            latestViewModel.sendIntent(HomeChatIntent.RefreshConfigs)
+        }
     }
 
     DisposableEffect(Unit) {
@@ -329,19 +332,27 @@ fun HomePageContent(
             latestViewModel.sendIntent(HomeChatIntent.NewConversation)
         },
         onOpenSettings = latestOnOpenSettings,
+        isGenerating = uiState.isGenerating,
         titleContent = titleContent,
     )
 
     val composerFocusRequester = remember { FocusRequester() }
 
-    HomeConfigPopover(
-        uiState = uiState,
-        anchorBounds = titleAnchorBounds,
+    HomeModelSwitchSheet(
+        visible = uiState.isConfigMenuVisible,
+        savedConfigs = uiState.savedConfigs,
+        activeConfig = uiState.displayConfig,
         onDismissRequest = {
             viewModel.sendIntent(HomeChatIntent.DismissConfigMenu)
         },
         onSelectConfig = { configId ->
             viewModel.sendIntent(HomeChatIntent.SelectConfig(configId))
+        },
+        onSelectModel = { configId, modelId ->
+            viewModel.sendIntent(HomeChatIntent.SelectModel(configId, modelId))
+        },
+        onUpdateThinkingLevel = { configId, wireValue ->
+            viewModel.sendIntent(HomeChatIntent.UpdateThinkingLevel(configId, wireValue))
         },
     )
 

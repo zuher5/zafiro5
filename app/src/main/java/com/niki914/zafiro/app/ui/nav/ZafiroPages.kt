@@ -187,6 +187,19 @@ data class McpServerDetailPage(
         if (isCreating) null else TopBarActionSpec(icon = Icons.Default.Delete, contentDescription = "Delete Button")
 }
 
+data class QuickPromptDetailPage(
+    val promptName: String,
+    val promptIndex: Int,
+    val isCreating: Boolean = false,
+) : ZafiroPage {
+    override val routeKey: String = "quick-prompt-detail:$promptIndex:$promptName"
+    override val titleSpec: PageTitleSpec = TextTitle(promptName)
+    override val leftAction: TopBarActionSpec =
+        TopBarActionSpec(icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back Button")
+    override val rightAction: TopBarActionSpec? =
+        if (isCreating) null else TopBarActionSpec(icon = Icons.Default.Delete, contentDescription = "Delete Button")
+}
+
 data class TextActionDetailPage(
     val actionName: String,
     val actionIndex: Int,
@@ -326,6 +339,15 @@ data object MarkdownScalePage : ZafiroPage {
     override val leftAction: TopBarActionSpec =
         TopBarActionSpec(icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back Button")
     override val rightAction: TopBarActionSpec? = null
+}
+
+data object ThemeStylesPage : ZafiroPage {
+    override val routeKey: String = "theme-styles"
+    override val titleSpec: PageTitleSpec = ResTitle(R.string.ui_settings_theme_style_title)
+    override val leftAction: TopBarActionSpec =
+        TopBarActionSpec(icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back Button")
+    override val rightAction: TopBarActionSpec? = null
+    override val titleMode: TitleBarMode = TitleBarMode.Collapsible
 }
 
 data object FloatingBallSettingsPage : ZafiroPage {

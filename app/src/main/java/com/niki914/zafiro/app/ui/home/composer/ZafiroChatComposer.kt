@@ -44,8 +44,9 @@ import androidx.compose.ui.unit.dp
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.kyant.backdrop.drawBackdrop
 import com.niki914.uikit.base.LocalAppDarkTheme
-import com.niki914.uikit.base.LocalThemeStyle
 import com.niki914.uikit.base.ThemeStyle
+import com.niki914.uikit.base.UiStylePart
+import com.niki914.uikit.base.resolvedUiStyle
 import com.niki914.uikit.infra.LiquidGlassPresets
 import com.niki914.uikit.infra.LocalScreenBackdrop
 import com.niki914.uikit.infra.interaction.InteractiveHighlight
@@ -56,6 +57,9 @@ import com.niki914.uikit.motion.springSquish
 import com.niki914.zafiro.app.R
 import com.niki914.zafiro.app.ui.home.composer.attach.ComposerAttachButton
 import com.niki914.zafiro.app.ui.home.composer.send.ComposerSendButton
+import com.niki914.zafiro.app.ui.home.composer.suggestion.SlashSuggestion
+import com.niki914.zafiro.app.ui.home.composer.suggestion.SlashTrigger
+import com.niki914.zafiro.app.ui.home.composer.suggestion.findSlashTrigger
 
 /** 紧凑态 composer 最小高度：12dp 容器垂直 padding × 2 + 48sp 按钮 footprint。 */
 internal val COMPACT_COMPOSER_MIN_HEIGHT = 72.dp
@@ -85,6 +89,9 @@ fun ZafiroChatComposer(
     modifier: Modifier = Modifier,
     contextProgress: Float? = null,
     onAttachImageClick: () -> Unit = {},
+    onSlashTriggerChange: (SlashTrigger?) -> Unit = {},
+    pendingSuggestion: SlashSuggestion? = null,
+    onSuggestionApplied: () -> Unit = {},
 ) {
     var expandedLatch by remember { mutableStateOf(false) }
     var compactWidth by remember { mutableIntStateOf(0) }
@@ -127,7 +134,40 @@ fun ZafiroChatComposer(
         }
     }
 
-    val themeStyle = LocalThemeStyle.current
+    val currentTrigger = remember(textFieldValue.text, textFieldValue.selection.end, isFocused) {
+        if (isFocused) {
+            findSlashTrigger(textFieldValue.text, textFieldValue.selection.end)
+        } else {
+            null
+        }
+    }
+
+    LaunchedEffect(currentTrigger) {
+        onSlashTriggerChange(currentTrigger)
+    }
+
+    LaunchedEffect(pendingSuggestion) {
+        val suggestion = pendingSuggestion ?: return@LaunchedEffect
+        val text = textFieldValue.text
+        val cursor = textFieldValue.selection.end
+        val trigger = findSlashTrigger(text, cursor)
+        if (trigger != null) {
+            val before = text.substring(0, trigger.slashIndex)
+            val after = text.substring(trigger.endIndex)
+            val newText = before + suggestion.replaceToken + after
+            val newCursor = before.length + suggestion.replaceToken.length
+            textFieldValue = TextFieldValue(
+                text = newText,
+                selection = TextRange(newCursor),
+            )
+            if (newText != value) {
+                onValueChange(newText)
+            }
+        }
+        onSuggestionApplied()
+    }
+
+    val themeStyle = resolvedUiStyle(UiStylePart.Composer)
     val colorScheme = MaterialTheme.colorScheme
     val isDarkTheme = LocalAppDarkTheme.current
     val interactiveEffectsEnabled = !isFocused || textFieldValue.text.isEmpty()

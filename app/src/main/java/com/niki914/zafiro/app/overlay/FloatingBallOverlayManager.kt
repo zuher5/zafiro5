@@ -328,6 +328,7 @@ object FloatingBallOverlayManager {
                         seedColor = seed,
                         isCatppuccin = themePrefs.isCatppuccin,
                         themeStyle = themePrefs.themeStyle,
+                        uiStyleLookup = ThemeController.uiStyleLookup(),
                     ) {
                         FloatingBallCollapsedBall(
                             onClick = {
@@ -395,6 +396,7 @@ object FloatingBallOverlayManager {
                         seedColor = seed,
                         isCatppuccin = themePrefs.isCatppuccin,
                         themeStyle = themePrefs.themeStyle,
+                        uiStyleLookup = ThemeController.uiStyleLookup(),
                     ) {
                         FloatingBallMorphCard(
                             state = uiState.ballState,
@@ -544,6 +546,7 @@ object FloatingBallOverlayManager {
                     seedColor = seed,
                     isCatppuccin = themePrefs.isCatppuccin,
                     themeStyle = themePrefs.themeStyle,
+                    uiStyleLookup = ThemeController.uiStyleLookup(),
                 ) {
                     val uiState by vm.uiStateFlow.collectAsState()
                     FloatingBallDetailMorphCard(

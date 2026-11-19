@@ -7,6 +7,7 @@ import com.niki914.zafiro.app.conversation.ConversationSummary
 import com.niki914.zafiro.app.conversation.ForkKind
 import com.niki914.zafiro.app.conversation.ForkResult
 import com.niki914.zafiro.app.conversation.TurnBranchState
+import com.niki914.zafiro.app.ui.home.composer.suggestion.SlashSuggestion
 import com.niki914.zafiro.app.ui.model.SavedConfigSummary
 import com.niki914.zafiro.chat.LlmErrorCode
 
@@ -168,6 +169,7 @@ data class HomeChatUiState(
      * 或模型未上报 usage），此时不画环。
      */
     val contextProgress: Float? = null,
+    val slashSuggestions: List<SlashSuggestion> = emptyList(),
 ) {
     val displayConfig: SavedConfigSummary?
         get() {
@@ -239,6 +241,8 @@ sealed interface HomeChatIntent {
     data object OpenConfigMenu : HomeChatIntent
     data object DismissConfigMenu : HomeChatIntent
     data class SelectConfig(val id: String) : HomeChatIntent
+    data class SelectModel(val configId: String, val modelId: String) : HomeChatIntent
+    data class UpdateThinkingLevel(val configId: String, val wireValue: String) : HomeChatIntent
     data object RefreshConfigs : HomeChatIntent
 }
 
@@ -249,9 +253,9 @@ sealed interface HomeChatIntent {
 sealed interface HomeChatEffect {
     data class FileAttachFailed(val reason: FileAttachReason) : HomeChatEffect
     data object EmptyInputAttempted : HomeChatEffect
-
     /** 发起被拒（TurnStart.Busy）：上一回合仍在跑，提示用户等待或停止。 */
     data object RoundBusy : HomeChatEffect
+    data object NoCompactableHistory : HomeChatEffect
 }
 
 /**

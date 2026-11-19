@@ -8,6 +8,8 @@
     <string name="ui_onboard_startup_demo_button">ابدأ</string>
     <string name="ui_onboard_provider_pick_title">اختر مزود الخدمة</string>
     <string name="ui_onboard_provider_pick_description">ابدأ من هنا لربط نموذجك.\nاختر مزود خدمة للمتابعة.</string>
+    <string name="ui_onboard_provider_pick_byok_hint">ما هو BYOK؟</string>
+    <string name="ui_provider_official_and_relay_summary">الرسمي ومرحلات الجهات الخارجية</string>
     <string name="ui_onboard_configure_title">إعداد الوصول إلى النموذج</string>
     <string name="ui_onboard_configure_description">أدخل إعدادات النموذج، ثم يمكنك البدء.</string>
     <string name="ui_onboard_configure_next">التالي</string>
@@ -22,6 +24,10 @@
     <string name="ui_onboard_configure_model_placeholder">أدخل معرّف نموذجك</string>
     <string name="ui_onboard_configure_model_example">مثال: %1$s</string>
     <string name="ui_onboard_configure_model_catalog_open">اختيار نموذج</string>
+    <string name="ui_onboard_configure_model_add_button">إضافة نموذج</string>
+    <string name="ui_onboard_configure_model_add_title">إضافة نموذج متاح</string>
+    <string name="ui_onboard_configure_model_add_placeholder">أدخل معرّف النموذج، مثل gpt-4o</string>
+    <string name="ui_onboard_configure_model_catalog_refresh">تحديث كتالوج النماذج</string>
     <string name="ui_onboard_configure_model_catalog_title">اختيار نموذج</string>
     <string name="ui_onboard_configure_model_catalog_search_placeholder">ابحث عن نموذج</string>
     <string name="ui_onboard_configure_model_catalog_empty">لا نماذج مطابقة</string>
@@ -38,7 +44,7 @@
     <!-- Home -->
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">محادثة جديدة</string>
-    <string name="ui_home_input_placeholder">اكتب رسالة...</string>
+    <string name="ui_home_input_placeholder">اكتب رسالة…</string>
     <string name="ui_home_empty_greeting">كيف يمكنني مساعدتك؟</string>
     <string name="ui_home_tap_hint">نصيحة: انقر على رسالة للنسخ أو إعادة التوليد أو التفرع</string>
     <string name="ui_home_conversation_compacted">تم ضغط المحادثة</string>
@@ -82,6 +88,10 @@
     <string name="ui_home_file_category_file">ملف</string>
     <string name="ui_action_view">عرض</string>
     <string name="ui_viewer_copy_all">نسخ الكل</string>
+    <string name="ui_viewer_refresh">تحديث</string>
+    <string name="ui_viewer_open_in_browser">فتح في المتصفح</string>
+    <string name="ui_viewer_copy_link">نسخ الرابط</string>
+    <string name="ui_viewer_copy_path">نسخ مسار الملف</string>
     <string name="ui_image_unavailable">لم تعد متاحة</string>
     <string name="ui_viewer_image_unavailable">تعذّر تحميل الصورة</string>
     <string name="ui_viewer_image_unavailable_desc">ملف الصورة غير موجود، أو مُسحت ذاكرة التخزين المؤقت</string>
@@ -89,6 +99,7 @@
     <string name="ui_toast_generating">جارٍ التوليد، انتظر قليلاً</string>
     <string name="ui_toast_empty_input">أدخل نصًا</string>
     <string name="ui_toast_round_busy">الجولة السابقة لا تزال قيد التشغيل؛ انتظر أو أوقفها أولاً</string>
+    <string name="ui_toast_no_compactable_history">لا يوجد سجل محادثة للضغط</string>
     <string name="ui_home_error_retry_body">أعد المحاولة لاحقًا.</string>
     <string name="ui_home_error_config_required_title">إعداد النموذج ناقص</string>
     <string name="ui_home_error_config_required_body">انتقل وأكمل إعداد النموذج.</string>
@@ -111,7 +122,7 @@
     <string name="ui_conversation_history_this_month">هذا الشهر</string>
     <string name="ui_conversation_history_older">أقدم</string>
     <string name="ui_conversation_history_pinned_section">المحادثات المثبتة</string>
-    <string name="ui_conversation_history_loading">جارٍ قراءة سجل المحادثات...</string>
+    <string name="ui_conversation_history_loading">جارٍ قراءة سجل المحادثات…</string>
     <string name="ui_conversation_history_empty_title">لا سجل محادثات بعد</string>
     <string name="ui_conversation_history_empty_body">بعد إرسال رسالة، تظهر المحادثة هنا.</string>
     <string name="ui_conversation_history_error_title">تعذّرت قراءة سجل المحادثات</string>
@@ -160,7 +171,7 @@
     <string name="ui_settings_skills">Skills</string>
     <string name="ui_settings_skills_summary">إدارة Skills المحلية</string>
     <string name="skill_page_description">شغّل Skills المحلية أو أوقفها. بعد التشغيل، يستطيع Agent استخدامها في المحادثة عند الحاجة.</string>
-    <string name="skill_loading">جارٍ قراءة Skills...</string>
+    <string name="skill_loading">جارٍ قراءة Skills…</string>
     <string name="skill_empty">لا Skill متاحة الآن.</string>
     <string name="skill_editor_description">حرّر ملف SKILL.md كاملًا. بعد الحفظ، يسري التغيير في المحادثة التالية.</string>
     <string name="skill_save_action">حفظ</string>
@@ -209,7 +220,7 @@
     <string name="ui_settings_storage_downloads_summary">ملفات نزّلها Agent أثناء المهام</string>
     <string name="ui_settings_storage_other_cache">ذاكرة أخرى</string>
     <string name="ui_settings_storage_other_cache_summary">ملفات مؤقتة من تشغيل التطبيق</string>
-    <string name="ui_settings_storage_loading">جارٍ حساب المساحة...</string>
+    <string name="ui_settings_storage_loading">جارٍ حساب المساحة…</string>
     <string name="ui_settings_storage_clear_dialog_title">مسح الذاكرة</string>
     <string name="ui_settings_storage_clear_dialog_text">مسح «%1$s»؟ لا يمكن التراجع عن هذا.</string>
     <string name="ui_settings_storage_clear_dialog_confirm">مسح</string>
@@ -275,7 +286,7 @@
     <!-- Memory Module -->
     <string name="memory_page_description">أدر الذكريات. اسحب يمينًا أو يسارًا للحذف، واضغط للتحرير. بعد الإضافة، يتذكرها Agent حتى في محادثة جديدة.</string>
     <string name="memory_page_empty_description">لا ذكريات محفوظة. اضغط زر الإضافة أعلى الشاشة لإضافة الأولى.</string>
-    <string name="memory_loading">جارٍ قراءة الذكريات...</string>
+    <string name="memory_loading">جارٍ قراءة الذكريات…</string>
     <string name="memory_editor_title_create">ذاكرة جديدة</string>
     <string name="memory_editor_title_edit">تحرير الذاكرة</string>
     <string name="memory_field_content">أدخل المحتوى</string>
@@ -352,16 +363,16 @@
 
     <!-- Tool Module -->
     <string name="tool_page_description">شغّل الأدوات أو أوقفها. بعد التشغيل، تتحدث في المحادثة التالية.</string>
-    <string name="tool_loading">جارٍ قراءة حالة الأدوات...</string>
+    <string name="tool_loading">جارٍ قراءة حالة الأدوات…</string>
     <string name="tool_empty">لا أدوات متاحة الآن.</string>
     <string name="tool_load_failed">تعذّرت القراءة: %1$s</string>
     <string name="tool_save_failed">تعذّر الحفظ: %1$s</string>
     <string name="tool_group_dev_tools">أدوات التطوير</string>
     <string name="tool_group_dev_tools_summary">تنفيذ أوامر Shell وشيفرة Python على الجهاز</string>
     <string name="tool_group_android_native">Android الأصلي</string>
-    <string name="tool_group_android_native_summary">فتح الروابط والبحث عن التطبيقات وتشغيلها وإرسال الإشعارات وغيرها من عمليات النظام</string>
+    <string name="tool_group_android_native_summary">البحث عن التطبيقات، وإرسال الإشعارات، وعرض الصور وغيرها من عمليات النظام</string>
     <string name="tool_group_screen_operation">تشغيل الشاشة</string>
-    <string name="tool_group_screen_operation_summary">قراءة الشاشة وتشغيلها عبر إمكانية الوصول أو Shell</string>
+    <string name="tool_group_screen_operation_summary">مجموعة المهارات المطلوبة لعمليات الشاشة</string>
     <string name="tool_custom_py_tools_entry">أدوات Python المخصصة</string>
     <string name="tool_custom_py_tools_entry_summary">أدوات Python مخصصة ذات معاملات، يستطيع Agent إنشاءها وتعديلها وتجربتها</string>
 
@@ -369,7 +380,7 @@
     <string name="custom_py_tool_page_title">أدوات Python المخصصة</string>
     <string name="custom_py_tool_page_description">أدر أدوات Python المخصصة.</string>
     <string name="custom_py_tool_page_empty_description">دع Agent ينشئ واحدة، أو اضغط زر الإضافة أعلى الشاشة.</string>
-    <string name="custom_py_tool_loading">جارٍ قراءة أدوات Python المحفوظة...</string>
+    <string name="custom_py_tool_loading">جارٍ قراءة أدوات Python المحفوظة…</string>
     <string name="custom_py_tool_editor_title_create">أداة Python جديدة</string>
     <string name="custom_py_tool_editor_description">اكتب دالة دخول main().\n\nتعليق النوع على المعاملات يحدد ما يستطيع Agent تمريره، ويصبح docstring وصف الأداة.</string>
     <string name="custom_py_tool_field_name">اسم الأداة</string>
@@ -524,6 +535,7 @@
     <string name="ui_backup_select_all">تحديد الكل</string>
     <string name="ui_backup_select_none">إلغاء التحديد</string>
     <string name="ui_backup_restoring">جارٍ الاستعادة</string>
+    <string name="ui_backup_inspecting">جارٍ التحقق…</string>
     <string name="ui_settings_general_group_appearance">المظهر واللغة</string>
     <string name="ui_settings_general_group_floating_notification">العائم والإشعارات</string>
     <string name="ui_settings_general_group_conversation">المحادثة والتفاعل</string>
@@ -589,8 +601,10 @@
     <string name="ui_settings_configure_protocol_hint">بعد تبديل البروتوكول، تأكد أن نقطة النهاية تطابقه.</string>
     <string name="ui_settings_configure_thinking_label">جهد التفكير</string>
     <string name="ui_settings_configure_thinking_hint">يتبع إعداد النموذج افتراضيًا. خفّض الجهد إذا رفضه مزود الخدمة.</string>
-    <string name="ui_settings_configure_thinking_start_label">Default</string>
-    <string name="ui_settings_configure_thinking_end_label">Max</string>
+    <string name="ui_home_model_sheet_title">التكوين الحالي</string>
+    <string name="ui_home_model_sheet_section_config">التكوين</string>
+    <string name="ui_home_model_sheet_section_thinking">قوة التفكير</string>
+    <string name="ui_home_model_sheet_section_model">النموذج</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">مثال: 200000 أو 200k</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">أدخل عددًا صالحًا لا يقل عن 256، مع دعم k/m/b</string>
@@ -602,6 +616,43 @@
     <string name="ui_theme_style_liquid">Glass</string>
     <string name="ui_theme_style_md3">MD3</string>
     <string name="ui_theme_style_md3e">MD3E</string>
+    <string name="ui_theme_style_custom">مخصص</string>
+    <string name="ui_theme_style_unified">نمط موحد</string>
+
+    <string name="ui_theme_group_controls">عناصر التحكم الأساسية</string>
+    <string name="ui_theme_group_layout">التخطيط والتنقل</string>
+    <string name="ui_theme_group_system">الحركة والنظام</string>
+
+    <string name="ui_theme_part_button">الأزرار</string>
+
+    <string name="ui_theme_part_switch">مفتاح التبديل</string>
+
+    <string name="ui_theme_part_slider">شريط التمرير</string>
+
+    <string name="ui_theme_part_text_field">حقل النص</string>
+
+    <string name="ui_theme_part_loading">مؤشر التحميل</string>
+
+    <string name="ui_theme_part_top_bar_buttons">أزرار الشريط العلوي</string>
+
+    <string name="ui_theme_part_top_bar_plate">لوحة الشريط العلوي</string>
+
+    <string name="ui_theme_part_composer">شريط إدخال المحادثة</string>
+
+    <string name="ui_theme_part_search">شريط البحث</string>
+
+    <string name="ui_theme_part_page_scroll">تمرير الصفحة</string>
+
+    <string name="ui_theme_part_dialog">مربعات الحوار</string>
+
+    <string name="ui_theme_part_menu">القائمة المنسدلة</string>
+
+    <string name="ui_theme_part_settings">بطاقات الإعدادات</string>
+
+    <string name="ui_theme_preview_primary_btn">أساسي</string>
+    <string name="ui_theme_preview_tonal_btn">نغمي</string>
+    <string name="ui_theme_preview_loading_hint">جارٍ المعالجة…</string>
+    <string name="ui_theme_preview_input_hint">أدخل نصًا…</string>
 
     <string name="ui_theme_mode_system">حسب النظام</string>
     <string name="ui_theme_mode_light">فاتح</string>
@@ -647,8 +698,6 @@
     <string name="ui_onboard_preferences_notification_desc">عرض حالة Agent المباشرة في شريط الإشعارات</string>
     <string name="ui_onboard_preferences_file_title">إذن الملفات</string>
     <string name="ui_onboard_preferences_file_desc">السماح لـ Agent بقراءة الملفات وكتابتها خارج الصندوق</string>
-    <string name="ui_onboard_preferences_granted">مُنح</string>
-    <string name="ui_onboard_preferences_grant_action">اضغط للسماح</string>
     <string name="ui_onboard_preferences_security_group">قواعد التنفيذ</string>
     <string name="ui_onboard_preferences_security_hint">أوامر تحتاج تأكيدًا قبل التنفيذ</string>
     <string name="ui_onboard_preferences_rule_add_action">قاعدة جديدة</string>
@@ -697,6 +746,29 @@
     <string name="text_action_menu_label">اسأل Zafiro</string>
     <string name="ui_settings_actions">إجراءات النص</string>
     <string name="ui_settings_actions_summary">اضبط الاختصارات التي تُطلَق عند تحديد نص</string>
+    <string name="ui_settings_quick_prompts">المطالبات السريعة</string>
+    <string name="ui_settings_quick_prompts_summary">تهيئة العبارات والقوالب السريعة التي تبدأ بـ / في مربع الكتابة</string>
+    <string name="quick_prompt_page_description">اقتراح واستبدال المطالبات المحددة مسبقًا بسرعة بكتابة / في مربع المحادثة.</string>
+    <string name="quick_prompt_page_empty_description">انقر على الزاوية العلوية لإضافة أول مطالبة سريعة.</string>
+    <string name="quick_prompt_loading">جارٍ تحميل المطالبات…</string>
+    <string name="quick_prompt_editor_title_create">مطالبة سريعة جديدة</string>
+    <string name="quick_prompt_save_action">حفظ المطالبة</string>
+    <string name="quick_prompt_field_name">مفتاح التفعيل</string>
+    <string name="quick_prompt_field_name_hint">مثال: btw</string>
+    <string name="quick_prompt_field_name_description">يتم تشغيله بكتابة / متبوعة بهذا المفتاح. لا يُسمح بالمسافات أو الرموز الخاصة.</string>
+    <string name="quick_prompt_field_prompt">محتوى المطالبة</string>
+    <string name="quick_prompt_field_prompt_hint">المحتوى المستبدل أو الموسع</string>
+    <string name="quick_prompt_field_enabled">مفعل</string>
+    <string name="quick_prompt_delete_dialog_title">حذف المطالبة السريعة</string>
+    <string name="quick_prompt_delete_dialog_text">هل تريد حذف المطالبة \"%1$s\"؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="quick_prompt_error_name_required">يرجى إدخال مفتاح التفعيل.</string>
+    <string name="quick_prompt_error_name_invalid">لا يمكن أن يحتوي مفتاح التفعيل على مسافات أو رموز خاصة.</string>
+    <string name="quick_prompt_error_name_duplicate">توجد بالفعل مطالبة بهذا المفتاح.</string>
+    <string name="quick_prompt_error_name_reserved">لا يمكن استخدام أوامر أو كلمات رئيسية محجوزة للنظام.</string>
+    <string name="quick_prompt_error_prompt_required">يرجى إدخال محتوى المطالبة.</string>
+    <string name="quick_prompt_error_load_failed">فشل تحميل المطالبات السريعة.</string>
+    <string name="quick_prompt_error_save_failed">فشل حفظ المطالبة السريعة.</string>
+    <string name="quick_prompt_error_delete_failed">فشل حذف المطالبة السريعة.</string>
     <string name="text_action_page_description">عند تحديد نص في تطبيق آخر، يمكن استدعاء الإجراءات المُعدّة هنا بسرعة.</string>
     <string name="text_action_page_empty_description">اضغط زر الإضافة أعلى الشاشة لإضافة أول إجراء نص.</string>
     <string name="text_action_loading">جارٍ تحميل الإجراءات…</string>

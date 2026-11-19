@@ -23,9 +23,9 @@ android {
         applicationId = "com.niki914.zafiro"
         minSdk = 26
         targetSdk = 34
-        versionName = "1.11.0"
-        // Keep the fork's monotonically increasing versionCode above v1.10.1 (27).
-        versionCode = 28
+        versionName = "2.0.0"
+        // Keep the fork's monotonically increasing versionCode above v1.11.0 (28).
+        versionCode = 29
         buildConfigField("String", "TELEMETRY_BASE_URL", "\"https://zafiro-telemetry.niki27687.workers.dev\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -128,6 +128,7 @@ dependencies {
     implementation("androidx.annotation:annotation:1.9.1")
     implementation("androidx.activity:activity-compose:1.4.0")
     implementation("androidx.documentfile:documentfile:1.0.1")
+    implementation("androidx.webkit:webkit:1.12.1")
 
     // Compose
     implementation("androidx.compose.material3:material3:1.5.0-alpha22")

@@ -8,6 +8,8 @@
     <string name="ui_onboard_startup_demo_button">Empezar</string>
     <string name="ui_onboard_provider_pick_title">Seleccionar proveedor</string>
     <string name="ui_onboard_provider_pick_description">Comience a conectar sus modelos desde aquí.\nSeleccione un proveedor para continuar.</string>
+    <string name="ui_onboard_provider_pick_byok_hint">¿Qué es BYOK?</string>
+    <string name="ui_provider_official_and_relay_summary">Oficial y relés de terceros</string>
     <string name="ui_onboard_configure_title">Configurar modelo</string>
     <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafiro.</string>
     <string name="ui_onboard_configure_next">Siguiente</string>
@@ -22,6 +24,10 @@
     <string name="ui_onboard_configure_model_placeholder">Introduzca el nombre del modelo</string>
     <string name="ui_onboard_configure_model_example">Ejemplo: %1$s</string>
     <string name="ui_onboard_configure_model_catalog_open">Elegir modelo</string>
+    <string name="ui_onboard_configure_model_add_button">Añadir modelo</string>
+    <string name="ui_onboard_configure_model_add_title">Añadir modelo disponible</string>
+    <string name="ui_onboard_configure_model_add_placeholder">Introduzca el ID del modelo, ej. gpt-4o</string>
+    <string name="ui_onboard_configure_model_catalog_refresh">Actualizar catálogo de modelos</string>
     <string name="ui_onboard_configure_model_catalog_title">Elegir modelo</string>
     <string name="ui_onboard_configure_model_catalog_search_placeholder">Buscar modelos</string>
     <string name="ui_onboard_configure_model_catalog_empty">Sin modelos coincidentes</string>
@@ -38,7 +44,7 @@
     <!-- Home -->
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">Nueva conversación</string>
-    <string name="ui_home_input_placeholder">Escriba un mensaje...</string>
+    <string name="ui_home_input_placeholder">Escriba un mensaje…</string>
     <string name="ui_home_empty_greeting">¿En qué puedo ayudarte?</string>
     <string name="ui_home_tap_hint">Consejo: toca un mensaje para copiar, regenerar o bifurcar</string>
     <string name="ui_home_conversation_compacted">Conversación compactada</string>
@@ -74,6 +80,10 @@
     <string name="ui_home_file_category_file">Archivo</string>
     <string name="ui_action_view">Ver</string>
     <string name="ui_viewer_copy_all">Copiar todo</string>
+    <string name="ui_viewer_refresh">Actualizar</string>
+    <string name="ui_viewer_open_in_browser">Abrir en el navegador</string>
+    <string name="ui_viewer_copy_link">Copiar enlace</string>
+    <string name="ui_viewer_copy_path">Copiar ruta del archivo</string>
     <string name="ui_image_unavailable">No disponible</string>
     <string name="ui_viewer_image_unavailable">No se puede cargar la imagen</string>
     <string name="ui_viewer_image_unavailable_desc">El archivo de imagen no existe o se ha borrado la caché</string>
@@ -81,6 +91,7 @@
     <string name="ui_toast_generating">Generando, espere un momento</string>
     <string name="ui_toast_empty_input">Por favor ingrese un mensaje</string>
     <string name="ui_toast_round_busy">La ronda anterior sigue en curso; espere o deténgala primero</string>
+    <string name="ui_toast_no_compactable_history">No hay historial de conversación para compactar</string>
     <string name="ui_home_error_retry_body">Inténtelo de nuevo más tarde.</string>
     <string name="ui_home_error_config_required_title">Configuración del modelo incompleta</string>
     <string name="ui_home_error_config_required_body">Complete la configuración del modelo antes de continuar.</string>
@@ -103,7 +114,7 @@
     <string name="ui_conversation_history_this_month">Este mes</string>
     <string name="ui_conversation_history_older">Anterior</string>
     <string name="ui_conversation_history_pinned_section">Fijadas</string>
-    <string name="ui_conversation_history_loading">Cargando historial...</string>
+    <string name="ui_conversation_history_loading">Cargando historial…</string>
     <string name="ui_conversation_history_empty_title">Sin conversaciones</string>
     <string name="ui_conversation_history_empty_body">Envíe un mensaje para comenzar una nueva conversación.</string>
     <string name="ui_conversation_history_error_title">No se pudo cargar el historial</string>
@@ -152,7 +163,7 @@
     <string name="ui_settings_skills">Skills</string>
     <string name="ui_settings_skills_summary">Gestionar Skills locales</string>
     <string name="skill_page_description">Activar o desactivar Skills locales. Cuando están activadas, el agente puede usarlas según sea necesario durante las conversaciones.</string>
-    <string name="skill_loading">Cargando Skills...</string>
+    <string name="skill_loading">Cargando Skills…</string>
     <string name="skill_empty">No hay Skills disponibles actualmente.</string>
     <string name="skill_editor_description">Editar el archivo SKILL.md completo. Los cambios se aplicarán en la siguiente conversación tras guardar.</string>
     <string name="skill_save_action">Guardar</string>
@@ -201,7 +212,7 @@
     <string name="ui_settings_storage_downloads_summary">Archivos descargados por el Agente durante las tareas</string>
     <string name="ui_settings_storage_other_cache">Otras cachés</string>
     <string name="ui_settings_storage_other_cache_summary">Archivos temporales del funcionamiento normal</string>
-    <string name="ui_settings_storage_loading">Midiendo el almacenamiento...</string>
+    <string name="ui_settings_storage_loading">Midiendo el almacenamiento…</string>
     <string name="ui_settings_storage_clear_dialog_title">Borrar caché</string>
     <string name="ui_settings_storage_clear_dialog_text">¿Vaciar «%1$s»? Esta acción no se puede deshacer.</string>
     <string name="ui_settings_storage_clear_dialog_confirm">Borrar</string>
@@ -267,7 +278,7 @@
     <!-- Memory Module -->
     <string name="memory_page_description">Gestione memorias guardadas. Deslice a la izquierda o derecha para eliminar, o toque para editar. Una vez añadidas, el agente las recordará en todas las conversaciones.</string>
     <string name="memory_page_empty_description">No hay memorias guardadas. Toque el botón superior derecho para añadir la primera.</string>
-    <string name="memory_loading">Cargando memorias...</string>
+    <string name="memory_loading">Cargando memorias…</string>
     <string name="memory_editor_title_create">Añadir memoria</string>
     <string name="memory_editor_title_edit">Editar memoria</string>
     <string name="memory_field_content">Contenido</string>
@@ -286,7 +297,7 @@
     <!-- Execution Rules Module -->
     <string name="execution_rules_page_description">Añada reglas de ejecución para mejorar la seguridad. Salvo los scripts, todas las ejecuciones de comandos de la app están reguladas por estas políticas.</string>
     <string name="execution_rules_empty_action_hint">Toque en la esquina superior derecha para añadir la primera regla de ejecución.</string>
-    <string name="execution_rules_loading">Cargando reglas de ejecución...</string>
+    <string name="execution_rules_loading">Cargando reglas de ejecución…</string>
     <string name="execution_rules_editor_title_create">Nueva regla de ejecución</string>
     <string name="execution_rules_delete_dialog_title">Eliminar regla de ejecución</string>
     <string name="execution_rules_delete_dialog_text">¿Está seguro de que desea eliminar la regla de ejecución «%1$s»? Esta acción no se puede deshacer.</string>
@@ -318,7 +329,7 @@
     <string name="takeover_default_responder">Modelo predeterminado</string>
     <string name="takeover_page_description">Las reglas se evalúan en orden para determinar qué asistente responderá cuando haya una coincidencia.</string>
     <string name="takeover_empty_action_hint">Toque en la esquina superior derecha para añadir la primera regla de control.</string>
-    <string name="takeover_loading">Cargando reglas de control...</string>
+    <string name="takeover_loading">Cargando reglas de control…</string>
     <string name="takeover_editor_title_create">Nueva regla de control</string>
     <string name="takeover_editor_description">Configure qué peticiones debe responder el asistente nativo y cuáles deben enviarse a Zafiro.</string>
     <string name="takeover_field_name">Nombre de la regla</string>
@@ -344,16 +355,16 @@
 
     <!-- Tool Module -->
     <string name="tool_page_description">Active o desactive las herramientas. Los cambios se aplicarán en la siguiente conversación.</string>
-    <string name="tool_loading">Cargando estado de las herramientas...</string>
+    <string name="tool_loading">Cargando estado de las herramientas…</string>
     <string name="tool_empty">No hay herramientas disponibles actualmente.</string>
     <string name="tool_load_failed">Error al cargar: %1$s</string>
     <string name="tool_save_failed">Error al guardar: %1$s</string>
     <string name="tool_group_dev_tools">Herramientas de desarrollo</string>
     <string name="tool_group_dev_tools_summary">Ejecutar comandos Shell y código Python en el dispositivo</string>
     <string name="tool_group_android_native">Nativo de Android</string>
-    <string name="tool_group_android_native_summary">Operaciones nativas del sistema como abrir enlaces, buscar/abrir apps y enviar notificaciones</string>
+    <string name="tool_group_android_native_summary">Operaciones nativas del sistema como buscar apps, enviar notificaciones y ver imágenes</string>
     <string name="tool_group_screen_operation">Operaciones de pantalla</string>
-    <string name="tool_group_screen_operation_summary">Leer y controlar la pantalla mediante Servicios de accesibilidad o Shell</string>
+    <string name="tool_group_screen_operation_summary">Conjunto de habilidades requeridas para operaciones en pantalla</string>
     <string name="tool_custom_py_tools_entry">Herramientas personalizadas de Python</string>
     <string name="tool_custom_py_tools_entry_summary">Herramientas personalizadas de Python parametrizadas que el agente puede crear, modificar y probar</string>
 
@@ -361,7 +372,7 @@
     <string name="custom_py_tool_page_title">Herramientas personalizadas de Python</string>
     <string name="custom_py_tool_page_description">Gestione sus herramientas personalizadas de Python.</string>
     <string name="custom_py_tool_page_empty_description">Deje que el agente las cree por usted o toque el botón superior derecho para añadir una nueva.</string>
-    <string name="custom_py_tool_loading">Cargando herramientas de Python guardadas...</string>
+    <string name="custom_py_tool_loading">Cargando herramientas de Python guardadas…</string>
     <string name="custom_py_tool_editor_title_create">Añadir herramienta de Python</string>
     <string name="custom_py_tool_editor_description">Defina una función de entrada main().\n\nLas anotaciones de tipo de los parámetros determinan lo que el agente puede pasar y el docstring se convierte en la descripción de la herramienta.</string>
     <string name="custom_py_tool_field_name">Nombre de la herramienta</string>
@@ -395,7 +406,7 @@
 
     <string name="mcp_page_description">Configure los métodos de conexión y autenticación para MCP. Tras guardar, Zafiro descubrirá automáticamente las herramientas disponibles en tiempo de ejecución.</string>
     <string name="mcp_page_empty_description">Toque en la esquina superior derecha para añadir su primer servidor MCP.</string>
-    <string name="mcp_loading">Cargando servidores MCP guardados...</string>
+    <string name="mcp_loading">Cargando servidores MCP guardados…</string>
     <string name="mcp_editor_title_create">Añadir servidor MCP</string>
     <string name="mcp_field_name">Nombre</string>
     <string name="mcp_field_name_hint">Ejemplo: mi-servidor-mcp</string>
@@ -510,6 +521,7 @@
     <string name="ui_backup_select_all">Seleccionar todo</string>
     <string name="ui_backup_select_none">No seleccionar nada</string>
     <string name="ui_backup_restoring">Restaurando</string>
+    <string name="ui_backup_inspecting">Validando…</string>
     <string name="ui_settings_general_group_appearance">Apariencia e idioma</string>
     <string name="ui_settings_general_group_floating_notification">Flotante y notificaciones</string>
     <string name="ui_settings_general_group_conversation">Conversación e interacción</string>
@@ -581,8 +593,10 @@
     <string name="ui_settings_configure_protocol_hint">Tras cambiar el protocolo, asegúrese de que el endpoint sea compatible con dicho protocolo.</string>
     <string name="ui_settings_configure_thinking_label">Esfuerzo de razonamiento</string>
     <string name="ui_settings_configure_thinking_hint">Sigue la configuración predeterminada del modelo. Reduzca la intensidad si el proveedor rechaza la solicitud.</string>
-    <string name="ui_settings_configure_thinking_start_label">Default</string>
-    <string name="ui_settings_configure_thinking_end_label">Max</string>
+    <string name="ui_home_model_sheet_title">Configuración actual</string>
+    <string name="ui_home_model_sheet_section_config">Configuración</string>
+    <string name="ui_home_model_sheet_section_thinking">Intensidad de razonamiento</string>
+    <string name="ui_home_model_sheet_section_model">Modelo</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">Por ejemplo: 200000 o 200k</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">Introduzca un número válido de al menos 256, admite k/m/b</string>
@@ -594,6 +608,43 @@
     <string name="ui_theme_style_liquid">Glass</string>
     <string name="ui_theme_style_md3">MD3</string>
     <string name="ui_theme_style_md3e">MD3E</string>
+    <string name="ui_theme_style_custom">Personalizado</string>
+    <string name="ui_theme_style_unified">Estilo unificado</string>
+
+    <string name="ui_theme_group_controls">Controles básicos</string>
+    <string name="ui_theme_group_layout">Diseño y navegación</string>
+    <string name="ui_theme_group_system">Animación y sistema</string>
+
+    <string name="ui_theme_part_button">Botones</string>
+
+    <string name="ui_theme_part_switch">Interruptor</string>
+
+    <string name="ui_theme_part_slider">Deslizador</string>
+
+    <string name="ui_theme_part_text_field">Campo de texto</string>
+
+    <string name="ui_theme_part_loading">Indicador de carga</string>
+
+    <string name="ui_theme_part_top_bar_buttons">Botones de barra superior</string>
+
+    <string name="ui_theme_part_top_bar_plate">Placa de barra superior</string>
+
+    <string name="ui_theme_part_composer">Barra de entrada de chat</string>
+
+    <string name="ui_theme_part_search">Barra de búsqueda</string>
+
+    <string name="ui_theme_part_page_scroll">Desplazamiento de página</string>
+
+    <string name="ui_theme_part_dialog">Diálogos</string>
+
+    <string name="ui_theme_part_menu">Menú desplegable</string>
+
+    <string name="ui_theme_part_settings">Tarjetas de configuración</string>
+
+    <string name="ui_theme_preview_primary_btn">Principal</string>
+    <string name="ui_theme_preview_tonal_btn">Secundario</string>
+    <string name="ui_theme_preview_loading_hint">Procesando…</string>
+    <string name="ui_theme_preview_input_hint">Escribe algo…</string>
 
     <string name="ui_theme_mode_system">Según el sistema</string>
     <string name="ui_theme_mode_light">Claro</string>
@@ -639,8 +690,6 @@
     <string name="ui_onboard_preferences_notification_desc">Mostrar el estado del agente en vivo en el panel de notificaciones</string>
     <string name="ui_onboard_preferences_file_title">Acceso a archivos</string>
     <string name="ui_onboard_preferences_file_desc">Permitir que el agente lea y escriba archivos fuera del sandbox</string>
-    <string name="ui_onboard_preferences_granted">Concedido</string>
-    <string name="ui_onboard_preferences_grant_action">Tocar para conceder</string>
     <string name="ui_onboard_preferences_security_group">Reglas de ejecución</string>
     <string name="ui_onboard_preferences_security_hint">Comandos que requieren confirmación antes de ejecutarse</string>
     <string name="ui_onboard_preferences_rule_add_action">Añadir regla</string>
@@ -689,6 +738,29 @@
     <string name="text_action_menu_label">Preguntar a Zafiro</string>
     <string name="ui_settings_actions">Acciones de texto</string>
     <string name="ui_settings_actions_summary">Configurar acciones para el texto seleccionado</string>
+    <string name="ui_settings_quick_prompts">Instrucciones rápidas</string>
+    <string name="ui_settings_quick_prompts_summary">Configurar frases rápidas y plantillas activadas por / en el compositor</string>
+    <string name="quick_prompt_page_description">Sugiere y expande rápidamente instrucciones preestablecidas escribiendo / en el compositor.</string>
+    <string name="quick_prompt_page_empty_description">Toca la esquina superior derecha para añadir tu primera instrucción rápida.</string>
+    <string name="quick_prompt_loading">Cargando instrucciones rápidas…</string>
+    <string name="quick_prompt_editor_title_create">Nueva instrucción rápida</string>
+    <string name="quick_prompt_save_action">Guardar instrucción</string>
+    <string name="quick_prompt_field_name">Clave de activación</string>
+    <string name="quick_prompt_field_name_hint">p. ej., btw</string>
+    <string name="quick_prompt_field_name_description">Se activa con / seguido de esta clave. No se permiten espacios ni caracteres especiales.</string>
+    <string name="quick_prompt_field_prompt">Contenido de la instrucción</string>
+    <string name="quick_prompt_field_prompt_hint">Contenido para reemplazar o expandir</string>
+    <string name="quick_prompt_field_enabled">Activado</string>
+    <string name="quick_prompt_delete_dialog_title">Eliminar instrucción rápida</string>
+    <string name="quick_prompt_delete_dialog_text">¿Eliminar la instrucción \"%1$s\"? Esta acción no se puede deshacer.</string>
+    <string name="quick_prompt_error_name_required">La clave de activación es obligatoria.</string>
+    <string name="quick_prompt_error_name_invalid">La clave de activación no puede contener espacios ni caracteres especiales.</string>
+    <string name="quick_prompt_error_name_duplicate">Ya existe una instrucción con esta clave de activación.</string>
+    <string name="quick_prompt_error_name_reserved">La clave no puede utilizar comandos ni palabras clave reservadas.</string>
+    <string name="quick_prompt_error_prompt_required">El contenido de la instrucción es obligatorio.</string>
+    <string name="quick_prompt_error_load_failed">Error al cargar las instrucciones rápidas.</string>
+    <string name="quick_prompt_error_save_failed">Error al guardar la instrucción rápida.</string>
+    <string name="quick_prompt_error_delete_failed">Error al eliminar la instrucción rápida.</string>
     <string name="text_action_page_description">Las acciones se ejecutan sobre el texto seleccionado en otras apps.</string>
     <string name="text_action_page_empty_description">Toque en la esquina superior derecha para añadir su primera acción.</string>
     <string name="text_action_loading">Cargando acciones…</string>
@@ -717,7 +789,7 @@
     <string name="ui_settings_masking_rules_summary">Enmascarar datos sensibles antes de solicitudes salientes</string>
     <string name="masking_rules_page_description">Configure reglas de enmascaramiento para datos sensibles. Las coincidencias en solicitudes salientes se sustituirán por marcadores de posición mientras los chats locales y herramientas conservan los datos originales.</string>
     <string name="masking_rules_empty_action_hint">Toque en la esquina superior derecha para añadir su primera regla de enmascaramiento.</string>
-    <string name="masking_rules_loading">Cargando reglas de enmascaramiento...</string>
+    <string name="masking_rules_loading">Cargando reglas de enmascaramiento…</string>
     <string name="masking_rules_editor_title_create">Nueva regla de enmascaramiento</string>
     <string name="masking_rules_editor_description">Los datos sensibles solo se reemplazan por marcadores de posición antes de enviar solicitudes salientes. La visualización local y la ejecución de herramientas no se ven afectadas.</string>
     <string name="masking_rules_field_name">Nombre de la regla</string>

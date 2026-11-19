@@ -49,6 +49,7 @@ object XRepo {
 
     val mcp: McpApi = McpApi(this)
     val textActions: TextActionApi = TextActionApi(this)
+    val quickPrompts: QuickPromptApi = QuickPromptApi(this)
     val mcpService: McpServiceApi = McpServiceApi(this)
     val customPyTools: CustomPyToolApi = CustomPyToolApi(this)
     val builtinTools: BuiltinToolApi = BuiltinToolApi(this)
@@ -107,6 +108,7 @@ object XRepo {
         phoneUseConsentGrantedField.flow.value = false
         mcpService.resetForTest()
         llmConfigs.resetForTest()
+        skills.resetForTest()
     }
 
     internal suspend fun context(): Context {
@@ -993,6 +995,59 @@ class LlmConfigsApi internal constructor(
         return null
     }
 
+    suspend fun updateModel(id: String, model: String) {
+        val targetId = id.trim()
+        val targetModel = model.trim()
+        if (targetId.isBlank() || targetModel.isBlank()) return
+        val updated = repo.updateJsonOrFalse(StoreDescriptorRegistry.LLM_CONFIGS_ID) { json ->
+            val doc = LlmConfigsSettingsCodec.parse(json)
+            val config = doc.configs.firstOrNull { it.id == targetId } ?: return@updateJsonOrFalse null
+            if (config.model == targetModel) return@updateJsonOrFalse null
+            val updatedConfigs = doc.configs.map {
+                if (it.id == targetId) it.copy(model = targetModel, updatedAt = System.currentTimeMillis()) else it
+            }
+            LlmConfigsSettingsCodec.encode(doc.copy(configs = updatedConfigs))
+        }
+        if (updated) {
+            bumpRevision()
+        }
+    }
+
+    suspend fun updateThinkingLevel(id: String, thinkingLevelWire: String) {
+        val targetId = id.trim()
+        val targetWire = thinkingLevelWire.trim()
+        if (targetId.isBlank()) return
+        val updated = repo.updateJsonOrFalse(StoreDescriptorRegistry.LLM_CONFIGS_ID) { json ->
+            val doc = LlmConfigsSettingsCodec.parse(json)
+            val config = doc.configs.firstOrNull { it.id == targetId } ?: return@updateJsonOrFalse null
+            if (config.thinkingLevel == targetWire) return@updateJsonOrFalse null
+            val updatedConfigs = doc.configs.map {
+                if (it.id == targetId) it.copy(thinkingLevel = targetWire, updatedAt = System.currentTimeMillis()) else it
+            }
+            LlmConfigsSettingsCodec.encode(doc.copy(configs = updatedConfigs))
+        }
+        if (updated) {
+            bumpRevision()
+        }
+    }
+
+    suspend fun updateAvailableModels(id: String, availableModels: List<AvailableModelItem>) {
+        val targetId = id.trim()
+        if (targetId.isBlank()) return
+        val updated = repo.updateJsonOrFalse(StoreDescriptorRegistry.LLM_CONFIGS_ID) { json ->
+            val doc = LlmConfigsSettingsCodec.parse(json)
+            val config = doc.configs.firstOrNull { it.id == targetId } ?: return@updateJsonOrFalse null
+            if (config.availableModels == availableModels) return@updateJsonOrFalse null
+            val updatedConfigs = doc.configs.map {
+                if (it.id == targetId) it.copy(availableModels = availableModels, updatedAt = System.currentTimeMillis()) else it
+            }
+            LlmConfigsSettingsCodec.encode(doc.copy(configs = updatedConfigs))
+        }
+        if (updated) {
+            bumpRevision()
+        }
+    }
+
     suspend fun delete(id: String) {
         val deleted = repo.updateJsonOrFalse(
             StoreDescriptorRegistry.LLM_CONFIGS_ID,
@@ -1519,6 +1574,68 @@ class TextActionApi internal constructor(
         }
     }
 }
+
+/**
+ * 用户自定义的快速提示词（Quick Prompts）。
+ * list 顺序 = 文件顺序，列表页 index 与编辑页 target 一一对应。
+ */
+class QuickPromptApi internal constructor(
+    private val repo: XRepo,
+) {
+    private val _revision = MutableStateFlow(0L)
+    val revision: StateFlow<Long> = _revision.asStateFlow()
+
+    suspend fun list(): List<RuntimeQuickPrompt> {
+        return QuickPromptSettingsCodec.parsePrompts(repo.readJson(StoreDescriptorRegistry.PROMPTS_QUICK_ID))
+    }
+
+    /** previousName 为 null 表示新建；否则先把同名旧项移除再落位，改名不产生重复条目。 */
+    suspend fun replace(previousName: String?, prompt: RuntimeQuickPrompt) {
+        repo.updateJson(StoreDescriptorRegistry.PROMPTS_QUICK_ID) { json ->
+            val prompts = QuickPromptSettingsCodec.parsePrompts(json)
+            val withoutPrevious = if (previousName != null && previousName != prompt.name) {
+                prompts.filterNot { it.name.equals(previousName, ignoreCase = true) }
+            } else {
+                prompts
+            }
+            QuickPromptSettingsCodec.encodePrompts(
+                if (withoutPrevious.any { it.name.equals(prompt.name, ignoreCase = true) }) {
+                    withoutPrevious.map { if (it.name.equals(prompt.name, ignoreCase = true)) prompt else it }
+                } else {
+                    withoutPrevious + prompt
+                },
+            )
+        }
+        _revision.value += 1L
+    }
+
+    suspend fun delete(index: Int) {
+        repo.updateJson(StoreDescriptorRegistry.PROMPTS_QUICK_ID) { json ->
+            val prompts = QuickPromptSettingsCodec.parsePrompts(json)
+            if (index !in prompts.indices) return@updateJson json
+            QuickPromptSettingsCodec.encodePrompts(prompts.filterIndexed { i, _ -> i != index })
+        }
+        _revision.value += 1L
+    }
+
+    suspend fun setEnabled(index: Int, enabled: Boolean) {
+        repo.updateJson(StoreDescriptorRegistry.PROMPTS_QUICK_ID) { json ->
+            QuickPromptSettingsCodec.encodePrompts(
+                QuickPromptSettingsCodec.parsePrompts(json).mapIndexed { i, prompt ->
+                    if (i == index) prompt.copy(enabled = enabled) else prompt
+                },
+            )
+        }
+        _revision.value += 1L
+    }
+}
+
+/** 单条快速提示词：name 为触发词，prompt 为替换内容。 */
+data class RuntimeQuickPrompt(
+    val name: String,
+    val prompt: String,
+    val enabled: Boolean = true,
+)
 
 /** 单条文本快捷动作：名字即会话标题资产，prompt 为动作模板。仅 app 进程内消费，不进 agent-runtime。 */
 data class RuntimeTextAction(

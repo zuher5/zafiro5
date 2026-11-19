@@ -8,6 +8,8 @@
     <string name="ui_onboard_startup_demo_button">شروع</string>
     <string name="ui_onboard_provider_pick_title">سرویس‌دهنده را انتخاب کنید</string>
     <string name="ui_onboard_provider_pick_description">از اینجا مدل‌تان را وصل کنید.\nبرای ادامه یک سرویس‌دهنده انتخاب کنید.</string>
+    <string name="ui_onboard_provider_pick_byok_hint">BYOK چیست؟</string>
+    <string name="ui_provider_official_and_relay_summary">رسمی و رله‌های شخص ثالث</string>
     <string name="ui_onboard_configure_title">پیکربندی دسترسی به مدل</string>
     <string name="ui_onboard_configure_description">تنظیمات مدل را وارد کنید. بعد از آن می‌توانید شروع کنید.</string>
     <string name="ui_onboard_configure_next">بعدی</string>
@@ -22,6 +24,10 @@
     <string name="ui_onboard_configure_model_placeholder">شناسه مدل خود را وارد کنید</string>
     <string name="ui_onboard_configure_model_example">نمونه: %1$s</string>
     <string name="ui_onboard_configure_model_catalog_open">انتخاب مدل</string>
+    <string name="ui_onboard_configure_model_add_button">افزودن مدل</string>
+    <string name="ui_onboard_configure_model_add_title">افزودن مدل در دسترس</string>
+    <string name="ui_onboard_configure_model_add_placeholder">شناسه مدل را وارد کنید، مثلاً gpt-4o</string>
+    <string name="ui_onboard_configure_model_catalog_refresh">به‌روزرسانی فهرست مدل‌ها</string>
     <string name="ui_onboard_configure_model_catalog_title">انتخاب مدل</string>
     <string name="ui_onboard_configure_model_catalog_search_placeholder">جستجوی مدل</string>
     <string name="ui_onboard_configure_model_catalog_empty">مدل منطبقی نیست</string>
@@ -38,7 +44,7 @@
     <!-- Home -->
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">گفتگوی تازه</string>
-    <string name="ui_home_input_placeholder">پیام بنویسید...</string>
+    <string name="ui_home_input_placeholder">پیام بنویسید…</string>
     <string name="ui_home_empty_greeting">چطور می‌توانم کمک کنم؟</string>
     <string name="ui_home_tap_hint">نکته: برای کپی، تولید دوباره یا انشعاب روی پیام ضربه بزنید</string>
     <string name="ui_home_conversation_compacted">گفتگو فشرده شد</string>
@@ -74,6 +80,10 @@
     <string name="ui_home_file_category_file">پرونده</string>
     <string name="ui_action_view">دیدن</string>
     <string name="ui_viewer_copy_all">کپی همه</string>
+    <string name="ui_viewer_refresh">تازه‌سازی</string>
+    <string name="ui_viewer_open_in_browser">باز کردن در مرورگر</string>
+    <string name="ui_viewer_copy_link">کپی پیوند</string>
+    <string name="ui_viewer_copy_path">کپی مسیر پرونده</string>
     <string name="ui_image_unavailable">دیگر در دسترس نیست</string>
     <string name="ui_viewer_image_unavailable">تصویر بار نشد</string>
     <string name="ui_viewer_image_unavailable_desc">پرونده تصویر وجود ندارد، یا حافظه پنهان پاک شده است</string>
@@ -81,6 +91,7 @@
     <string name="ui_toast_generating">در حال تولید است، کمی صبر کنید</string>
     <string name="ui_toast_empty_input">متنی وارد کنید</string>
     <string name="ui_toast_round_busy">دور قبلی هنوز در حال اجراست؛ صبر کنید یا ابتدا آن را متوقف کنید</string>
+    <string name="ui_toast_no_compactable_history">تاریخچه گفتگویی برای فشرده‌سازی وجود ندارد</string>
     <string name="ui_home_error_retry_body">بعداً دوباره تلاش کنید.</string>
     <string name="ui_home_error_config_required_title">پیکربندی مدل ناقص است</string>
     <string name="ui_home_error_config_required_body">بروید و پیکربندی مدل را کامل کنید.</string>
@@ -103,7 +114,7 @@
     <string name="ui_conversation_history_this_month">این ماه</string>
     <string name="ui_conversation_history_older">قدیمی‌تر</string>
     <string name="ui_conversation_history_pinned_section">گفتگوهای سنجاق‌شده</string>
-    <string name="ui_conversation_history_loading">در حال خواندن تاریخچه گفتگو...</string>
+    <string name="ui_conversation_history_loading">در حال خواندن تاریخچه گفتگو…</string>
     <string name="ui_conversation_history_empty_title">هنوز تاریخچه گفتگویی نیست</string>
     <string name="ui_conversation_history_empty_body">بعد از فرستادن یک پیام، گفتگو اینجا دیده می‌شود.</string>
     <string name="ui_conversation_history_error_title">تاریخچه گفتگو خوانده نشد</string>
@@ -152,7 +163,7 @@
     <string name="ui_settings_skills">Skills</string>
     <string name="ui_settings_skills_summary">مدیریت Skills محلی</string>
     <string name="skill_page_description">Skills محلی را روشن یا خاموش کنید. پس از روشن شدن، Agent می‌تواند در گفتگو در صورت نیاز از آن‌ها استفاده کند.</string>
-    <string name="skill_loading">در حال خواندن Skills...</string>
+    <string name="skill_loading">در حال خواندن Skills…</string>
     <string name="skill_empty">اکنون Skill در دسترسی نیست.</string>
     <string name="skill_editor_description">کل SKILL.md را ویرایش کنید. پس از ذخیره، تغییر در گفتگوی بعدی اعمال می‌شود.</string>
     <string name="skill_save_action">ذخیره</string>
@@ -201,7 +212,7 @@
     <string name="ui_settings_storage_downloads_summary">پرونده‌هایی که Agent در طول کار دانلود کرده است</string>
     <string name="ui_settings_storage_other_cache">سایر حافظه پنهان</string>
     <string name="ui_settings_storage_other_cache_summary">پرونده‌های موقت هنگام اجرای برنامه</string>
-    <string name="ui_settings_storage_loading">در حال محاسبه فضا...</string>
+    <string name="ui_settings_storage_loading">در حال محاسبه فضا…</string>
     <string name="ui_settings_storage_clear_dialog_title">پاک کردن حافظه پنهان</string>
     <string name="ui_settings_storage_clear_dialog_text">«%1$s» پاک شود؟ این کار برگشت‌ناپذیر است.</string>
     <string name="ui_settings_storage_clear_dialog_confirm">پاک کردن</string>
@@ -267,7 +278,7 @@
     <!-- Memory Module -->
     <string name="memory_page_description">خاطره‌ها را مدیریت کنید. برای حذف به چپ یا راست بکشید و برای ویرایش بزنید. پس از افزودن، Agent حتی در گفتگوی تازه آن‌ها را به یاد دارد.</string>
     <string name="memory_page_empty_description">خاطره‌ای ذخیره نشده است. دکمه افزودن بالای صفحه را بزنید تا اولین خاطره را اضافه کنید.</string>
-    <string name="memory_loading">در حال خواندن خاطره‌ها...</string>
+    <string name="memory_loading">در حال خواندن خاطره‌ها…</string>
     <string name="memory_editor_title_create">خاطره تازه</string>
     <string name="memory_editor_title_edit">ویرایش خاطره</string>
     <string name="memory_field_content">متن را وارد کنید</string>
@@ -344,16 +355,16 @@
 
     <!-- Tool Module -->
     <string name="tool_page_description">ابزارها را روشن یا خاموش کنید. پس از روشن شدن، در گفتگوی بعدی به‌روز می‌شوند.</string>
-    <string name="tool_loading">در حال خواندن وضعیت ابزارها...</string>
+    <string name="tool_loading">در حال خواندن وضعیت ابزارها…</string>
     <string name="tool_empty">اکنون ابزاری در دسترس نیست.</string>
     <string name="tool_load_failed">خواندن نشد: %1$s</string>
     <string name="tool_save_failed">ذخیره نشد: %1$s</string>
     <string name="tool_group_dev_tools">ابزارهای توسعه</string>
     <string name="tool_group_dev_tools_summary">اجرای فرمان Shell و کد Python روی دستگاه</string>
     <string name="tool_group_android_native">Android بومی</string>
-    <string name="tool_group_android_native_summary">باز کردن پیوند، جستجو و اجرای برنامه، فرستادن اعلان و دیگر کارهای بومی سیستم</string>
+    <string name="tool_group_android_native_summary">یافتن برنامه‌ها، ارسال اعلان، مشاهده تصویر و دیگر کارهای بومی سیستم</string>
     <string name="tool_group_screen_operation">کار با صفحه</string>
-    <string name="tool_group_screen_operation_summary">خواندن و کار با صفحه از راه دسترس‌پذیری یا Shell</string>
+    <string name="tool_group_screen_operation_summary">مجموعه مهارت‌های لازم برای کار با صفحه</string>
     <string name="tool_custom_py_tools_entry">ابزارهای پایتون سفارشی</string>
     <string name="tool_custom_py_tools_entry_summary">ابزارهای پایتون سفارشی با پارامتر که Agent می‌تواند بسازد، تغییر دهد و آزمایشی اجرا کند</string>
 
@@ -361,7 +372,7 @@
     <string name="custom_py_tool_page_title">ابزارهای پایتون سفارشی</string>
     <string name="custom_py_tool_page_description">ابزارهای پایتون سفارشی خود را مدیریت کنید.</string>
     <string name="custom_py_tool_page_empty_description">بگذارید Agent یکی بسازد، یا دکمه افزودن بالای صفحه را بزنید.</string>
-    <string name="custom_py_tool_loading">در حال خواندن ابزارهای پایتون ذخیره‌شده...</string>
+    <string name="custom_py_tool_loading">در حال خواندن ابزارهای پایتون ذخیره‌شده…</string>
     <string name="custom_py_tool_editor_title_create">ابزار پایتون تازه</string>
     <string name="custom_py_tool_editor_description">یک تابع ورودی main() بنویسید.\n\nحاشیه نوع پارامترها تعیین می‌کند Agent چه چیزی می‌تواند بفرستد، و docstring توضیح ابزار می‌شود.</string>
     <string name="custom_py_tool_field_name">نام ابزار</string>
@@ -516,6 +527,7 @@
     <string name="ui_backup_select_all">انتخاب همه</string>
     <string name="ui_backup_select_none">انتخاب هیچ‌کدام</string>
     <string name="ui_backup_restoring">در حال بازیابی</string>
+    <string name="ui_backup_inspecting">در حال اعتبارسنجی…</string>
     <string name="ui_settings_general_group_appearance">ظاهر و زبان</string>
     <string name="ui_settings_general_group_floating_notification">شناور و اعلان</string>
     <string name="ui_settings_general_group_conversation">گفتگو و تعامل</string>
@@ -581,8 +593,10 @@
     <string name="ui_settings_configure_protocol_hint">پس از تعویض پروتکل، مطمئن شوید نقطه پایانی با آن می‌خواند.</string>
     <string name="ui_settings_configure_thinking_label">میزان تفکر</string>
     <string name="ui_settings_configure_thinking_hint">به‌طور پیش‌فرض از تنظیم مدل پیروی می‌کند. اگر سرویس‌دهنده خطا داد، میزان را کم کنید.</string>
-    <string name="ui_settings_configure_thinking_start_label">Default</string>
-    <string name="ui_settings_configure_thinking_end_label">Max</string>
+    <string name="ui_home_model_sheet_title">پیکربندی فعلی</string>
+    <string name="ui_home_model_sheet_section_config">پیکربندی</string>
+    <string name="ui_home_model_sheet_section_thinking">شدت تفکر</string>
+    <string name="ui_home_model_sheet_section_model">مدل</string>
     <string name="ui_settings_configure_max_tokens_label">Max Tokens</string>
     <string name="ui_settings_configure_max_tokens_placeholder">نمونه: 200000 یا 200k</string>
     <string name="ui_settings_configure_error_max_tokens_invalid">عددی معتبر و دست‌کم 256 وارد کنید. k/m/b پشتیبانی می‌شود</string>
@@ -594,6 +608,43 @@
     <string name="ui_theme_style_liquid">Glass</string>
     <string name="ui_theme_style_md3">MD3</string>
     <string name="ui_theme_style_md3e">MD3E</string>
+    <string name="ui_theme_style_custom">سفارشی</string>
+    <string name="ui_theme_style_unified">سبک یکپارچه</string>
+
+    <string name="ui_theme_group_controls">کنترل‌های پایه</string>
+    <string name="ui_theme_group_layout">طرح‌بندی و پیمایش</string>
+    <string name="ui_theme_group_system">حرکت و سیستم</string>
+
+    <string name="ui_theme_part_button">دکمه‌ها</string>
+
+    <string name="ui_theme_part_switch">کلید سوئیچ</string>
+
+    <string name="ui_theme_part_slider">نوار لغزنده</string>
+
+    <string name="ui_theme_part_text_field">کادر متنی</string>
+
+    <string name="ui_theme_part_loading">نشانگر بارگذاری</string>
+
+    <string name="ui_theme_part_top_bar_buttons">دکمه‌های نوار بالا</string>
+
+    <string name="ui_theme_part_top_bar_plate">صفحه نوار بالا</string>
+
+    <string name="ui_theme_part_composer">نوار ورودی گفتگو</string>
+
+    <string name="ui_theme_part_search">نوار جستجو</string>
+
+    <string name="ui_theme_part_page_scroll">پیمایش صفحه</string>
+
+    <string name="ui_theme_part_dialog">دیالوگ‌ها</string>
+
+    <string name="ui_theme_part_menu">منوی کشویی</string>
+
+    <string name="ui_theme_part_settings">کارت‌های تنظیمات</string>
+
+    <string name="ui_theme_preview_primary_btn">اصلی</string>
+    <string name="ui_theme_preview_tonal_btn">تنال</string>
+    <string name="ui_theme_preview_loading_hint">در حال پردازش…</string>
+    <string name="ui_theme_preview_input_hint">چیزی تایپ کنید…</string>
 
     <string name="ui_theme_mode_system">پیروی از سیستم</string>
     <string name="ui_theme_mode_light">روشن</string>
@@ -639,8 +690,6 @@
     <string name="ui_onboard_preferences_notification_desc">وضعیت زنده Agent را در نوار اعلان نشان بدهید</string>
     <string name="ui_onboard_preferences_file_title">مجوز پرونده</string>
     <string name="ui_onboard_preferences_file_desc">به Agent اجازه دهید پرونده‌های بیرون از جعبه شنی را بخواند و بنویسد</string>
-    <string name="ui_onboard_preferences_granted">داده شد</string>
-    <string name="ui_onboard_preferences_grant_action">برای دادن مجوز بزنید</string>
     <string name="ui_onboard_preferences_security_group">قانون‌های اجرا</string>
     <string name="ui_onboard_preferences_security_hint">فرمان‌هایی که پیش از اجرا باید دوباره تأیید شوند</string>
     <string name="ui_onboard_preferences_rule_add_action">قانون تازه</string>
@@ -689,6 +738,29 @@
     <string name="text_action_menu_label">از Zafiro بپرس</string>
     <string name="ui_settings_actions">کنش‌های متن</string>
     <string name="ui_settings_actions_summary">میانبرهایی را تنظیم کنید که با انتخاب متن اجرا می‌شوند</string>
+    <string name="ui_settings_quick_prompts">دستورهای سریع</string>
+    <string name="ui_settings_quick_prompts_summary">پیکربندی عبارات و الگوهای سریعی که با / در کادر گفتگو فعال می‌شوند</string>
+    <string name="quick_prompt_page_description">با تایپ / در کادر ورودی، دستورهای از پیش تعیین‌شده را سریعاً پیشنهاد دهید و جایگزین کنید.</string>
+    <string name="quick_prompt_page_empty_description">برای افزودن اولین دستور سریع، روی گوشه بالا ضربه بزنید.</string>
+    <string name="quick_prompt_loading">در حال بارگذاری دستورها…</string>
+    <string name="quick_prompt_editor_title_create">دستور سریع جدید</string>
+    <string name="quick_prompt_save_action">ذخیره دستور</string>
+    <string name="quick_prompt_field_name">کلید فعال‌سازی</string>
+    <string name="quick_prompt_field_name_hint">مثلاً: btw</string>
+    <string name="quick_prompt_field_name_description">با وارد کردن / به همراه این نام فعال می‌شود. فاصله یا نمادهای ویژه مجاز نیست.</string>
+    <string name="quick_prompt_field_prompt">متن دستور</string>
+    <string name="quick_prompt_field_prompt_hint">متنی که باید جایگزین یا باز شود</string>
+    <string name="quick_prompt_field_enabled">فعال</string>
+    <string name="quick_prompt_delete_dialog_title">حذف دستور سریع</string>
+    <string name="quick_prompt_delete_dialog_text">آیا از حذف دستور «%1$s» مطمئن هستید؟ این عملیات قابل برگشت نیست.</string>
+    <string name="quick_prompt_error_name_required">لطفاً کلید فعال‌سازی را وارد کنید.</string>
+    <string name="quick_prompt_error_name_invalid">کلید فعال‌سازی نباید شامل فاصله یا نمادهای ویژه باشد.</string>
+    <string name="quick_prompt_error_name_duplicate">دستوری با این کلید فعال‌سازی قبلاً ثبت شده است.</string>
+    <string name="quick_prompt_error_name_reserved">کلید فعال‌سازی نباید از دستورات یا کلمات کلیدی رزرو شده استفاده کند.</string>
+    <string name="quick_prompt_error_prompt_required">لطفاً متن دستور را وارد کنید.</string>
+    <string name="quick_prompt_error_load_failed">بارگذاری دستورهای سریع با شکست مواجه شد.</string>
+    <string name="quick_prompt_error_save_failed">ذخیره دستور سریع با شکست مواجه شد.</string>
+    <string name="quick_prompt_error_delete_failed">حذف دستور سریع با شکست مواجه شد.</string>
     <string name="text_action_page_description">وقتی در برنامه دیگری متنی را انتخاب می‌کنید، می‌توانید کنش‌های تنظیم‌شده اینجا را سریع صدا بزنید.</string>
     <string name="text_action_page_empty_description">دکمه افزودن بالای صفحه را بزنید تا اولین کنش متن را اضافه کنید.</string>
     <string name="text_action_loading">در حال بار کردن کنش‌ها…</string>

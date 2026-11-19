@@ -48,6 +48,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.niki914.logging.Logger
 import com.niki914.uikit.base.BaseTheme
 import com.niki914.uikit.base.ThemeStyle
+import com.niki914.uikit.base.UiStylePart
+import com.niki914.uikit.base.resolvedUiStyle
 import com.niki914.uikit.menu.ZafiroDropdownMenu
 import com.niki914.uikit.menu.ZafiroMenuItem
 import com.niki914.uikit.menu.ZafiroMenuAlignment
@@ -81,8 +83,11 @@ import com.niki914.zafiro.app.ui.nav.TitleBarMode
 import com.niki914.zafiro.app.ui.nav.TopBarActionSpec
 import com.niki914.zafiro.app.ui.nav.ViewerPage
 import com.niki914.zafiro.app.ui.nav.ZafiroPage
+import com.niki914.zafiro.app.ui.viewer.InAppPreviewBridge
 import com.niki914.zafiro.app.ui.viewer.LocalViewerOpener
+import com.niki914.zafiro.app.ui.viewer.LocalWebBackdropGate
 import com.niki914.zafiro.app.ui.viewer.ViewerContent
+import com.niki914.zafiro.app.ui.viewer.WebBackdropGate
 import com.niki914.zafiro.business.application.ApplicationService
 import com.niki914.zafiro.repo.XRepo
 import com.niki914.zafiro.service.findService
@@ -135,14 +140,11 @@ fun ZafiroApp(
 
     val currentEntry = controller.currentEntry
     val currentPage = currentEntry.page
+    val webBackdropGate = remember { WebBackdropGate() }
+    val showingWeb = (currentPage as? ViewerPage)?.content is ViewerContent.Web
+    val recordContentBackdrop = !showingWeb && webBackdropGate.activeCount == 0
     val currentChrome = pageChromeHost.stateFor(currentEntry.id)
     val isChromeMenuOpen = chromeMenuExpanded && currentChrome.menuItems.isNotEmpty()
-    val shouldFadeRightButton = themePrefs.themeStyle == ThemeStyle.LiquidGlass && isChromeMenuOpen
-    val rightButtonAlpha by animateFloatAsState(
-        targetValue = if (shouldFadeRightButton) 0f else 1f,
-        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
-        label = "rightButtonAlpha",
-    )
     val currentLeftAction = currentChrome.leftAction ?: currentPage.leftAction
     val latestCurrentChrome by rememberUpdatedState(currentChrome)
     fun closeChromeMenu() {
@@ -199,6 +201,12 @@ fun ZafiroApp(
         { content ->
             closeChromeMenu()
             navigator.push(ViewerPage(content))
+        }
+    }
+
+    LaunchedEffect(openViewer) {
+        InAppPreviewBridge.requests.collect { webContent ->
+            openViewer(webContent)
         }
     }
 
@@ -324,9 +332,18 @@ fun ZafiroApp(
             seedColor = seedColor,
             isCatppuccin = themePrefs.isCatppuccin,
             themeStyle = themePrefs.themeStyle,
+            uiStyleLookup = ThemeController.uiStyleLookup(),
         ) {
+            val plateIsLiquid = resolvedUiStyle(UiStylePart.TopBarPlate) == ThemeStyle.LiquidGlass
+            val shouldFadeRightButton = plateIsLiquid && isChromeMenuOpen
+            val rightButtonAlpha by animateFloatAsState(
+                targetValue = if (shouldFadeRightButton) 0f else 1f,
+                animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+                label = "rightButtonAlpha",
+            )
             CompositionLocalProvider(
                 LocalMarkdownScale provides markdownScale,
+                LocalWebBackdropGate provides webBackdropGate,
             ) {
                 ZafiroScreen(
                     state = screenState,
@@ -341,11 +358,12 @@ fun ZafiroApp(
                     onLeftClick = onLeftClick,
                     onRightClick = onRightClick,
                     onRightButtonBoundsChanged = { rightButtonBounds = it },
+                    recordContentBackdrop = recordContentBackdrop,
+                    topBarLoad = currentChrome.topBarLoad,
                     leftButton = currentLeftAction?.let { action ->
                         {
                             TopBarActionIcon(
                                 action = action,
-                                themeStyle = themePrefs.themeStyle,
                                 tint = actionIconTint,
                                 label = "leftActionIcon",
                             )
@@ -355,7 +373,6 @@ fun ZafiroApp(
                         {
                             TopBarActionIcon(
                                 action = action,
-                                themeStyle = themePrefs.themeStyle,
                                 tint = actionIconTint,
                                 label = "rightActionIcon",
                             )
@@ -497,12 +514,11 @@ private fun resolveRightAction(
 @Composable
 private fun TopBarActionIcon(
     action: TopBarActionSpec,
-    themeStyle: ThemeStyle,
     tint: Color,
     label: String,
     modifier: Modifier = Modifier,
 ) {
-    val isLiquid = themeStyle == ThemeStyle.LiquidGlass
+    val isLiquid = resolvedUiStyle(UiStylePart.TopBarButtons) == ThemeStyle.LiquidGlass
 
     AnimatedContent(
         targetState = action.icon,

@@ -1,8 +1,6 @@
 ---
-name: Phone Use
-description: MUST Load this skill for ANY task that involves Android screen interaction or device control —
-  operating the virtual background display ('vd-*') or physical screen ('phone'), opening apps, tapping,
-  typing, scrolling, swiping, Back/Home navigation, reading UI trees, taking screenshots, or inspecting on-screen state.
+name: phone-use
+description: MUST load for any app or screen tasks. Guides on screenshots, tapping, swiping, and UI interactions.
 ---
 
 ## Overview
@@ -19,7 +17,7 @@ Always prioritize non-intrusive execution:
 
 1. **Default to virtual display (`vd-*`)**:
    - Create a virtual screen using `screens`. It runs the app in the background and displays a floating preview card so the user can observe without interruption.
-   - Launch the target app onto the virtual display using `open`.
+   - Launch the target app onto the virtual display with `open` after `find_installed_apps` returns its package name.
    - **Always teardown**: Release the screen via `screens` when the task finishes or aborts to dismiss the floating card.
 2. **Fallback to physical screen (`phone`)**:
    - Use the main screen only when the user explicitly requests it or when virtual display creation fails.

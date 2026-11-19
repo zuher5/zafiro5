@@ -2,6 +2,7 @@ package com.niki914.zafiro.app.ui.model
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.niki914.zafiro.app.R
 
 sealed interface ProviderSpec {
@@ -18,6 +19,9 @@ sealed interface ProviderSpec {
 
     /** true 时 API Key 可为空，用于 KiloCode free / bansos proxy 等无 key 网关。 */
     val allowsEmptyApiKey: Boolean get() = false
+
+    @get:StringRes
+    val summaryRes: Int? get() = null
 
     @get:DrawableRes
     val iconRes: Int
@@ -114,6 +118,7 @@ private data object OpenAiSpec : ProviderSpec {
     override val exampleModelId: String = "gpt-5.4"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-responses"
+    override val summaryRes: Int = R.string.ui_provider_official_and_relay_summary
     override val iconRes: Int = R.drawable.openai
     override val tintIcon: Boolean = true
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
@@ -133,6 +138,7 @@ private data object AnthropicSpec : ProviderSpec {
     override val exampleModelId: String = "claude-sonnet-4-6"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "anthropic-messages"
+    override val summaryRes: Int = R.string.ui_provider_official_and_relay_summary
     override val iconRes: Int = R.drawable.anthropic
     override val tintIcon: Boolean = true
     override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
@@ -256,8 +262,8 @@ private data object CommandCodeSpec : ProviderSpec {
 private data object OpenCodeFreeSpec : ProviderSpec {
     override val id: String = "opencode-zen-free"
     override val brandName: String = "OpenCode Free"
-    override val officialEndpoint: String = "https://opencode.ai/zen/v1/chat/completions"
-    override val exampleModelId: String = "mimo-v2.6-flash-free"
+    override val officialEndpoint: String = "https://opencode.ai/inference/v1/chat/completions"
+    override val exampleModelId: String = "deepseek-v4.1-flash-free"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true
@@ -287,7 +293,7 @@ private data object OpenCodePIProxySpec : ProviderSpec {
     override val id: String = "opencode-pi"
     override val brandName: String = "OpenCode PI"
     override val officialEndpoint: String = "http://127.0.0.1:18080/v1/chat/completions"
-    override val exampleModelId: String = "mimo-v2.6-flash-free"
+    override val exampleModelId: String = "deepseek-v4.1-flash-free"
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true
