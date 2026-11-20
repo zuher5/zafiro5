@@ -11,7 +11,6 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import com.niki914.zafiro.chat.OpenCodeFreeSupport
 import kotlinx.serialization.json.longOrNull
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
@@ -38,9 +37,6 @@ internal object ModelCatalogApi {
         apiKey: String,
         protocol: LlmProtocol,
     ): ModelCatalog = withContext(Dispatchers.IO) {
-        // OpenCode Zen gate rejects a bare client: catalog scan must carry the
-        // same fingerprint as inference or it 403s.
-        val isOpenCodeZen = modelsUrl.contains("opencode.ai", ignoreCase = true)
         val request = Request.Builder()
             .url(modelsUrl)
             .get()
@@ -53,11 +49,6 @@ internal object ModelCatalogApi {
                         header("anthropic-version", "2023-06-01")
                     } else {
                         header("Authorization", "Bearer $key")
-                    }
-                }
-                if (isOpenCodeZen) {
-                    for ((name, value) in OpenCodeFreeSupport.headers()) {
-                        header(name, value)
                     }
                 }
             }

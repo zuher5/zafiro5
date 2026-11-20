@@ -114,8 +114,6 @@ internal class OkiaSessionAssembler(
     var activeSession: Okia? = null
     var sessionProtocol: LlmProtocol? = null
         private set
-    var sessionOpenCodeFree: Boolean? = null
-        private set
 
     var deviceStateProvider: DeviceStateProvider? = null
 
@@ -154,7 +152,6 @@ internal class OkiaSessionAssembler(
         kotlinx.coroutines.runBlocking { activeSession?.close() }
         activeSession = null
         sessionProtocol = null
-        sessionOpenCodeFree = null
         sessionForwardJob?.cancel()
         sessionForwardJob = null
         conversationFlow.value = null
@@ -169,22 +166,17 @@ internal class OkiaSessionAssembler(
         restore: SessionSnapshot? = null,
         forceNew: Boolean = false,
     ): Okia {
-        val effectiveEndpoint = config.endpoint.ifBlank {
-            protocolDefaultEndpointFallback(protocol ?: LlmProtocol.Default)
-        }
-        val isOpenCodeFree = isOpenCodeFreeEndpoint(effectiveEndpoint)
         if (!forceNew && restore == null) {
-            activeSession?.takeIf { sessionProtocol == protocol && sessionOpenCodeFree == isOpenCodeFree }
+            activeSession?.takeIf { sessionProtocol == protocol }
                 ?.let { return it }
         }
         val carried = restore ?: activeSession?.takeIf {
-            sessionProtocol != protocol || sessionOpenCodeFree != isOpenCodeFree
+            sessionProtocol != protocol
         }?.export()
         activeSession?.close()
         return openSession(protocol ?: LlmProtocol.Default, config, carried).also {
             activeSession = it
             sessionProtocol = protocol
-            sessionOpenCodeFree = isOpenCodeFree
             forwardConversation(it)
         }
     }
@@ -206,7 +198,6 @@ internal class OkiaSessionAssembler(
         activeSession?.close()
         activeSession = null
         sessionProtocol = null
-        sessionOpenCodeFree = null
         sessionForwardJob?.cancel()
         sessionForwardJob = null
         conversationFlow.value = null
@@ -229,7 +220,6 @@ internal class OkiaSessionAssembler(
             }
         activeSession = null
         sessionProtocol = null
-        sessionOpenCodeFree = null
         sessionForwardJob?.cancel()
         sessionForwardJob = null
         conversationFlow.value = null
@@ -251,9 +241,7 @@ internal class OkiaSessionAssembler(
         config: ResolvedLlmConfig,
     ): Okia {
         val endpoint = config.endpoint.ifBlank { protocolDefaultEndpointFallback(protocol) }
-        val baseProtocol = wireProtocolFor(protocol)
-        val isOpenCodeFree = isOpenCodeFreeEndpoint(endpoint)
-        val wireProtocol = if (isOpenCodeFree) OpenCodeFreeProtocol(baseProtocol) else baseProtocol
+        val wireProtocol = wireProtocolFor(protocol)
         val saver = ensureImageSaver()
         return Okia.open(wireProtocol, restore) {
             this.endpoint = endpoint
@@ -273,112 +261,11 @@ internal class OkiaSessionAssembler(
             supportsImages = imageLoader != null && config.supportsImages
             thinkingLevel = config.thinkingLevel
             proxy = config.proxy
-            if (isOpenCodeFree) {
-                headers = OpenCodeFreeSupport.headers()
-            }
             requestLogger = androidRequestLogger
             repetitionConfig = config.repetitionSensitivity.toRepetitionConfig()
         }
     }
 
-    private fun isOpenCodeFreeEndpoint(endpoint: String): Boolean =
-        endpoint.contains("opencode.ai/zen", ignoreCase = true) ||
-            endpoint.contains("zen/v1", ignoreCase = true) ||
-            endpoint.contains("opencode.ai/inference", ignoreCase = true) ||
-            endpoint.contains("inference/v1", ignoreCase = true)
-
-    private class OpenCodeFreeProtocol(private val base: ChatProtocol) : ChatProtocol {
-        @Volatile
-        private var toolAliases: Map<String, String> = emptyMap()
-
-        override val id: String get() = base.id
-        override val defaultEndpoint: String? get() = base.defaultEndpoint
-        override fun withCodec(codec: Json): ChatProtocol = base.withCodec(codec)
-        override fun useApiKey(apiKey: String): Map<String, String> = emptyMap()
-        override suspend fun buildRequest(snapshot: RequestSnapshot, history: List<Message>): HttpRequest {
-            val request = base.buildRequest(snapshot, history)
-            val body = request.body ?: return request
-            val result = OpenCodeFreeSupport.transform(Json.parseToJsonElement(body) as JsonObject)
-            toolAliases = result.toolAliases
-            val freshHeaders = request.headers.toMutableMap()
-            freshHeaders.putAll(OpenCodeFreeSupport.headers())
-            return request.copy(
-                url = rewriteUrl(request.url, result.responsesPath),
-                headers = freshHeaders,
-                body = result.body.toString(),
-            )
-        }
-
-        override fun parseStream(rawSseLines: Flow<SseLine>): Flow<ProtocolEvent> =
-            base.parseStream(rawSseLines).map { event ->
-                if (event is ProtocolEvent.Error) {
-                    val msg = event.cause.message.orEmpty()
-                    if (msg.contains("429") || msg.contains("FreeUsageLimitError", ignoreCase = true) || msg.contains("quota", ignoreCase = true)) {
-                        OpenCodeFreeSupport.burnSessionId()
-                    }
-                    // Gate 403: session/identitas bisa usang — refresh untuk request
-                    // berikutnya (reactive, bridge-style). Tidak auto-retry di sini:
-                    // upstream menekan per-IP, retry storm hanya memperpanjang hukuman.
-                    if (msg.contains("403") || msg.contains("FreeTierError", ignoreCase = true)) {
-                        OpenCodeFreeSupport.burnSessionId()
-                        OpenCodeFreeSupport.markIdentityStale()
-                    }
-                }
-                restoreToolAlias(event)
-            }
-
-        /** Undo the `*_pi` aliasing so the loop sees Zafiro's own tool names. */
-        private fun restoreToolAlias(event: ProtocolEvent): ProtocolEvent {
-            val aliases = toolAliases
-            if (aliases.isEmpty()) return event
-            return when (event) {
-                is ProtocolEvent.ToolCallStarted -> {
-                    val restored = aliases[event.toolName] ?: return event
-                    event.copy(toolName = restored)
-                }
-
-                is ProtocolEvent.ToolCallDelta -> {
-                    val restored = aliases[event.toolName] ?: return event
-                    event.copy(toolName = restored)
-                }
-
-                is ProtocolEvent.ToolCallReady -> {
-                    val restored = aliases[event.toolName] ?: return event
-                    event.copy(toolName = restored)
-                }
-
-                else -> event
-            }
-        }
-
-        // Permukaan inference upstream berpindah-pindah (/zen/v1 → /inference/v1 →
-        // /inference/openai/v1): prefix aktif diturunkan dari katalog, semua varian
-        // lama dipetakan ke sana. Model muse-class memakai permukaan /responses.
-        private fun rewriteUrl(url: String, responsesPath: Boolean): String {
-            val schemeEnd = url.indexOf("://")
-            val originEnd = url.indexOf('/', schemeEnd + 3)
-            if (schemeEnd < 0 || originEnd < 0) return url
-            val origin = url.substring(0, originEnd)
-            var path = url.substring(originEnd)
-            val legacyPrefixes = listOf("/zen/v1", "/inference/v1", "/inference/openai/v1")
-            val matched = legacyPrefixes.firstOrNull { path.startsWith(it, ignoreCase = true) }
-            if (matched != null) {
-                path = OpenCodeFreeSupport.inferencePathPrefix() + path.substring(matched.length)
-            }
-            if (!responsesPath) return origin + path
-            return when {
-                path.contains("/responses", ignoreCase = true) -> origin + path
-                path.contains("/chat/completions", ignoreCase = true) ->
-                    origin + path.replace("/chat/completions", "/responses", ignoreCase = true)
-
-                else -> origin + path.trimEnd('/') + "/responses"
-            }
-        }
-
-        override fun encodeToolResult(call: ContentBlock.ToolCall, outcome: ToolCallOutcome): Message =
-            base.encodeToolResult(call, outcome)
-        override val compat: Compat get() = base.compat
-    }
 
     internal fun isImageSupported(configSupportsImages: Boolean): Boolean {
         return imageLoader != null && configSupportsImages

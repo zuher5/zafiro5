@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.ConnectionSpec
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType
@@ -20,7 +19,6 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import okhttp3.TlsVersion
 import okio.BufferedSink
 import com.niki914.okia.util.tryOrNull
 import java.io.IOException
@@ -202,18 +200,12 @@ class OkHttpEngine(
 
     // 按请求超时克隆 client；newBuilder 共享基础 client 的连接池与 dispatcher
     private fun clientFor(timeouts: HttpTimeouts, requestUrl: String = ""): OkHttpClient {
-        val builder = base.newBuilder()
+        return base.newBuilder()
             .connectTimeout(timeouts.connectMs, TimeUnit.MILLISECONDS)
             .readTimeout(timeouts.readMs, TimeUnit.MILLISECONDS)
             .writeTimeout(timeouts.writeMs, TimeUnit.MILLISECONDS)
             .proxySelector(proxySelector())
-        if (requestUrl.contains("opencode.ai", ignoreCase = true)) {
-            // TLS 1.3/1.2 + Bun 的 17 套件 ClientHello。默认协议（h2+http/1.1）
-            // 保留——强制 HTTP/1.1 会把 ALPN 扩展从 ClientHello 里去掉，指纹
-            // 直接少一个扩展；CLI 本身就是 ALPN [h2, http/1.1]。
-            builder.connectionSpecs(listOf(OPENCODE_CONNECTION_SPEC, ConnectionSpec.CLEARTEXT))
-        }
-        return builder.build()
+            .build()
     }
 
     // body 行流：分块读 UTF-8 字符 → SseLineParser 切行（行切分与分类单一来源）。
@@ -285,30 +277,5 @@ class OkHttpEngine(
 
     private companion object {
         const val READ_CHUNK_SIZE = 8192
-
-        val OPENCODE_CIPHERS = arrayOf(
-            "TLS_AES_128_GCM_SHA256",
-            "TLS_AES_256_GCM_SHA384",
-            "TLS_CHACHA20_POLY1305_SHA256",
-            "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-            "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-            "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-            "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-            "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-            "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-            "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
-            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
-            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
-            "TLS_RSA_WITH_AES_128_GCM_SHA256",
-            "TLS_RSA_WITH_AES_256_GCM_SHA384",
-            "TLS_RSA_WITH_AES_128_CBC_SHA",
-            "TLS_RSA_WITH_AES_256_CBC_SHA",
-        )
-
-        val OPENCODE_CONNECTION_SPEC: ConnectionSpec = ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-            .tlsVersions(TlsVersion.TLS_1_3, TlsVersion.TLS_1_2)
-            .cipherSuites(*OPENCODE_CIPHERS)
-            .build()
     }
 }
