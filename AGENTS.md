@@ -101,10 +101,6 @@ AI 对话通常是以 list 的形式存放 messages，同时只会有一个对�
 - Conversation - 单次对话中的消息的集合
 - Turn - Agent 通常会与 Tool 交互多个回合才结束。因此，我们将一条用户消息与其产生的若干 Agent 回答、Tool 调用、Tool 结果的集合称为一个 Turn。便于管理
 
-### 手机控制
-
-手机控制通过 Screens API 完成，底层基于无障碍实现。Zafiro Agent 通过内置的 phone-use Skill 来完成任务。手机控制有两种选项：运行在虚拟屏或直接运行在主屏。虚拟屏模式下有一个悬浮窗显示屏幕内容
-
 ### 持久化
 
 项目有着多种持久化方案：
@@ -121,6 +117,33 @@ Zafiro Agent 的对话功能是限定在主进程之内的，虽然有一个宿�
 ### 日志与调试
 
 如果身处 lima Linux 环境, 请调用 `host-command-bridge` 来与主机 macOS 环境交互。调试构建额外把同一条日志落到沙箱，如果 logcat 被冲掉了可以用 adb 把日志拉出来看。详情通过调用 `zafiro-qa` 技能来了解
+
+### 维护者约定与定制特性 (Maintainer Context)
+
+- **Application ID / Package Name**: 必须始终保持基础 ID 为 `com.niki914.zafiro`（不要改成 `com.niki914.zafiro5` 或其他）。当前配置与最新版本为维护者明确指定的目标状态。
+- **Debug 包名后缀隔离 (Release / Debug Coexistence Rule)**:
+  - Debug 构建必须始终配置 `applicationIdSuffix = ".debug"`，实际包名为 `com.niki914.zafiro.debug`。
+  - Release 构建包名为 `com.niki914.zafiro`。
+  - 目的：允许同一台测试机/真机上同时安装 Release 版与 Debug 版共存，避免 `INSTALL_FAILED_DUPLICATE_PERMISSION` 权限声明冲突或签名不一致导致覆盖失败。后续维护或重构严禁移除 debug 的 `.debug` 后缀。
+- **免费模型接入 (Free LLM Providers)**:
+  - `KiloCode Free` (`kilo-free`): 直连 `https://api.kilo.ai/api/gateway/chat/completions`，支持空 API Key，默认模型 `kilo-auto/free`。
+  - `OpenCode Free` (`opencode-zen-free`): 直连 `https://opencode.ai/inference/openai/v1/chat/completions`（inference 前缀与模型事实动态从 `models.opencode.ai/api.json` field `api` 与 `opencode.ai/update/api/latest/cli/npm` 推导，写死前缀必然随 upstream 迁移失效；`/zen/v1` 与 `/inference/v1` 已退役），支持空 API Key，默认模型 `deepseek-v4.1-flash-free`。`OpenCodeFreeSupport` 维护 bridge-style wire identity：UA `opencode/<channel>/<ver>/<name>`（如 `opencode/latest/2.3.2/cli`，来自 update API，非 npm registry）、`x-opencode-client: cli`、恰好 7 个 gate headers（不发 `x-opencode-request`、不发 `Connection: close`）、`prompt_cache_key`、`<env>` 环境指纹、verbatim `read`+`shell` schema；429/403 时 `burnSessionId()` + `markIdentityStale()` reactive 自愈（不做 auto-retry，以免加剧 upstream per-IP 冷却）；additive token budgeting (`max(requested, 1024) + 4096`) 防止 reasoning 模型输出截断，ceiling 取自 katalog；OkHttp 侧 17 套件 ClientHello + 保留默认 h2+http/1.1（强制 HTTP/1.1 会剥掉 ALPN 扩展，破坏指纹）。
+  - `OpenCode PI` (`opencode-pi`): 经 Termux `pi-bansos` 或 `opencode-to-api` 代理的回退通道 (`http://127.0.0.1:18080/v1/chat/completions`)。
+  - 设置页中的 `proxy` 仅支持标准 HTTP/SOCKS 代理；像 Vercel relay 等需要自定义 `x-relay-target` 头的服务不能直接填入普通代理输入框。
+- **会话滑动快捷操作 (Session Swipe Actions)**:
+  - 对话历史列表中每一项封装在 `SwipeToDismissBox` 中：向右滑重命名会话，向左滑删除会话。在进行合并和 UI 重构时必须完整保留该能力。
+- **Upstream 同步基线**:
+  - 已完整合并 upstream `v20-2.0.0`（包含 Room 全文搜索 `ZafiroSearchBar`、Viewer 媒体与 Web 预览、Slash Suggestions、Quick Prompts、HomeModelSwitchSheet、Orphan Image Cleanup、输入框折叠优化、多主题系统 `BaseTheme` / `ZafiroTopBarLayout` / UI styles）。
+- **构建与发布约束 (GitHub Actions Only)**:
+  - Android 构建只在 GitHub Actions 执行；本地环境不作为 Gradle、Chaquopy 或签名构建环境，不要在本地运行 Android build。
+  - Release 构建使用 `.github/workflows/release.yml` 的 `workflow_dispatch` 或版本 tag 触发；签名构建依赖 GitHub Secrets。
+  - 触发 workflow 前必须确认目标 commit 已推送到 GitHub，并保留 workflow run URL 与最终 artifact/release 状态作为验证证据。
+- **构建指令语义 (Release Command Semantics)** — 用户以短语下达构建/发布指令，按字面范围执行，不扩大也不缩小：
+  - **`debug release`**：只构建 Debug APK，不打 tag、不发 Release。Debug 包名带 `.debug` 后缀（`com.niki914.zafiro.debug`，与 Release 共存，见上）。产物为 `Build APK` workflow 的 artifact。
+  - **`tag release`**：执行 Signed Release 并直接打版本 tag（`v<versionName>`）推送，由 CI `Release Build` 构建签名 APK 并创建 GitHub Release，随后设置标题与双语 notes。
+  - **`release`**（单独一词）：两者全做——先出 Debug artifact，再做 Signed Release，Signed Release 照常打 tag。
+  - 用户只说其中一条时严格只做那一条；例如 `debug release` 后不要顺带 tag。tag 前若版本未 bump，先走 `release-new-version` skill 完成版本号与 notes 的确认。
+
 
 ---
 

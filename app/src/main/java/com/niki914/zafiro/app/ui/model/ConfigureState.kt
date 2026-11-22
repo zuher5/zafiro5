@@ -677,7 +677,7 @@ class ConfigureViewModel internal constructor(
             )
             if (key == lastCatalogKey) return@debounce
             // 空值短路：Key 或 endpoint 为空直接不发，保留旧缓存
-            if (key.endpoint.isBlank() || key.apiKey.isBlank()) return@debounce
+            if (key.endpoint.isBlank() || (key.apiKey.isBlank() && !state.providerSpec.allowsEmptyApiKey)) return@debounce
             val protocol = LlmProtocol.fromWire(key.protocolWireId)
             val modelsUrl = EndpointInference.modelsUrl(key.endpoint, protocol)
                 ?: return@debounce
@@ -1133,7 +1133,7 @@ private enum class ConfigureFieldTarget {
 private fun ConfigureUiState.firstInvalidField(): ConfigureFieldTarget? {
     return when {
         // 与填写顺序一致：API Key → Model → Endpoint → Proxy → MaxTokens → ContextWindow
-        apiKeyInput.trim().isBlank() -> ConfigureFieldTarget.ApiKey
+        apiKeyInput.trim().isBlank() && !providerSpec.allowsEmptyApiKey -> ConfigureFieldTarget.ApiKey
         modelInput.trim().isBlank() -> ConfigureFieldTarget.Model
         endpointOverrideEnabled && endpointInput.trim().isBlank() -> ConfigureFieldTarget.Endpoint
         isValidProxy(proxyInput).not() -> ConfigureFieldTarget.Proxy

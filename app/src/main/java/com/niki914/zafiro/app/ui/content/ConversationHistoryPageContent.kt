@@ -33,10 +33,15 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material3.ExperimentalMaterial3Api
 import com.niki914.uikit.control.ZafiroLoadingIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -142,6 +148,12 @@ internal fun ConversationHistoryPageContent(
             onConversationToggleSelection = onConversationToggleSelection,
             onConversationLongClick = { conversation ->
                 sheetConversation = conversation
+            },
+            onConversationSwipeRename = { conversation ->
+                renamingConversation = conversation
+            },
+            onConversationSwipeDelete = { conversation ->
+                deleteConfirmation = conversation
             },
             modifier = modifier,
         )
@@ -285,6 +297,8 @@ private fun ConversationHistoryListContent(
     onConversationClick: (String) -> Unit,
     onConversationToggleSelection: (String) -> Unit,
     onConversationLongClick: (ConversationSummary) -> Unit,
+    onConversationSwipeRename: (ConversationSummary) -> Unit,
+    onConversationSwipeDelete: (ConversationSummary) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val deleteErrorPrefix = deleteErrorMessage?.let {
@@ -400,33 +414,59 @@ private fun ConversationHistoryListContent(
                                     section.conversations.forEach { conversation ->
                                         key(conversation.id) {
                                             val matchedSnippet = searchResultById[conversation.id]?.matchedSnippet
-                                            ConversationHistoryItem(
-                                                conversation = conversation,
-                                                isPinned = conversation.rootId in pinnedIds || conversation.id in pinnedIds,
-                                                inPinnedSection = section.bucket == TimelineBucket.Pinned,
-                                                initialPulsed = !isSearchingActive && conversation.id == initialPulsedId,
-                                                currentTimeMillis = currentTimeMillis,
-                                                selected = conversation.id in selectedIds,
-                                                runState = runStates[conversation.id]
-                                                    ?: ConversationRunState.Idle,
-                                                searchQuery = searchQuery,
-                                                matchedSnippet = matchedSnippet,
-                                                onClick = {
-                                                    if (selecting) {
-                                                        onConversationToggleSelection(conversation.id)
-                                                    } else {
-                                                        onConversationClick(conversation.id)
+                                            val dismissState = rememberSwipeToDismissBoxState(
+                                                confirmValueChange = { targetValue ->
+                                                    when (targetValue) {
+                                                        SwipeToDismissBoxValue.StartToEnd -> {
+                                                            onConversationSwipeRename(conversation)
+                                                            false
+                                                        }
+                                                        SwipeToDismissBoxValue.EndToStart -> {
+                                                            onConversationSwipeDelete(conversation)
+                                                            false
+                                                        }
+                                                        SwipeToDismissBoxValue.Settled -> true
                                                     }
-                                                },
-                                                onLongClick = {
-                                                    if (selecting) {
-                                                        onConversationToggleSelection(conversation.id)
-                                                    } else {
-                                                        onConversationLongClick(conversation)
-                                                    }
+                                                }
+                                            )
+
+                                            SwipeToDismissBox(
+                                                state = dismissState,
+                                                enableDismissFromStartToEnd = !selecting,
+                                                enableDismissFromEndToStart = !selecting,
+                                                backgroundContent = {
+                                                    SwipeBackground(dismissState = dismissState)
                                                 },
                                                 modifier = Modifier.fillMaxWidth(),
-                                            )
+                                            ) {
+                                                ConversationHistoryItem(
+                                                    conversation = conversation,
+                                                    isPinned = conversation.rootId in pinnedIds || conversation.id in pinnedIds,
+                                                    inPinnedSection = section.bucket == TimelineBucket.Pinned,
+                                                    initialPulsed = !isSearchingActive && conversation.id == initialPulsedId,
+                                                    currentTimeMillis = currentTimeMillis,
+                                                    selected = conversation.id in selectedIds,
+                                                    runState = runStates[conversation.id]
+                                                        ?: ConversationRunState.Idle,
+                                                    searchQuery = searchQuery,
+                                                    matchedSnippet = matchedSnippet,
+                                                    onClick = {
+                                                        if (selecting) {
+                                                            onConversationToggleSelection(conversation.id)
+                                                        } else {
+                                                            onConversationClick(conversation.id)
+                                                        }
+                                                    },
+                                                    onLongClick = {
+                                                        if (selecting) {
+                                                            onConversationToggleSelection(conversation.id)
+                                                        } else {
+                                                            onConversationLongClick(conversation)
+                                                        }
+                                                    },
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -1059,4 +1099,47 @@ private fun ConversationHistoryInlineErrorText(
             .fillMaxWidth()
             .padding(horizontal = 4.dp),
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeBackground(
+    dismissState: SwipeToDismissBoxState,
+    modifier: Modifier = Modifier,
+) {
+    val direction = dismissState.dismissDirection
+    val alignment = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+        SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+        SwipeToDismissBoxValue.Settled -> Alignment.Center
+    }
+    val icon = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Edit
+        SwipeToDismissBoxValue.EndToStart -> Icons.Default.Delete
+        SwipeToDismissBoxValue.Settled -> null
+    }
+    val tint = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
+        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error
+        SwipeToDismissBoxValue.Settled -> Color.Transparent
+    }
+    val cardShape = remember { G2CardShape(20.dp) }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .clip(cardShape)
+            .background(tint.copy(alpha = 0.16f))
+            .padding(horizontal = 20.dp),
+        contentAlignment = alignment,
+    ) {
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+    }
 }
