@@ -64,8 +64,6 @@ open class PhoneScreenAccess(
 
     private suspend fun ensureConsent(): PhoneScreenDenial? {
         if (settings()?.phoneUseConsentGranted?.value == true) return null
-        // 自动放行只跳过这一次弹窗，不代替用户持久化知情同意。
-        if (settings()?.screenControlAutoApproved?.value == true) return null
         if (askConsent() != ApprovalDecision.Allow) {
             return PhoneScreenDenial(
                 code = "CONSENT_DENIED",

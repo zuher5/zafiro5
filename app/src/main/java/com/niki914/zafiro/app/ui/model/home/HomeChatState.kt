@@ -28,9 +28,6 @@ internal interface HomeConversationStore {
     //  截断点与回填内容由仓储按回合计算，UI 侧不见底层条目与 okia 消息。
     suspend fun forkAtTurn(sourceId: String, turnIndex: Int, kind: ForkKind): ForkResult?
 
-    /** 原地重生成：截断当前会话到该回合（不派生新会话），返回需回填的输入。 */
-    suspend fun truncateAtTurn(conversationId: String, turnIndex: Int): ForkResult?
-
     /** 分支组全部成员（按序号升序）；单版本会话返回空列表。 */
     suspend fun branchGroup(conversationId: String): List<ConversationSummary>
 
@@ -132,6 +129,17 @@ data class HomeChatFile(
     val category: HomeChatFileCategory get() = HomeChatFileCategory.fromPath(path)
 }
 
+sealed interface HomeVirtualDisplayStage {
+    data object AppPicker : HomeVirtualDisplayStage
+    data class Launching(val packageName: String, val appName: String) : HomeVirtualDisplayStage
+    data class Running(val packageName: String, val appName: String) : HomeVirtualDisplayStage
+}
+
+data class HomeVirtualDisplayUiState(
+    val stage: HomeVirtualDisplayStage = HomeVirtualDisplayStage.AppPicker,
+    val isOverlayExpanded: Boolean = false,
+)
+
 data class HomeChatUiState(
     val input: String = "",
     /** 待发送图片（composer 上方图片条）。send 时移入新 turn.images 并清空。 */
@@ -170,6 +178,8 @@ data class HomeChatUiState(
      */
     val contextProgress: Float? = null,
     val slashSuggestions: List<SlashSuggestion> = emptyList(),
+    val virtualDisplay: HomeVirtualDisplayUiState? = null,
+    val showTerminateVirtualDisplayDialog: Boolean = false,
 ) {
     val displayConfig: SavedConfigSummary?
         get() {
@@ -196,6 +206,7 @@ fun HomeChatUiState.withClearedTransient() = copy(
     expandedActionSource = null,
     activeThinkingKey = null,
     isConfigMenuVisible = false,
+    showTerminateVirtualDisplayDialog = false,
 )
 
 sealed interface HomeChatIntent {
@@ -244,6 +255,10 @@ sealed interface HomeChatIntent {
     data class SelectModel(val configId: String, val modelId: String) : HomeChatIntent
     data class UpdateThinkingLevel(val configId: String, val wireValue: String) : HomeChatIntent
     data object RefreshConfigs : HomeChatIntent
+    data object OpenVirtualDisplay : HomeChatIntent
+    data object RequestTerminateVirtualDisplay : HomeChatIntent
+    data object DismissTerminateVirtualDisplay : HomeChatIntent
+    data object ConfirmTerminateVirtualDisplay : HomeChatIntent
 }
 
 /**
@@ -253,9 +268,9 @@ sealed interface HomeChatIntent {
 sealed interface HomeChatEffect {
     data class FileAttachFailed(val reason: FileAttachReason) : HomeChatEffect
     data object EmptyInputAttempted : HomeChatEffect
-    /** 发起被拒（TurnStart.Busy）：上一回合仍在跑，提示用户等待或停止。 */
-    data object RoundBusy : HomeChatEffect
     data object NoCompactableHistory : HomeChatEffect
+    data object VirtualDisplayRequiresConversation : HomeChatEffect
+    data class OpenVirtualDisplayPage(val conversationId: String) : HomeChatEffect
 }
 
 /**

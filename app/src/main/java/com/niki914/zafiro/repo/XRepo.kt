@@ -17,13 +17,11 @@ import com.niki914.zafiro.settings.model.RuntimeTakeoverTarget
 import com.niki914.zafiro.settings.model.TAKEOVER_FIELD_NAME
 import com.niki914.zafiro.settings.model.TAKEOVER_FIELD_PATTERNS
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
@@ -56,6 +54,7 @@ object XRepo {
     val customPyTools: CustomPyToolApi = CustomPyToolApi(this)
     val builtinTools: BuiltinToolApi = BuiltinToolApi(this)
     val memory: MemoryApi = MemoryApi(this)
+    val web: WebSettingsApi = WebSettingsApi()
     val executionRules: ExecutionRulesApi = ExecutionRulesApi(this)
     val maskingRules: MaskingRulesApi = MaskingRulesApi(this)
     val takeoverRules: TakeoverRulesApi = TakeoverRulesApi(this)
@@ -102,7 +101,6 @@ object XRepo {
         residentNotificationEnabledField.flow.value = false
         turnNotificationEnabledField.flow.value = false
         floatingBallAutoExpandField.flow.value = true
-        screenControlAutoApprovedField.flow.value = false
         stopRoundOnCommandDenyField.flow.value = true
         floatingBallOpacityPercentField.flow.value = 60
         floatingBallSubmergedOffsetDpField.flow.value = 8
@@ -120,55 +118,49 @@ object XRepo {
         return appContext ?: context
     }
 
-    // 所有 store I/O 必须落在 IO 池：调用方遍布各 ViewModel 的 Main 协程，
-    // 在这里单点切换（ConfigPersistence 的文件读写是同步实现），否则
-    // 每次草稿落盘 / 设置读取都是主线程磁盘 I/O。
-    internal suspend fun readJson(storeId: String): String =
-        withContext(Dispatchers.IO) {
-            val startedAtMs = System.currentTimeMillis()
-            val json = store.readJson(context(), storeId)
-            Logger.d(
-                LOG_TAG,
-                "readJson storeId=$storeId jsonLength=${json.length} " +
-                        "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
-            )
-            json
-        }
+    internal suspend fun readJson(storeId: String): String {
+        val startedAtMs = System.currentTimeMillis()
+        val json = store.readJson(context(), storeId)
+        Logger.d(
+            LOG_TAG,
+            "readJson storeId=$storeId jsonLength=${json.length} " +
+                    "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
+        )
+        return json
+    }
 
-    internal suspend fun writeJson(storeId: String, json: String): Boolean =
-        withContext(Dispatchers.IO) {
-            val startedAtMs = System.currentTimeMillis()
-            val result = writeMutex.withLock {
-                writeJsonLocked(context(), storeId, json)
-            }
-            Logger.i(
-                LOG_TAG,
-                "writeJson storeId=$storeId result=$result jsonLength=${json.length} " +
-                        "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
-            )
-            result
+    internal suspend fun writeJson(storeId: String, json: String): Boolean {
+        val startedAtMs = System.currentTimeMillis()
+        val result = writeMutex.withLock {
+            writeJsonLocked(context(), storeId, json)
         }
+        Logger.i(
+            LOG_TAG,
+            "writeJson storeId=$storeId result=$result jsonLength=${json.length} " +
+                    "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
+        )
+        return result
+    }
 
-    internal suspend fun updateJson(storeId: String, transform: (String) -> String): Boolean =
-        withContext(Dispatchers.IO) {
-            val startedAtMs = System.currentTimeMillis()
-            val result = writeMutex.withLock {
-                val context = context()
-                val latest = store.readJson(context, storeId)
-                writeJsonLocked(context, storeId, transform(latest))
-            }
-            Logger.d(
-                LOG_TAG,
-                "updateJson storeId=$storeId result=$result " +
-                        "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
-            )
-            result
+    internal suspend fun updateJson(storeId: String, transform: (String) -> String): Boolean {
+        val startedAtMs = System.currentTimeMillis()
+        val result = writeMutex.withLock {
+            val context = context()
+            val latest = store.readJson(context, storeId)
+            writeJsonLocked(context, storeId, transform(latest))
         }
+        Logger.d(
+            LOG_TAG,
+            "updateJson storeId=$storeId result=$result " +
+                    "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
+        )
+        return result
+    }
 
     internal suspend fun updateJsonOrFalse(
         storeId: String,
         transform: (String) -> String?
-    ): Boolean = withContext(Dispatchers.IO) {
+    ): Boolean {
         val startedAtMs = System.currentTimeMillis()
         val result = writeMutex.withLock {
             val context = context()
@@ -181,7 +173,7 @@ object XRepo {
             "updateJsonOrFalse storeId=$storeId result=$result " +
                     "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
         )
-        result
+        return result
     }
 
     private suspend fun writeJsonLocked(context: Context, storeId: String, json: String): Boolean {
@@ -191,62 +183,61 @@ object XRepo {
         return true
     }
 
-    suspend fun tryPutDefaultSettings(): Boolean =
-        withContext(Dispatchers.IO) {
-            val startedAtMs = System.currentTimeMillis()
-            val result = writeMutex.withLock {
-                val context = context()
-                val appState = AppStateSettingsCodec.parse(
-                    store.readJson(
-                        context,
-                        StoreDescriptorRegistry.APP_STATE_ID
-                    )
-                )
-                if (appState.onboardingCompleted) {
-                    return@withLock false
-                }
-                writeJsonLocked(
+    suspend fun tryPutDefaultSettings(): Boolean {
+        val startedAtMs = System.currentTimeMillis()
+        val result = writeMutex.withLock {
+            val context = context()
+            val appState = AppStateSettingsCodec.parse(
+                store.readJson(
                     context,
-                    StoreDescriptorRegistry.LLM_CONFIGS_ID,
-                    LlmConfigsSettingsCodec.encode(
-                        LlmConfigsDocument(
-                            prompt = LocalSettingsDefaults.DEFAULT_SYSTEM_PROMPT.trimIndent(),
-                        )
-                    ),
+                    StoreDescriptorRegistry.APP_STATE_ID
                 )
-                writeJsonLocked(
-                    context,
-                    StoreDescriptorRegistry.AGENT_MAIN_MEMORY_ID,
-                    MemorySettingsCodec.encodeMemories(
-                        LocalSettingsDefaults.defaultMemories(context),
-                        System.currentTimeMillis()
-                    ),
-                )
-                writeJsonLocked(
-                    context,
-                    StoreDescriptorRegistry.AGENT_REGISTRY_ID,
-                    AgentSettingsCodec.encodeRegistry(listOf(defaultMainAgentProfile(System.currentTimeMillis()))),
-                )
-                writeJsonLocked(
-                    context,
-                    StoreDescriptorRegistry.TOOLS_PY_ID,
-                    ToolSettingsCodec.encodeCustomPyTools(seedPyToolDefaults(context)),
-                )
-                writeJsonLocked(
-                    context,
-                    StoreDescriptorRegistry.RULES_EXECUTION_ID,
-                    RuleSettingsCodec.encodeExecutionRules(LocalSettingsDefaults.defaultExecutionRules),
-                )
-                true
-            }
-            Logger.i(
-                LOG_TAG,
-                "tryPutDefaultSettings result=$result " +
-                        "reason=${if (result) "initialized" else "alreadyOnboarded"} " +
-                        "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
             )
-            result
+            if (appState.onboardingCompleted) {
+                return@withLock false
+            }
+            writeJsonLocked(
+                context,
+                StoreDescriptorRegistry.LLM_CONFIGS_ID,
+                LlmConfigsSettingsCodec.encode(
+                    LlmConfigsDocument(
+                        prompt = LocalSettingsDefaults.DEFAULT_SYSTEM_PROMPT.trimIndent(),
+                    )
+                ),
+            )
+            writeJsonLocked(
+                context,
+                StoreDescriptorRegistry.AGENT_MAIN_MEMORY_ID,
+                MemorySettingsCodec.encodeMemories(
+                    LocalSettingsDefaults.defaultMemories(context),
+                    System.currentTimeMillis()
+                ),
+            )
+            writeJsonLocked(
+                context,
+                StoreDescriptorRegistry.AGENT_REGISTRY_ID,
+                AgentSettingsCodec.encodeRegistry(listOf(defaultMainAgentProfile(System.currentTimeMillis()))),
+            )
+            writeJsonLocked(
+                context,
+                StoreDescriptorRegistry.TOOLS_PY_ID,
+                ToolSettingsCodec.encodeCustomPyTools(seedPyToolDefaults(context)),
+            )
+            writeJsonLocked(
+                context,
+                StoreDescriptorRegistry.RULES_EXECUTION_ID,
+                RuleSettingsCodec.encodeExecutionRules(LocalSettingsDefaults.defaultExecutionRules),
+            )
+            true
         }
+        Logger.i(
+            LOG_TAG,
+            "tryPutDefaultSettings result=$result " +
+                    "reason=${if (result) "initialized" else "alreadyOnboarded"} " +
+                    "elapsedMs=${System.currentTimeMillis() - startedAtMs}"
+        )
+        return result
+    }
 
     /**
      * 启动时补齐缺失的 seed py tools（按 name 判缺）。
@@ -296,7 +287,7 @@ object XRepo {
         val flow = MutableStateFlow(default)
 
         init {
-            XRepo.hydrateSteps.add { state -> flow.value = state.select() }
+            XRepo.hydrateSteps.add { flow.value = XRepo.readAppStateField(select) }
         }
 
         suspend fun get(): T = XRepo.readAppStateField(select).also { flow.value = it }
@@ -320,7 +311,7 @@ object XRepo {
         }
     }
 
-    private val hydrateSteps = mutableListOf<(AppStateSettings) -> Unit>()
+    private val hydrateSteps = mutableListOf<suspend () -> Unit>()
 
     private val onboardingCompletedField = PlainAppStateField(
         select = { onboardingCompleted },
@@ -605,39 +596,26 @@ object XRepo {
 
     suspend fun setMarkdownScale(value: Float) = markdownScaleField.set(value)
 
-    /**
-     * 屏幕控制知情门自动放行开关的进程内热更新通道。
-     * PhoneScreenAccess 经 XSettings 读，默认 false = 保持每次询问。
-     */
-    private val screenControlAutoApprovedField = ReactiveAppStateField(
-        default = false,
-        select = { screenControlAutoApproved },
-        update = { copy(screenControlAutoApproved = it) },
+    /** 首页模型选择器风格的进程内热更新通道：detailed/compact，默认 detailed。 */
+    private val modelChooserStyleField = ReactiveAppStateField(
+        default = "detailed",
+        select = { modelChooserStyle },
+        update = { copy(modelChooserStyle = it) },
     )
-    val screenControlAutoApprovedSetting: MutableStateFlow<Boolean>
-        get() = screenControlAutoApprovedField.flow
+    val modelChooserStyleSetting: MutableStateFlow<String>
+        get() = modelChooserStyleField.flow
 
-    suspend fun screenControlAutoApproved(): Boolean = screenControlAutoApprovedField.get()
+    suspend fun modelChooserStyle(): String = modelChooserStyleField.get()
 
-    suspend fun setScreenControlAutoApproved(value: Boolean) =
-        screenControlAutoApprovedField.set(value)
+    suspend fun setModelChooserStyle(value: String) = modelChooserStyleField.set(value)
 
     /**
      * 回填型设置 flow 的统一冷启动回填：flow 初值是猜的默认值，必须有人调一次
      * 读盘才能对齐真值。MainActivity.onCreate 同步调用。
      * 响应式字段构造时已自注册到 hydrateSteps，新增无需手动登记。
-     * 读盘与 JSON 解析只做一次，全部字段共用同一份快照。
      */
     suspend fun hydrateSettings() {
-        hydrateSettings(readStartupState())
-    }
-
-    /** 冷启动快照：一次读盘 + 一次解析，供 MainActivity 的启动路径共享。 */
-    internal suspend fun readStartupState(): AppStateSettings =
-        AppStateSettingsCodec.parse(readJson(StoreDescriptorRegistry.APP_STATE_ID))
-
-    internal suspend fun hydrateSettings(state: AppStateSettings) {
-        hydrateSteps.forEach { it(state) }
+        hydrateSteps.forEach { it() }
     }
 
     private val themeModeField = PlainAppStateField(
@@ -693,7 +671,7 @@ object XRepo {
     }
 
     private val SCHEMA_WEB_SEARCH =
-        """{"type":"object","properties":{"query":{"type":"string"},"engine":{"type":"string","description":"default: 'auto' (Tavily -> DDG -> Sogou fallback), or 'tavily', 'sogou', 'ddg', 'all'"},"max_results":{"type":"integer","description":"default: 8"}},"required":["query"]}"""
+        """{"type":"object","properties":{"query":{"type":"string"},"engine":{"type":"string","enum":["all","baidu","sogou","ddg"],"description":"search engine; \"all\" (default) merges Baidu + Sogou + DuckDuckGo"},"max_results":{"type":"integer","description":"default: 8"}},"required":["query"]}"""
 
     // Seed custom py tools 全量列表：新增 seed 时在此追加，
     // seedPyTools() 每次启动补齐缺失，老用户升级后自动获得新工具。
@@ -709,7 +687,7 @@ object XRepo {
     // Seed custom py tools: code lives in res/raw，此处只负责组装。
     private fun seedWebSearchTool(context: Context) = CustomPyTool(
         name = "py_web_search",
-        description = "Search the web via Tavily AI, DuckDuckGo, or Sogou. Returns a list of {title, url, snippet}. Reports an error object when search is unreachable or yields nothing.",
+        description = "Search the web (default: multi-engine merge of Baidu + Sogou + DuckDuckGo; or engine=baidu/sogou/ddg). Returns a list of {title, url, snippet}.",
         schemaJson = SCHEMA_WEB_SEARCH,
         code = readRawResource(context, R.raw.seed_py_web_search),
     )
@@ -727,7 +705,7 @@ object XRepo {
 
     private fun seedLaunchWechatTool(context: Context) = CustomPyTool(
         name = "py_launch_wechat",
-        description = "Launch WeChat.",
+        description = "启动微信 (Launch WeChat).",
         schemaJson = """{"type":"object","properties":{},"required":[]}""",
         code = readRawResource(context, R.raw.seed_py_launch_wechat),
     )
@@ -932,7 +910,8 @@ class LlmConfigsApi internal constructor(
                     if (trimmed.isNotBlank() &&
                         trimmed != RuntimeEnvContextConfig.KEY_DATE &&
                         trimmed != RuntimeEnvContextConfig.KEY_TIME &&
-                        trimmed != RuntimeEnvContextConfig.KEY_DEVICE
+                        trimmed != RuntimeEnvContextConfig.KEY_DEVICE &&
+                        trimmed != RuntimeEnvContextConfig.KEY_VIRTUAL_DISPLAY
                     ) {
                         trimmed to v.trim()
                     } else null

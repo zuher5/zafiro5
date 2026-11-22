@@ -44,9 +44,19 @@
     <!-- Home -->
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">محادثة جديدة</string>
+    <string name="ui_home_menu_virtual_display">شاشة افتراضية</string>
+    <string name="ui_virtual_display_recent_apps">المستخدمة مؤخراً</string>
+    <string name="ui_virtual_display_all_apps">جميع التطبيقات</string>
+    <string name="ui_virtual_display_create_failed">فشل إنشاء الشاشة الافتراضية. تحقق من الأذونات.</string>
+    <string name="ui_virtual_display_app_in_use_on_main">هذا التطبيق مفتوح حاليًا على الشاشة الرئيسية</string>
+    <string name="ui_virtual_display_app_launch_failed">فشل تشغيل التطبيق على الشاشة الافتراضية</string>
+    <string name="ui_virtual_display_pick_app">اختر تطبيقًا</string>
+    <string name="ui_virtual_display_launching_app">جارٍ تشغيل %1$s…</string>
+    <string name="ui_virtual_display_card_terminate">إنهاء</string>
+    <string name="ui_virtual_display_terminate_title">إنهاء الشاشة الافتراضية؟</string>
+    <string name="ui_virtual_display_terminate_message">سيؤدي هذا إلى إغلاق الشاشة الافتراضية المرتبطة بهذه المحادثة وإيقاف التطبيقات فيها.</string>
+    <string name="ui_virtual_display_requires_conversation">يرجى بدء محادثة أولاً</string>
     <string name="ui_home_input_placeholder">اكتب رسالة…</string>
-    <string name="ui_home_empty_greeting">كيف يمكنني مساعدتك؟</string>
-    <string name="ui_home_tap_hint">نصيحة: انقر على رسالة للنسخ أو إعادة التوليد أو التفرع</string>
     <string name="ui_home_conversation_compacted">تم ضغط المحادثة</string>
     <string name="ui_home_conversation_compacting">جارٍ الضغط</string>
     <string name="ui_tool_status_called">تم الاستدعاء</string>
@@ -98,7 +108,6 @@
     <string name="ui_toast_copied">تم النسخ</string>
     <string name="ui_toast_generating">جارٍ التوليد، انتظر قليلاً</string>
     <string name="ui_toast_empty_input">أدخل نصًا</string>
-    <string name="ui_toast_round_busy">الجولة السابقة لا تزال قيد التشغيل؛ انتظر أو أوقفها أولاً</string>
     <string name="ui_toast_no_compactable_history">لا يوجد سجل محادثة للضغط</string>
     <string name="ui_home_error_retry_body">أعد المحاولة لاحقًا.</string>
     <string name="ui_home_error_config_required_title">إعداد النموذج ناقص</string>
@@ -263,6 +272,7 @@
     <string name="ui_settings_env_context_key_date">التاريخ</string>
     <string name="ui_settings_env_context_key_time">الوقت</string>
     <string name="ui_settings_env_context_key_device">حالة الجهاز</string>
+    <string name="ui_settings_env_context_key_virtual_display">شاشة افتراضية</string>
     <string name="ui_settings_env_context_group_custom">متغيرات مخصصة</string>
     <string name="ui_settings_env_context_empty_custom">لا توجد متغيرات مخصصة. اضغط «+» في الأعلى للإضافة.</string>
     <string name="ui_settings_env_context_variable_title_create">إضافة متغير</string>
@@ -276,7 +286,7 @@
     <string name="ui_settings_env_context_delete_dialog_title">حذف المتغير</string>
     <string name="ui_settings_env_context_delete_dialog_text">هل تريد بالتأكيد حذف المتغير «%1$s»؟</string>
     <string name="ui_settings_env_context_error_key_required">لا يمكن أن يكون الاسم فارغًا</string>
-    <string name="ui_settings_env_context_error_key_reserved">لا يمكن استخدام الأسماء المحجوزة: date, time, device</string>
+    <string name="ui_settings_env_context_error_key_reserved">لا يمكن استخدام الأسماء المحجوزة: date, time, device, virtual_display</string>
     <string name="ui_settings_env_context_error_key_duplicate">هذا الاسم مستخدم بالفعل، يرجى اختيار اسم آخر</string>
     <string name="ui_settings_env_context_error_key_invalid_format">صيغة الاسم غير صالحة. يُسمح فقط بالأحرف والأرقام والشرطات والشرطات السفلية</string>
     <string name="ui_settings_env_context_error_value_required">لا يمكن أن يكون المحتوى فارغًا</string>
@@ -292,6 +302,7 @@
     <string name="memory_field_content">أدخل المحتوى</string>
     <string name="memory_field_content_hint">مثال: عيد ميلاد المستخدم في اليوم Y من الشهر X</string>
     <string name="memory_save_action">حفظ الذاكرة</string>
+    <string name="memory_cancel_action">إلغاء</string>
     <string name="memory_delete_dialog_title">حذف الذاكرة</string>
     <string name="memory_delete_dialog_text">حذف هذه الذاكرة؟\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">حذف</string>
@@ -557,6 +568,9 @@
     <string name="ui_settings_general_language_follow_system">حسب النظام</string>
     <string name="ui_settings_markdown_scale_title">مقياس تنسيق Markdown</string>
     <string name="ui_settings_markdown_scale_default">افتراضي</string>
+    <string name="ui_settings_model_chooser_style_title">نمط محدد النماذج</string>
+    <string name="ui_settings_model_chooser_style_detailed">مفصل</string>
+    <string name="ui_settings_model_chooser_style_compact">موجز</string>
     <string name="ui_settings_general_load_last_conversation">فتح آخر محادثة عند التشغيل</string>
     <string name="ui_settings_general_idle_timeout">مهلة خمول الاستجابة</string>
     <string name="ui_settings_general_idle_timeout_summary">إنهاء الجولة إذا بقي الخادم بلا استجابة طويلًا</string>
@@ -565,8 +579,6 @@
     <string name="ui_settings_general_retry_summary">إعادة تلقائية بعد فشل الطلب</string>
     <string name="ui_settings_general_keep_screen_on">إبقاء الشاشة مضاءة أثناء الرد</string>
     <string name="ui_settings_general_keep_screen_on_summary">إبقاء الشاشة مضاءة أثناء الرد وتنفيذ الأدوات</string>
-    <string name="ui_settings_general_screen_control_auto_approve">الموافقة التلقائية على التحكم بالشاشة</string>
-    <string name="ui_settings_general_screen_control_auto_approve_summary">تخطَّ التأكيد قبل أن يقرأ الوكيل الشاشة أو ينقر عليها.</string>
     <string name="ui_settings_runtime_control">التحكم في التشغيل</string>
     <string name="ui_settings_runtime_control_summary">الحدود وإعادة المحاولة وكشف التكرار</string>
     <string name="ui_settings_runtime_group_network">الشبكة</string>
@@ -670,7 +682,6 @@
     <string name="ui_theme_color_lemon">ليموني</string>
     <string name="ui_theme_color_amber">كهرماني</string>
     <string name="ui_theme_color_sunset">غروب</string>
-    <string name="ui_theme_color_catppuccin">Catppuccin</string>
 
     <!-- Resident Notification -->
     <string name="agent_resident_title_idle">Agent · جاهز</string>

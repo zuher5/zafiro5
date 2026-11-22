@@ -14,7 +14,6 @@ import com.niki914.uikit.base.UiStyleLookup
 import com.niki914.uikit.base.UiStylePart
 import com.niki914.uikit.base.resolveThemeColorScheme
 import com.niki914.zafiro.api.util.runCatchingCancellable
-import com.niki914.zafiro.repo.AppStateSettings
 import com.niki914.zafiro.repo.UiStylesCodec
 import com.niki914.zafiro.repo.XRepo
 
@@ -34,8 +33,7 @@ enum class ThemeMode(val storageKey: String) {
 data class ThemePrefs(
     val mode: ThemeMode = ThemeMode.Light,
     /** ARGB int；null = 壁纸动态色。 */
-    val seedColor: Int? = 0xFF52DBC9.toInt(),
-    val isCatppuccin: Boolean = false,
+    val seedColor: Int? = 0xFFFABD00.toInt(),
     val themeStyle: ThemeStyle = ThemeStyle.default(),
 ) {
     fun resolveDarkTheme(systemDark: Boolean): Boolean = when (mode) {
@@ -82,12 +80,10 @@ object ThemeController {
 
     suspend fun load() {
         runCatchingCancellable {
-            val rawSeed = XRepo.themeSeedColor()
-            val isCatppuccin = rawSeed.equals("catppuccin", ignoreCase = true)
             prefs = ThemePrefs(
                 mode = ThemeMode.fromStorageKey(XRepo.themeMode()),
-                seedColor = if (isCatppuccin) null else rawSeed.takeIf { it.isNotBlank() }?.toLongOrNull(16)?.toInt(),
-                isCatppuccin = isCatppuccin,
+                seedColor = XRepo.themeSeedColor().takeIf { it.isNotBlank() }?.toLongOrNull(16)
+                    ?.toInt(),
                 themeStyle = ThemeStyle.fromStorageKey(XRepo.themeStyle()),
             )
         }.onFailure {
@@ -102,21 +98,6 @@ object ThemeController {
         }
     }
 
-    internal suspend fun load(state: AppStateSettings) {
-        runCatchingCancellable {
-            val rawSeed = state.themeSeedColor
-            val isCatppuccin = rawSeed.equals("catppuccin", ignoreCase = true)
-            prefs = ThemePrefs(
-                mode = ThemeMode.fromStorageKey(state.themeMode),
-                seedColor = if (isCatppuccin) null else rawSeed.takeIf { it.isNotBlank() }?.toLongOrNull(16)?.toInt(),
-                isCatppuccin = isCatppuccin,
-                themeStyle = ThemeStyle.fromStorageKey(state.themeStyle),
-            )
-        }.onFailure {
-            Logger.w("niki914_zafiro_ThemeController", "load failed ${it.message}")
-        }
-    }
-
     suspend fun setMode(mode: ThemeMode) {
         prefs = prefs.copy(mode = mode)
         runCatching { XRepo.setThemeMode(mode.storageKey) }
@@ -128,24 +109,13 @@ object ThemeController {
             }
     }
 
-    suspend fun setCatppuccin() {
-        prefs = prefs.copy(isCatppuccin = true, seedColor = null)
-        runCatchingCancellable { XRepo.setThemeSeedColor("catppuccin") }
-            .onFailure {
-                Logger.w(
-                    "niki914_zafiro_ThemeController",
-                    "persist catppuccin failed ${it.message}",
-                )
-            }
-    }
-
     suspend fun setThemeStyle(style: ThemeStyle) {
         prefs = prefs.copy(themeStyle = style)
         runCatchingCancellable { XRepo.setThemeStyle(style.storageKey) }
             .onFailure {
                 Logger.w(
                     "niki914_zafiro_ThemeController",
-                    "persist theme style failed ${it.message}",
+                    "persist theme style failed ${it.message}"
                 )
             }
     }
@@ -176,7 +146,7 @@ object ThemeController {
     }
 
     suspend fun setSeedColor(argb: Int?) {
-        prefs = prefs.copy(isCatppuccin = false, seedColor = argb)
+        prefs = prefs.copy(seedColor = argb)
         val hex = argb?.let { "%08X".format(it) } ?: ""
         runCatching { XRepo.setThemeSeedColor(hex) }
             .onFailure {

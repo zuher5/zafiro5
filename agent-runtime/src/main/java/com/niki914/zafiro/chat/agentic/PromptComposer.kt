@@ -166,8 +166,7 @@ class PromptComposer {
                     "You assist users with a wide range of tasks including answering questions, " +
                     "managing their device, and executing actions via your tools. " +
                     "You communicate clearly, admit uncertainty when appropriate, and prioritize " +
-                    "being genuinely useful over being verbose. " +
-                    "Always communicate in the user's language (e.g., respond in Indonesian when addressed in Indonesian, English when addressed in English)."
+                    "being genuinely useful over being verbose."
 
         internal const val TASK_COMPLETION_GUIDANCE =
             "# Finishing the job\n" +
@@ -193,8 +192,7 @@ class PromptComposer {
                     "what you would do or end your turn with a promise of future action.\n" +
                     "- Never run high-privilege, intrusive, or diagnostic commands (e.g., root scans, " +
                     "system state checks) unless the user explicitly requests them.\n" +
-                    "- MUST pass a `ui_intent` argument (2-6 words) displayed on the UI. " +
-                    "Strictly match the user's conversation language: for Indonesian requests, use Indonesian (e.g. \"Periksa penggunaan memori\"); for English requests, use English (e.g. \"Check memory usage\"); for Chinese requests, use Chinese (e.g. \"检查内存占用\"). Never mix languages."
+                    "- MUST pass a `ui_intent` argument (2-6 words, user's language) displayed on the UI. Use a neutral, tenseless phrase (e.g. \"Check disk usage\", \"搜索错误日志\", \"检查微信是否安装\")."
 
         internal const val HARNESS_RULES_GUIDANCE =
             "# Harness rules (configurable in Zafiro settings. MUST subject to user confirmation.)\n" +

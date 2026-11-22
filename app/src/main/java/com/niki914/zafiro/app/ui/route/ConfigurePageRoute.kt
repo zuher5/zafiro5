@@ -104,9 +104,6 @@ internal fun ConfigurePageRoute(
         onMaxTokensChange = { value ->
             viewModel.sendIntent(ConfigureIntent.UpdateMaxTokens(value))
         },
-        onProxyChange = { proxy ->
-            viewModel.sendIntent(ConfigureIntent.UpdateProxy(proxy))
-        },
         onComplete = { viewModel.sendIntent(ConfigureIntent.Save) },
         onConfirmEndpointMismatch = { viewModel.sendIntent(ConfigureIntent.ConfirmEndpointMismatch) },
         onCancelEndpointMismatch = { viewModel.sendIntent(ConfigureIntent.CancelEndpointMismatch) },

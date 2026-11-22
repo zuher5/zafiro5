@@ -3,7 +3,7 @@ package com.niki914.zafiro.app.ui.model
 import com.niki914.zafiro.app.ui.nav.HomePage
 import com.niki914.zafiro.app.ui.nav.StartupPage
 import com.niki914.zafiro.app.ui.nav.ZafiroPage
-import com.niki914.zafiro.repo.AppStateSettings
+import com.niki914.zafiro.repo.XRepo
 
 data class AppLaunchDecision(
     val initialPage: ZafiroPage,
@@ -12,12 +12,11 @@ data class AppLaunchDecision(
     val languageTag: String,
 ) {
     companion object {
-        internal suspend fun resolve(
+        suspend fun resolve(
             startupAssistantUi: StartupAssistantUi,
-            state: AppStateSettings,
         ): AppLaunchDecision {
-            val onboardingCompleted = state.onboardingCompleted
-            val languageTag = state.languageTag.trim()
+            val onboardingCompleted = XRepo.onboardingCompleted()
+            val languageTag = XRepo.languageTag()
             val startupPage = when (startupAssistantUi) {
                 StartupAssistantUi.Breeno,
                 StartupAssistantUi.XiaoAi,

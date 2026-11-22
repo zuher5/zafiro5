@@ -85,7 +85,6 @@ object PyRuntime {
     private const val EXEC_GRACE_MS = 2_000L
     private const val CONNECT_TIMEOUT_MS = 10_000L
     private const val PROCESS_DIE_SETTLE_MS = 200L
-    private const val KILL_GRACE_MS = 2_000L
 
     private val connectionMutex = Mutex()
 
@@ -203,11 +202,7 @@ object PyRuntime {
         return execOn(svc, code, timeoutMs)
     }
 
-    /**
-     * Kill the worker process — used by the round-terminate path.
-     * Binder transact 超时只放弃等待（worker 若被 zombie 线程钉住，kill transact
-     * 仍在后台跑完）；停止链路绝不能为此无限挂住。
-     */
+    /** Kill the worker process — used by the round-terminate path. */
     suspend fun kill() {
         if (!pythonUsed) return
         pythonUsed = false
@@ -224,9 +219,7 @@ object PyRuntime {
             return
         }
         try {
-            withTimeoutOrNull(KILL_GRACE_MS) {
-                withContext(Dispatchers.IO) { target.kill() }
-            } ?: Logger.w(LOG_TAG, "python worker kill timed out after ${KILL_GRACE_MS}ms")
+            withContext(Dispatchers.IO) { target.kill() }
         } catch (_: Throwable) {
             // process dies mid-transact — expected
         }

@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import com.niki914.logging.Logger
 import com.niki914.uikit.base.BaseTheme
 import com.niki914.uikit.infra.component.OptionRow
@@ -33,7 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
 /**
@@ -63,15 +62,14 @@ class TextActionActivity : ComponentActivity() {
             return
         }
 
-        lifecycleScope.launch {
-            val actions = withContext(Dispatchers.IO) {
-                runCatching { XRepo.textActions.list() }
-                    .onFailure { Logger.w(LOG_TAG, "load actions failed reason=${it.message}") }
-                    .getOrDefault(emptyList())
-            }.filter { it.enabled }
+        val actions = runBlocking {
+            // githooks:ignore uncancellable-run-catching
+            runCatching { XRepo.textActions.list() }
+                .onFailure { Logger.w(LOG_TAG, "load actions failed reason=${it.message}") }
+                .getOrDefault(emptyList())
+        }.filter { it.enabled }
 
-            showActionSheet(actions, selectedText)
-        }
+        showActionSheet(actions, selectedText)
     }
 
     private fun showActionSheet(actions: List<RuntimeTextAction>, selectedText: String) {

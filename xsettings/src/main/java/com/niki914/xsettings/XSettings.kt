@@ -43,13 +43,6 @@ interface XSettings {
         get() = MutableStateFlow(false)
 
     /**
-     * 屏幕控制知情门是否自动放行（跳过弹窗）。默认关。
-     * 消费方：`PhoneScreenAccess`。
-     */
-    val screenControlAutoApproved: StateFlow<Boolean>
-        get() = MutableStateFlow(false)
-
-    /**
      * 写入 Phone Use 知情同意授权状态。
      */
     suspend fun setPhoneUseConsentGranted(granted: Boolean) {}

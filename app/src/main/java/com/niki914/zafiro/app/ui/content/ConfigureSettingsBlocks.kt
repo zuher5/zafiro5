@@ -194,8 +194,8 @@ internal fun ConfigureConnectionSettingsBlock(
                     enabled = endpointEditable && !uiState.isSaving,
                     shape = shape,
                     isStandaloneCard = isStandalone,
-                    minLines = 1,
-                    maxLines = 1,
+                    minLines = 3,
+                    maxLines = 6,
                 )
             }
             if (policy.showEndpointOverrideToggle) {
@@ -222,7 +222,6 @@ internal fun ConfigureConnectionSettingsBlock(
                     )
                 }
             }
-
         }
     }
 }

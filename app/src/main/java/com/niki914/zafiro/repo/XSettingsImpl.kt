@@ -23,9 +23,6 @@ object XSettingsImpl : XSettings {
     override val phoneUseConsentGranted: StateFlow<Boolean>
         get() = XRepo.phoneUseConsentGrantedSetting
 
-    override val screenControlAutoApproved: StateFlow<Boolean>
-        get() = XRepo.screenControlAutoApprovedSetting
-
     override suspend fun setPhoneUseConsentGranted(granted: Boolean) {
         XRepo.setPhoneUseConsentGranted(granted)
     }

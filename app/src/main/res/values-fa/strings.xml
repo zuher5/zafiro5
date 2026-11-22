@@ -44,9 +44,19 @@
     <!-- Home -->
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">گفتگوی تازه</string>
+    <string name="ui_home_menu_virtual_display">نمایشگر مجازی</string>
+    <string name="ui_virtual_display_recent_apps">اخیراً استفاده‌شده</string>
+    <string name="ui_virtual_display_all_apps">همه برنامه‌ها</string>
+    <string name="ui_virtual_display_create_failed">ایجاد نمایشگر مجازی ناموفق بود. مجوزها را بررسی کنید.</string>
+    <string name="ui_virtual_display_app_in_use_on_main">این برنامه در حال حاضر در صفحه اصلی باز است</string>
+    <string name="ui_virtual_display_app_launch_failed">اجرای برنامه در نمایشگر مجازی ناموفق بود</string>
+    <string name="ui_virtual_display_pick_app">انتخاب برنامه</string>
+    <string name="ui_virtual_display_launching_app">در حال اجرای %1$s…</string>
+    <string name="ui_virtual_display_card_terminate">پایان دادن</string>
+    <string name="ui_virtual_display_terminate_title">پایان دادن به نمایشگر مجازی؟</string>
+    <string name="ui_virtual_display_terminate_message">نمایشگر مجازی متصل به این گفتگو و برنامه‌های در حال اجرا بسته می‌شوند.</string>
+    <string name="ui_virtual_display_requires_conversation">لطفاً ابتدا یک گفتگو شروع کنید</string>
     <string name="ui_home_input_placeholder">پیام بنویسید…</string>
-    <string name="ui_home_empty_greeting">چطور می‌توانم کمک کنم؟</string>
-    <string name="ui_home_tap_hint">نکته: برای کپی، تولید دوباره یا انشعاب روی پیام ضربه بزنید</string>
     <string name="ui_home_conversation_compacted">گفتگو فشرده شد</string>
     <string name="ui_home_conversation_compacting">در حال فشرده‌سازی</string>
     <string name="ui_tool_status_called">فراخوانده شد</string>
@@ -90,7 +100,6 @@
     <string name="ui_toast_copied">کپی شد</string>
     <string name="ui_toast_generating">در حال تولید است، کمی صبر کنید</string>
     <string name="ui_toast_empty_input">متنی وارد کنید</string>
-    <string name="ui_toast_round_busy">دور قبلی هنوز در حال اجراست؛ صبر کنید یا ابتدا آن را متوقف کنید</string>
     <string name="ui_toast_no_compactable_history">تاریخچه گفتگویی برای فشرده‌سازی وجود ندارد</string>
     <string name="ui_home_error_retry_body">بعداً دوباره تلاش کنید.</string>
     <string name="ui_home_error_config_required_title">پیکربندی مدل ناقص است</string>
@@ -255,6 +264,7 @@
     <string name="ui_settings_env_context_key_date">تاریخ</string>
     <string name="ui_settings_env_context_key_time">زمان</string>
     <string name="ui_settings_env_context_key_device">وضعیت دستگاه</string>
+    <string name="ui_settings_env_context_key_virtual_display">نمایشگر مجازی</string>
     <string name="ui_settings_env_context_group_custom">متغیرهای سفارشی</string>
     <string name="ui_settings_env_context_empty_custom">متغیر سفارشی وجود ندارد. «+» بالای صفحه را برای افزودن بزنید.</string>
     <string name="ui_settings_env_context_variable_title_create">افزودن متغیر</string>
@@ -268,7 +278,7 @@
     <string name="ui_settings_env_context_delete_dialog_title">حذف متغیر</string>
     <string name="ui_settings_env_context_delete_dialog_text">آیا از حذف متغیر «%1$s» مطمئن هستید؟</string>
     <string name="ui_settings_env_context_error_key_required">نام نمی‌تواند خالی باشد</string>
-    <string name="ui_settings_env_context_error_key_reserved">استفاده از نام‌های رزرو شده مجاز نیست: date, time, device</string>
+    <string name="ui_settings_env_context_error_key_reserved">استفاده از نام‌های رزرو شده مجاز نیست: date, time, device, virtual_display</string>
     <string name="ui_settings_env_context_error_key_duplicate">این نام قبلاً استفاده شده است، نام دیگری انتخاب کنید</string>
     <string name="ui_settings_env_context_error_key_invalid_format">قالب نام نامعتبر است. فقط حروف، اعداد، خط تیره و زیرخط مجاز هستند</string>
     <string name="ui_settings_env_context_error_value_required">محتوا نمی‌تواند خالی باشد</string>
@@ -284,6 +294,7 @@
     <string name="memory_field_content">متن را وارد کنید</string>
     <string name="memory_field_content_hint">نمونه: تولد کاربر روز Y ماه X است</string>
     <string name="memory_save_action">ذخیره خاطره</string>
+    <string name="memory_cancel_action">لغو</string>
     <string name="memory_delete_dialog_title">حذف خاطره</string>
     <string name="memory_delete_dialog_text">این خاطره حذف شود؟\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">حذف</string>
@@ -549,6 +560,9 @@
     <string name="ui_settings_general_language_follow_system">پیروی از سیستم</string>
     <string name="ui_settings_markdown_scale_title">مقیاس صفحه‌آرایی Markdown</string>
     <string name="ui_settings_markdown_scale_default">پیش‌فرض</string>
+    <string name="ui_settings_model_chooser_style_title">سبک انتخاب‌کننده مدل</string>
+    <string name="ui_settings_model_chooser_style_detailed">مفصل</string>
+    <string name="ui_settings_model_chooser_style_compact">فشرده</string>
     <string name="ui_settings_general_load_last_conversation">بار کردن گفتگوی قبلی هنگام شروع</string>
     <string name="ui_settings_general_idle_timeout">مهلت بیکاری پاسخ</string>
     <string name="ui_settings_general_idle_timeout_summary">اگر سرور مدت زیادی پاسخ ندهد، نوبت پایان می‌یابد</string>
@@ -557,8 +571,6 @@
     <string name="ui_settings_general_retry_summary">تلاش خودکار پس از ناموفق بودن درخواست</string>
     <string name="ui_settings_general_keep_screen_on">روشن ماندن صفحه هنگام پاسخ</string>
     <string name="ui_settings_general_keep_screen_on_summary">صفحه هنگام پاسخ و اجرای ابزار روشن می‌ماند</string>
-    <string name="ui_settings_general_screen_control_auto_approve">تأیید خودکار کنترل صفحه</string>
-    <string name="ui_settings_general_screen_control_auto_approve_summary">رد کردن تأیید پیش از خواندن یا لمس صفحه توسط عامل.</string>
     <string name="ui_settings_runtime_control">کنترل اجرا</string>
     <string name="ui_settings_runtime_control_summary">سقف، تلاش دوباره و تشخیص تکرار</string>
     <string name="ui_settings_runtime_group_network">شبکه</string>
@@ -662,7 +674,6 @@
     <string name="ui_theme_color_lemon">لیمویی</string>
     <string name="ui_theme_color_amber">کهربایی</string>
     <string name="ui_theme_color_sunset">غروب</string>
-    <string name="ui_theme_color_catppuccin">Catppuccin</string>
 
     <!-- Resident Notification -->
     <string name="agent_resident_title_idle">Agent · آماده</string>

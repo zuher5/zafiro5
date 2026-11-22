@@ -23,9 +23,9 @@ android {
         applicationId = "com.niki914.zafiro"
         minSdk = 26
         targetSdk = 34
-        versionName = "2.0.2"
-        // Keep the fork's monotonically increasing versionCode above v1.11.0 (28).
-        versionCode = 31
+        versionName = "2.1.0"
+        // Keep the fork's monotonically increasing versionCode above v2.0.2 (31).
+        versionCode = 32
         buildConfigField("String", "TELEMETRY_BASE_URL", "\"https://zafiro-telemetry.niki27687.workers.dev\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -104,6 +104,7 @@ dependencies {
     implementation(project(":accessibility"))
     implementation(project(":business:screen"))
     implementation(project(":business:api"))
+    implementation(project(":business:screen"))
     implementation(project(":business:agent"))
     implementation(project(":remote-view"))
 

@@ -421,16 +421,6 @@ class SettingsDomainCodecsTest {
     }
 
     @Test
-    fun appStateScreenControlAutoApprovedDefaultsDisabledAndRoundTrips() {
-        assertFalse(AppStateSettingsCodec.parse("""{}""").screenControlAutoApproved)
-
-        val json =
-            AppStateSettingsCodec.encode(AppStateSettings(screenControlAutoApproved = true))
-        assertTrue(jsonObject(json)["screen_control_auto_approved"]!!.jsonPrimitive.boolean)
-        assertTrue(AppStateSettingsCodec.parse(json).screenControlAutoApproved)
-    }
-
-    @Test
     fun appStatePhoneUseConsentGrantedDefaultsDisabledAndRoundTrips() {
         assertFalse(AppStateSettingsCodec.parse("""{}""").phoneUseConsentGranted)
 
@@ -478,6 +468,14 @@ class SettingsDomainCodecsTest {
     @Test
     fun appStateBlankSeedColorMeansFollowWallpaper() {
         assertEquals("", AppStateSettingsCodec.parse("""{"theme_seed_color":""}""").themeSeedColor)
+    }
+
+    @Test
+    fun appStateModelChooserStyleFallback() {
+        assertEquals("detailed", AppStateSettingsCodec.parse("""{"model_chooser_style":"unknown"}""").modelChooserStyle)
+        assertEquals("detailed", AppStateSettingsCodec.parse("""{"model_chooser_style":""}""").modelChooserStyle)
+        assertEquals("compact", AppStateSettingsCodec.parse("""{"model_chooser_style":"compact"}""").modelChooserStyle)
+        assertEquals("detailed", AppStateSettingsCodec.parse("""{"model_chooser_style":"detailed"}""").modelChooserStyle)
     }
 
     @Test

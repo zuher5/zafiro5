@@ -44,9 +44,19 @@
     <!-- Home -->
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">新對話</string>
+    <string name="ui_home_menu_virtual_display">虛擬螢幕</string>
+    <string name="ui_virtual_display_recent_apps">最近使用</string>
+    <string name="ui_virtual_display_all_apps">全部應用</string>
+    <string name="ui_virtual_display_create_failed">虛擬螢幕建立失敗，請檢查懸浮窗、無障礙與 Shizuku 權限</string>
+    <string name="ui_virtual_display_app_in_use_on_main">該應用正在主螢幕執行，請先離開主螢幕後再試</string>
+    <string name="ui_virtual_display_app_launch_failed">在虛擬螢幕中啟動應用失敗</string>
+    <string name="ui_virtual_display_pick_app">選擇應用</string>
+    <string name="ui_virtual_display_launching_app">正在啟動 %1$s…</string>
+    <string name="ui_virtual_display_card_terminate">終止</string>
+    <string name="ui_virtual_display_terminate_title">終止虛擬螢幕？</string>
+    <string name="ui_virtual_display_terminate_message">將立即關閉目前對話綁定的虛擬螢幕及其執行中的應用。</string>
+    <string name="ui_virtual_display_requires_conversation">請先建立對話</string>
     <string name="ui_home_input_placeholder">輸入訊息…</string>
-    <string name="ui_home_empty_greeting">有什麼我可以幫你？</string>
-    <string name="ui_home_tap_hint">提示：點擊訊息可複製、重新產生或分支</string>
     <string name="ui_home_conversation_compacted">對話已壓縮</string>
     <string name="ui_home_conversation_compacting">正在壓縮</string>
     <string name="ui_tool_status_called">已調用</string>
@@ -88,7 +98,6 @@
     <string name="ui_toast_copied">已複製</string>
     <string name="ui_toast_generating">生成中，請稍後</string>
     <string name="ui_toast_empty_input">請輸入內容</string>
-    <string name="ui_toast_round_busy">上一輪仍在運行，請稍候或先停止</string>
     <string name="ui_toast_no_compactable_history">暫無可壓縮的對話內容</string>
     <string name="ui_home_error_retry_body">請稍後再試。</string>
     <string name="ui_home_error_config_required_title">模型配置不完整</string>
@@ -253,6 +262,7 @@
     <string name="ui_settings_env_context_key_date">日期</string>
     <string name="ui_settings_env_context_key_time">時間</string>
     <string name="ui_settings_env_context_key_device">設備狀態</string>
+    <string name="ui_settings_env_context_key_virtual_display">虛擬螢幕</string>
     <string name="ui_settings_env_context_group_custom">自訂變數</string>
     <string name="ui_settings_env_context_empty_custom">暫無自訂變數。點擊右上角「+」新增。</string>
     <string name="ui_settings_env_context_variable_title_create">新增變數</string>
@@ -266,7 +276,7 @@
     <string name="ui_settings_env_context_delete_dialog_title">刪除變數</string>
     <string name="ui_settings_env_context_delete_dialog_text">確定要刪除變數「%1$s」嗎？</string>
     <string name="ui_settings_env_context_error_key_required">名稱不能為空</string>
-    <string name="ui_settings_env_context_error_key_reserved">不可使用系統保留名稱：date、time、device</string>
+    <string name="ui_settings_env_context_error_key_reserved">不可使用系統保留名稱：date、time、device、virtual_display</string>
     <string name="ui_settings_env_context_error_key_duplicate">該名稱已存在，請更換</string>
     <string name="ui_settings_env_context_error_key_invalid_format">名稱格式不合規，僅支援字母、數字、底線及連字號</string>
     <string name="ui_settings_env_context_error_value_required">內容不能為空</string>
@@ -282,6 +292,7 @@
     <string name="memory_field_content">輸入內容</string>
     <string name="memory_field_content_hint">例如：使用者的生日是 X 月 Y 日</string>
     <string name="memory_save_action">儲存記憶</string>
+    <string name="memory_cancel_action">取消</string>
     <string name="memory_delete_dialog_title">刪除記憶</string>
     <string name="memory_delete_dialog_text">確定要刪除這條記憶嗎？\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">刪除</string>
@@ -504,6 +515,9 @@
     <string name="ui_settings_general_language_follow_system">跟隨系統</string>
     <string name="ui_settings_markdown_scale_title">Markdown 排版縮放</string>
     <string name="ui_settings_markdown_scale_default">預設</string>
+    <string name="ui_settings_model_chooser_style_title">模型選擇器風格</string>
+    <string name="ui_settings_model_chooser_style_detailed">詳細</string>
+    <string name="ui_settings_model_chooser_style_compact">簡潔</string>
     <string name="ui_settings_general_load_last_conversation">啟動時載入上次對話</string>
     <string name="ui_settings_general_idle_timeout">回應空閒逾時</string>
     <string name="ui_settings_general_idle_timeout_summary">伺服器長時間無回應時終止回合</string>
@@ -512,8 +526,6 @@
     <string name="ui_settings_general_retry_summary">請求失敗後的自動重試</string>
     <string name="ui_settings_general_keep_screen_on">回應期間保持螢幕常亮</string>
     <string name="ui_settings_general_keep_screen_on_summary">回應與工具執行期間保持螢幕常亮</string>
-    <string name="ui_settings_general_screen_control_auto_approve">自動允許螢幕控制</string>
-    <string name="ui_settings_general_screen_control_auto_approve_summary">略過 Agent 讀取或點擊螢幕前的確認。</string>
     <string name="ui_settings_runtime_control">執行控制</string>
     <string name="ui_settings_runtime_control_summary">上限、重試與複讀偵測</string>
     <string name="ui_settings_runtime_group_network">網路</string>
@@ -645,7 +657,6 @@
     <string name="ui_theme_color_lemon">檸檬黃</string>
     <string name="ui_theme_color_amber">琥珀</string>
     <string name="ui_theme_color_sunset">落日橙</string>
-    <string name="ui_theme_color_catppuccin">Catppuccin</string>
 
     <!-- Resident Notification -->
     <string name="agent_resident_title_idle">Agent · 待命</string>

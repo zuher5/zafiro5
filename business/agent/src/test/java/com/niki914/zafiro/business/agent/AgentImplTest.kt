@@ -1,6 +1,6 @@
-// githooks:ignore-file file-token-limit
 // 保护：Agent 状态机重置、草稿镜像、权限裁决与会话绑定/加载生命周期契约。
 // 命令确认上点拒绝时，只有开关打开才把本回合停成打断；屏幕授权、弃权凑成的拒绝、允许、开关关闭或没装配置都不停。
+// githooks:ignore-file file-token-limit
 package com.niki914.zafiro.business.agent
 
 import com.niki914.logging.Backend

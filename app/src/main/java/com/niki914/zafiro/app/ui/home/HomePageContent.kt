@@ -26,7 +26,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.niki914.uikit.dialog.LocalHasActiveDialog
+import com.niki914.uikit.dialog.ZafiroConfirmationDialog
 import com.niki914.uikit.screen.ReportTitleBarCollapsed
 import com.niki914.uikit.scroll.rememberZafiroOverscrollController
 import com.niki914.uikit.infra.nav.pageViewModel
@@ -40,9 +42,11 @@ import com.niki914.zafiro.app.ui.helper.ZafiroToast
 import com.niki914.zafiro.app.ui.home.dialog.ScreenControlConsentDialog
 import com.niki914.zafiro.app.ui.home.dialog.ToolPermissionDialog
 import com.niki914.zafiro.app.ui.home.dialog.UpdateAvailableDialog
+import com.niki914.zafiro.app.ui.home.header.HomeConfigPopover
 import com.niki914.zafiro.app.ui.home.header.HomeModelSwitchSheet
 import com.niki914.zafiro.app.ui.home.header.HomeTitleConfigChip
 import com.niki914.zafiro.app.ui.home.header.HomeTopBarContribution
+import com.niki914.zafiro.app.ui.model.ModelChooserStyle
 import com.niki914.zafiro.app.ui.model.home.FileAttachReason
 import com.niki914.zafiro.app.ui.model.home.HomeChatEffect
 import com.niki914.zafiro.app.ui.model.home.HomeChatIntent
@@ -71,11 +75,13 @@ fun HomePageContent(
     onConversationSelectionConsumed: (String) -> Unit,
     onActiveConversationChanged: (String?) -> Unit,
     onOpenHistory: () -> Unit,
+    onOpenVirtualDisplay: (String) -> Unit = {},
     onOpenSettings: () -> Unit,
 ) {
     val viewModel = pageViewModel<HomeChatViewModel>()
     val latestViewModel by rememberUpdatedState(viewModel)
     val latestOnOpenHistory by rememberUpdatedState(onOpenHistory)
+    val latestOnOpenVirtualDisplay by rememberUpdatedState(onOpenVirtualDisplay)
     val latestOnOpenSettings by rememberUpdatedState(onOpenSettings)
     val latestOnConversationSelectionConsumed by rememberUpdatedState(
         onConversationSelectionConsumed
@@ -98,8 +104,10 @@ fun HomePageContent(
                 )
 
                 HomeChatEffect.EmptyInputAttempted -> ZafiroToast.show(R.string.ui_toast_empty_input)
-                HomeChatEffect.RoundBusy -> ZafiroToast.show(R.string.ui_toast_round_busy)
                 HomeChatEffect.NoCompactableHistory -> ZafiroToast.show(R.string.ui_toast_no_compactable_history)
+                HomeChatEffect.VirtualDisplayRequiresConversation ->
+                    ZafiroToast.show(R.string.ui_virtual_display_requires_conversation)
+                is HomeChatEffect.OpenVirtualDisplayPage -> latestOnOpenVirtualDisplay(effect.conversationId)
             }
         }
     }
@@ -320,8 +328,12 @@ fun HomePageContent(
         }
     }
 
+    val modelChooserStyle by XRepo.modelChooserStyleSetting.collectAsState()
+
     HomeTopBarContribution(
         isConfigMenuVisible = uiState.isConfigMenuVisible,
+        isTitleOccluded = uiState.isConfigMenuVisible &&
+            modelChooserStyle == ModelChooserStyle.Compact.storageKey,
         onDismissConfigMenu = {
             latestViewModel.sendIntent(HomeChatIntent.DismissConfigMenu)
         },
@@ -331,30 +343,46 @@ fun HomePageContent(
             pendingViewportAnchor = null
             latestViewModel.sendIntent(HomeChatIntent.NewConversation)
         },
+        onOpenVirtualDisplay = {
+            latestViewModel.sendIntent(HomeChatIntent.OpenVirtualDisplay)
+        },
         onOpenSettings = latestOnOpenSettings,
-        isGenerating = uiState.isGenerating,
         titleContent = titleContent,
     )
 
     val composerFocusRequester = remember { FocusRequester() }
 
-    HomeModelSwitchSheet(
-        visible = uiState.isConfigMenuVisible,
-        savedConfigs = uiState.savedConfigs,
-        activeConfig = uiState.displayConfig,
-        onDismissRequest = {
-            viewModel.sendIntent(HomeChatIntent.DismissConfigMenu)
-        },
-        onSelectConfig = { configId ->
-            viewModel.sendIntent(HomeChatIntent.SelectConfig(configId))
-        },
-        onSelectModel = { configId, modelId ->
-            viewModel.sendIntent(HomeChatIntent.SelectModel(configId, modelId))
-        },
-        onUpdateThinkingLevel = { configId, wireValue ->
-            viewModel.sendIntent(HomeChatIntent.UpdateThinkingLevel(configId, wireValue))
-        },
-    )
+    if (modelChooserStyle == ModelChooserStyle.Compact.storageKey) {
+        HomeConfigPopover(
+            uiState = uiState,
+            anchorBounds = titleAnchorBounds,
+            onDismissRequest = {
+                viewModel.sendIntent(HomeChatIntent.DismissConfigMenu)
+            },
+            onSelectConfig = { configId ->
+                viewModel.sendIntent(HomeChatIntent.SelectConfig(configId))
+                viewModel.sendIntent(HomeChatIntent.DismissConfigMenu)
+            },
+        )
+    } else {
+        HomeModelSwitchSheet(
+            visible = uiState.isConfigMenuVisible,
+            savedConfigs = uiState.savedConfigs,
+            activeConfig = uiState.displayConfig,
+            onDismissRequest = {
+                viewModel.sendIntent(HomeChatIntent.DismissConfigMenu)
+            },
+            onSelectConfig = { configId ->
+                viewModel.sendIntent(HomeChatIntent.SelectConfig(configId))
+            },
+            onSelectModel = { configId, modelId ->
+                viewModel.sendIntent(HomeChatIntent.SelectModel(configId, modelId))
+            },
+            onUpdateThinkingLevel = { configId, wireValue ->
+                viewModel.sendIntent(HomeChatIntent.UpdateThinkingLevel(configId, wireValue))
+            },
+        )
+    }
 
     val hasActiveDialog = LocalHasActiveDialog.current
     // 冷启动键盘焦点：仅进程内首次进入 Home、无草稿输入、不在加载中且当前无弹窗时抢焦点。
@@ -472,6 +500,30 @@ fun HomePageContent(
         alwaysShowDetailed = alwaysShowDetailedToolOutput,
         onToggleActionKey = { key, isExpanded ->
             viewModel.sendIntent(HomeChatIntent.ToggleActionKey(key, isExpanded))
+        },
+        virtualDisplayState = uiState.virtualDisplay,
+        onOpenVirtualDisplay = {
+            viewModel.sendIntent(HomeChatIntent.OpenVirtualDisplay)
+        },
+        onTerminateVirtualDisplay = {
+            viewModel.sendIntent(HomeChatIntent.RequestTerminateVirtualDisplay)
+        },
+    )
+
+    ZafiroConfirmationDialog(
+        visible = uiState.showTerminateVirtualDisplayDialog,
+        onDismissRequest = {
+            viewModel.sendIntent(HomeChatIntent.DismissTerminateVirtualDisplay)
+        },
+        title = stringResource(R.string.ui_virtual_display_terminate_title),
+        text = stringResource(R.string.ui_virtual_display_terminate_message),
+        negativeButtonText = stringResource(R.string.dialog_cancel),
+        positiveButtonText = stringResource(R.string.ui_virtual_display_card_terminate),
+        onNegativeClick = {
+            viewModel.sendIntent(HomeChatIntent.DismissTerminateVirtualDisplay)
+        },
+        onPositiveClick = {
+            viewModel.sendIntent(HomeChatIntent.ConfirmTerminateVirtualDisplay)
         },
     )
 

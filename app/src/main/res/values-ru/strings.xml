@@ -39,9 +39,19 @@
     <string name="ui_onboard_done_enter_home">Открыть Zafiro</string>
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">Новый диалог</string>
+    <string name="ui_home_menu_virtual_display">Виртуальный экран</string>
+    <string name="ui_virtual_display_recent_apps">Недавние</string>
+    <string name="ui_virtual_display_all_apps">Все приложения</string>
+    <string name="ui_virtual_display_create_failed">Не удалось создать виртуальный экран. Проверьте разрешения.</string>
+    <string name="ui_virtual_display_app_in_use_on_main">Это приложение открыто на основном экране</string>
+    <string name="ui_virtual_display_app_launch_failed">Не удалось запустить приложение на виртуальном экране</string>
+    <string name="ui_virtual_display_pick_app">Выберите приложение</string>
+    <string name="ui_virtual_display_launching_app">Запуск %1$s…</string>
+    <string name="ui_virtual_display_card_terminate">Завершить</string>
+    <string name="ui_virtual_display_terminate_title">Завершить виртуальный экран?</string>
+    <string name="ui_virtual_display_terminate_message">Виртуальный экран этого диалога и запущенные в нём приложения будут закрыты.</string>
+    <string name="ui_virtual_display_requires_conversation">Сначала начните диалог</string>
     <string name="ui_home_input_placeholder">Введите сообщение…</string>
-    <string name="ui_home_empty_greeting">Чем я могу помочь?</string>
-    <string name="ui_home_tap_hint">Совет: нажмите на сообщение, чтобы скопировать, перегенерировать или создать ветку</string>
     <string name="ui_home_conversation_compacted">Диалог сжат</string>
     <string name="ui_home_conversation_compacting">Сжатие</string>
     <string name="ui_tool_status_called">Вызван</string>
@@ -89,7 +99,6 @@
     <string name="ui_toast_copied">Скопировано</string>
     <string name="ui_toast_generating">Идёт генерация, подождите</string>
     <string name="ui_toast_empty_input">Пожалуйста, введите сообщение</string>
-    <string name="ui_toast_round_busy">Предыдущий раунд ещё выполняется; подождите или остановите его</string>
     <string name="ui_toast_no_compactable_history">Нет истории диалога для сжатия</string>
     <string name="ui_home_error_retry_body">Попробуйте позже.</string>
     <string name="ui_home_error_config_required_title">Настройки модели заполнены не полностью</string>
@@ -243,6 +252,7 @@
     <string name="ui_settings_env_context_key_date">Дата</string>
     <string name="ui_settings_env_context_key_time">Время</string>
     <string name="ui_settings_env_context_key_device">Состояние устройства</string>
+    <string name="ui_settings_env_context_key_virtual_display">Виртуальный экран</string>
     <string name="ui_settings_env_context_group_custom">Пользовательские переменные</string>
     <string name="ui_settings_env_context_empty_custom">Нет пользовательских переменных. Нажмите «+» вверху справа, чтобы добавить.</string>
     <string name="ui_settings_env_context_variable_title_create">Добавить переменную</string>
@@ -256,7 +266,7 @@
     <string name="ui_settings_env_context_delete_dialog_title">Удалить переменную</string>
     <string name="ui_settings_env_context_delete_dialog_text">Удалить переменную «%1$s»?</string>
     <string name="ui_settings_env_context_error_key_required">Имя не может быть пустым</string>
-    <string name="ui_settings_env_context_error_key_reserved">Нельзя использовать зарезервированные имена: date, time, device</string>
+    <string name="ui_settings_env_context_error_key_reserved">Нельзя использовать зарезервированные имена: date, time, device, virtual_display</string>
     <string name="ui_settings_env_context_error_key_duplicate">Это имя уже существует, выберите другое</string>
     <string name="ui_settings_env_context_error_key_invalid_format">Неверный формат имени. Разрешены только буквы, цифры, дефисы и подчеркивания</string>
     <string name="ui_settings_env_context_error_value_required">Содержимое не может быть пустым</string>
@@ -270,6 +280,7 @@
     <string name="memory_field_content">Содержание</string>
     <string name="memory_field_content_hint">Например: день рождения пользователя — X месяца, Y числа</string>
     <string name="memory_save_action">Сохранить запись</string>
+    <string name="memory_cancel_action">Отмена</string>
     <string name="memory_delete_dialog_title">Удалить запись</string>
     <string name="memory_delete_dialog_text">Удалить эту запись памяти?\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">Удалить</string>
@@ -503,6 +514,9 @@
     <string name="ui_settings_general_language_follow_system">Как в системе</string>
     <string name="ui_settings_markdown_scale_title">Масштаб Markdown</string>
     <string name="ui_settings_markdown_scale_default">По умолчанию</string>
+    <string name="ui_settings_model_chooser_style_title">Стиль выбора модели</string>
+    <string name="ui_settings_model_chooser_style_detailed">Подробный</string>
+    <string name="ui_settings_model_chooser_style_compact">Компактный</string>
     <string name="ui_settings_general_load_last_conversation">Открывать последний диалог при запуске</string>
     <string name="ui_settings_general_idle_timeout">Тайм-аут ожидания</string>
     <string name="ui_settings_general_idle_timeout_summary">Прерывать ответ, если сервер слишком долго молчит</string>
@@ -511,8 +525,6 @@
     <string name="ui_settings_general_retry_summary">Автоматические повторы после неудачного запроса</string>
     <string name="ui_settings_general_keep_screen_on">Не гасить экран во время ответа</string>
     <string name="ui_settings_general_keep_screen_on_summary">Не гасить экран, пока агент отвечает и выполняет инструменты</string>
-    <string name="ui_settings_general_screen_control_auto_approve">Автоматически разрешать управление экраном</string>
-    <string name="ui_settings_general_screen_control_auto_approve_summary">Пропускать подтверждение перед чтением экрана и касаниями агента.</string>
     <string name="ui_settings_runtime_control">Управление выполнением</string>
     <string name="ui_settings_runtime_control_summary">Лимиты, повторы и обнаружение зацикливания</string>
     <string name="ui_settings_runtime_group_network">Сеть</string>
@@ -621,7 +633,6 @@
     <string name="ui_theme_color_lemon">Лимон</string>
     <string name="ui_theme_color_amber">Янтарь</string>
     <string name="ui_theme_color_sunset">Закат</string>
-    <string name="ui_theme_color_catppuccin">Catppuccin</string>
     <string name="agent_resident_title_idle">Агент · Ожидание</string>
     <string name="agent_resident_title_failed">Агент · Ошибка</string>
     <string name="agent_resident_title_interrupted">Агент · Остановлен</string>

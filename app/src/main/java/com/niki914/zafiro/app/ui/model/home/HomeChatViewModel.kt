@@ -14,11 +14,13 @@ import com.niki914.zafiro.api.model.Conversation
 import com.niki914.zafiro.api.model.DraftImage
 import com.niki914.zafiro.api.model.FileRef
 import com.niki914.zafiro.api.model.isRunning
+import com.niki914.zafiro.api.screen.Screens
+import com.niki914.zafiro.app.screen.AppScreens
+import com.niki914.zafiro.app.screen.VirtualDisplayCard
+import com.niki914.zafiro.app.screen.VirtualDisplayStage
 import com.niki914.zafiro.app.conversation.ConversationBranchTree
 import com.niki914.zafiro.app.conversation.ConversationFormatter
-import com.niki914.zafiro.app.conversation.ConversationSummary
 import com.niki914.zafiro.app.conversation.ForkKind
-import com.niki914.zafiro.app.conversation.TurnBranchState
 import com.niki914.zafiro.app.ui.home.composer.suggestion.BuiltinSlashCommand
 import com.niki914.zafiro.app.ui.home.composer.suggestion.SlashCategory
 import com.niki914.zafiro.app.ui.home.composer.suggestion.SlashSuggestion
@@ -32,6 +34,7 @@ import com.niki914.zafiro.business.files.FilesService
 import com.niki914.zafiro.repo.LlmConfigsDocument
 import com.niki914.zafiro.repo.RuntimeQuickPrompt
 import com.niki914.zafiro.repo.XRepo
+import com.niki914.zafiro.service.findService
 import com.niki914.zafiro.service.requireService
 import com.niki914.zafiro.settings.model.RuntimeSkillMetadata
 import kotlinx.coroutines.CancellableContinuation
@@ -41,16 +44,13 @@ import com.niki914.zafiro.api.util.runCatchingCancellable
 import com.niki914.zafiro.api.util.tryOrDefault
 import com.niki914.zafiro.api.util.tryIgnore
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import kotlin.coroutines.resume
 
@@ -129,21 +129,6 @@ class HomeChatViewModel internal constructor(
     private var pacedThinkingBlockId: String? = null
     private var conversationBeingLoaded: String? = null
 
-    // ── 流式重映射合并与分支缓存（见 applyConversation / applyConversationNow） ──
-    private var lastApplyAtMs = 0L
-
-    @Volatile
-    private var pendingApply: Conversation? = null
-
-    @Volatile
-    private var pendingAnimateTail = true
-    private val applyMutex = Mutex()
-    private var branchCacheId: String? = null
-    private var branchCacheTurnCount = -1
-    private var branchCacheFamily: List<ConversationSummary> = emptyList()
-    private var branchCacheTurnBranches: Map<Long, TurnBranchState> = emptyMap()
-    private var lastLoggedTurnCount = -1
-
     init {
         observeAgent()
         restoreStartupState()
@@ -165,6 +150,7 @@ class HomeChatViewModel internal constructor(
                 refreshSavedConfigs()
             }
         }
+        observeVirtualDisplay()
     }
 
     override fun initUiState(): HomeChatUiState = HomeChatUiState()
@@ -176,9 +162,7 @@ class HomeChatViewModel internal constructor(
             HomeChatIntent.Warmup -> agent.warmup()
             is HomeChatIntent.ImageAttached -> attachImage(intent.uri)
             is HomeChatIntent.ImageRemoved -> removeImage(intent.id)
-            // 挂起可能长达 60s（等用户从设置页回来），独立协程跑，
-            // 不占 intent 通道——通道被占住时删除会话等后续 intent 全部排队
-            is HomeChatIntent.FileAttached -> viewModelScope.launch { attachFile(intent.uri) }
+            is HomeChatIntent.FileAttached -> attachFile(intent.uri)
             is HomeChatIntent.FileRemoved -> removeFile(intent.id)
             is HomeChatIntent.CameraCaptured -> attachCameraImage(intent.uri, intent.path)
             HomeChatIntent.StopGenerating -> stopGenerating()
@@ -292,7 +276,77 @@ class HomeChatViewModel internal constructor(
                 refreshSavedConfigs()
                 refreshSlashSuggestions()
             }
+
+            HomeChatIntent.OpenVirtualDisplay -> handleOpenVirtualDisplay()
+
+            HomeChatIntent.RequestTerminateVirtualDisplay -> {
+                updateState { copy(showTerminateVirtualDisplayDialog = true) }
+            }
+
+            HomeChatIntent.DismissTerminateVirtualDisplay -> {
+                updateState { copy(showTerminateVirtualDisplayDialog = false) }
+            }
+
+            HomeChatIntent.ConfirmTerminateVirtualDisplay -> confirmTerminateVirtualDisplay()
         }
+    }
+
+    private fun observeVirtualDisplay() {
+        viewModelScope.launch {
+            combine(AppScreens.foregroundState, VirtualDisplayCard.isExpanded) { fg, expanded ->
+                fg to expanded
+            }.collectLatest { (fg, expanded) ->
+                if (fg == null) {
+                    updateState { copy(virtualDisplay = null) }
+                } else {
+                    fg.stage.collect { stage ->
+                        val uiStage = when (stage) {
+                            is VirtualDisplayStage.AppPicker -> HomeVirtualDisplayStage.AppPicker
+                            is VirtualDisplayStage.Launching -> HomeVirtualDisplayStage.Launching(
+                                packageName = stage.packageName,
+                                appName = stage.appName,
+                            )
+                            is VirtualDisplayStage.Running -> HomeVirtualDisplayStage.Running(
+                                packageName = stage.packageName,
+                                appName = stage.appName,
+                            )
+                        }
+                        updateState {
+                            copy(
+                                virtualDisplay = HomeVirtualDisplayUiState(
+                                    stage = uiStage,
+                                    isOverlayExpanded = expanded,
+                                ),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun handleOpenVirtualDisplay() {
+        val conversationId = currentState.currentConversationId?.takeIf { it.isNotBlank() }
+        if (conversationId == null) {
+            sendEffect(HomeChatEffect.VirtualDisplayRequiresConversation)
+            return
+        }
+        val screens = findService<Screens>()
+        if (screens != null && screens.hasVirtualScreen(conversationId)) {
+            if (screens.isOverlayShowing(conversationId)) {
+                screens.expandOverlay(conversationId)
+            } else {
+                screens.reopenOverlay(conversationId)
+            }
+            return
+        }
+        sendEffect(HomeChatEffect.OpenVirtualDisplayPage(conversationId))
+    }
+
+    private suspend fun confirmTerminateVirtualDisplay() {
+        updateState { copy(showTerminateVirtualDisplayDialog = false) }
+        val conversationId = currentState.currentConversationId?.takeIf { it.isNotBlank() } ?: return
+        findService<Screens>()?.closeForConversation(conversationId)
     }
 
     private suspend fun refreshSlashSuggestions() {
@@ -411,23 +465,6 @@ class HomeChatViewModel internal constructor(
      */
     private suspend fun applyConversation(conversation: Conversation, animateTail: Boolean = true) {
         if (conversationBeingLoaded != null && conversation.id?.value != conversationBeingLoaded) return
-        // 流式 delta 的发射频率远超显示帧率：全量重映射（含分支查询与 mapper）合并到
-        // [REMAP_COALESCE_MS] 一帧。collectLatest 会取消上一个等待中的 apply，最新发射
-        // 总是先落 pending；持锁者等满窗口后只重映射 pending —— 重映射频率封顶 1/窗口。
-        pendingApply = conversation
-        pendingAnimateTail = animateTail
-        applyMutex.withLock {
-            val elapsed = System.currentTimeMillis() - lastApplyAtMs
-            if (elapsed < REMAP_COALESCE_MS) delay(REMAP_COALESCE_MS - elapsed)
-            lastApplyAtMs = System.currentTimeMillis()
-            val latest = pendingApply ?: return@withLock
-            pendingApply = null
-            applyConversationNow(latest, pendingAnimateTail)
-        }
-    }
-
-    private suspend fun applyConversationNow(conversation: Conversation, animateTail: Boolean = true) {
-        if (conversationBeingLoaded != null && conversation.id?.value != conversationBeingLoaded) return
         val isLoadedConversation = conversation.id?.value == conversationBeingLoaded
         val target = conversation.toHomeTurns().toMutableList()
         val loaded = !animateTail || isLoadedConversation
@@ -495,32 +532,19 @@ class HomeChatViewModel internal constructor(
             else -> currentState.currentConversationTitle
         }
         val isFirstConversationAssignment = currentState.currentConversationId == null && id != null
-        // 分支族与翻页分支状态只随会话身份和回合数变化，与 delta 内容无关：
-        // 按 (id, turns.size) 缓存，流式期间同一回合内直接复用，不再每帧查 Room
-        val family: List<ConversationSummary>
-        val turnBranches: Map<Long, TurnBranchState>
-        if (branchCacheId == id && branchCacheTurnCount == conversation.turns.size) {
-            family = branchCacheFamily
-            turnBranches = branchCacheTurnBranches
+        val family = if (!id.isNullOrBlank()) {
+            tryOrDefault(emptyList()) { conversations.branchGroup(id) }
         } else {
-            family = if (!id.isNullOrBlank()) {
-                tryOrDefault(emptyList()) { conversations.branchGroup(id) }
-            } else {
-                emptyList()
-            }
-            turnBranches = if (!id.isNullOrBlank()) {
-                ConversationBranchTree.computeTurnBranches(
-                    currentConversationId = id,
-                    turns = conversation.turns,
-                    family = family,
-                )
-            } else {
-                emptyMap()
-            }
-            branchCacheId = id
-            branchCacheTurnCount = conversation.turns.size
-            branchCacheFamily = family
-            branchCacheTurnBranches = turnBranches
+            emptyList()
+        }
+        val turnBranches = if (!id.isNullOrBlank()) {
+            ConversationBranchTree.computeTurnBranches(
+                currentConversationId = id,
+                turns = conversation.turns,
+                family = family,
+            )
+        } else {
+            emptyMap()
         }
         updateState {
             copy(
@@ -532,12 +556,8 @@ class HomeChatViewModel internal constructor(
                 userToggledKeys = if (id != currentConversationId) emptyMap() else userToggledKeys,
             )
         }
-        // 流式期间每个 delta 都会走到这里：只在回合数变化时记一条，否则日志
-        // 会在主线程上以 delta 频率写 logcat（debug 构建还落文件）
-        if (target.size != lastLoggedTurnCount) {
-            lastLoggedTurnCount = target.size
-            Logger.i(LOG_TAG, "applyConversation done id=$id turnsCount=${target.size}")
-        }
+        notifyForegroundConversation(id)
+        Logger.i(LOG_TAG, "applyConversation done id=$id turnsCount=${target.size}")
         if (isFirstConversationAssignment && !currentState.boundConfigId.isNullOrBlank()) {
             val assignedId = id!!
             val boundConfig = currentState.boundConfigId!!
@@ -709,6 +729,19 @@ class HomeChatViewModel internal constructor(
             .onFailure { Logger.w(LOG_TAG, "camera temp file delete failed path=$path") }
     }
 
+    private fun clearInputDraft() {
+        draftDebouncer.cancel()
+        agent.updateDraft { it.copy(text = "") }
+        viewModelScope.launch {
+            runCatchingCancellable {
+                conversations.setDraftText("")
+            }.onFailure { t ->
+                Logger.w(LOG_TAG, "clear draft failed: ${t.message}")
+            }
+        }
+        updateState { copy(input = "") }
+    }
+
     private suspend fun sendCurrentInput() {
         val trimmedInput = currentState.input.trim()
         val hasAttachments =
@@ -721,7 +754,7 @@ class HomeChatViewModel internal constructor(
         if (!hasAttachments) {
             when (BuiltinSlashCommand.find(trimmedInput)) {
                 BuiltinSlashCommand.NewSession -> {
-                    updateState { copy(input = "") }
+                    clearInputDraft()
                     startNewConversation()
                     return
                 }
@@ -735,6 +768,11 @@ class HomeChatViewModel internal constructor(
                     }
                     // 透传给 agent.stream()，由 AgentImpl 拦截执行强制压缩
                 }
+                BuiltinSlashCommand.VirtualDisplay -> {
+                    clearInputDraft()
+                    handleOpenVirtualDisplay()
+                    return
+                }
                 null -> { /* 普通消息，继续正常发送 */ }
             }
         }
@@ -742,37 +780,20 @@ class HomeChatViewModel internal constructor(
         val expandedInput = expandQuickPrompts(trimmedInput, configDependencies.loadQuickPrompts())
         agent.updateDraft { it.copy(text = expandedInput) }
         // stream() is synchronous; don't let it consume Pending images before AgentImpl finishes ingest.
-        withTimeoutOrNull(3000L) {
-            agent.draft.first { draft -> draft.images.none { it is DraftImage.Pending } }
-        }
+        agent.draft.first { draft -> draft.images.none { it is DraftImage.Pending } }
         updateState { copy(isGenerating = true, unreadTurnId = null) }
-        val result = try {
-            agent.stream()
-        } catch (t: Throwable) {
-            Logger.e(LOG_TAG, "agent.stream() threw: ${t.message}")
-            updateState { copy(isGenerating = false) }
-            return
-        }
+        val result = agent.stream()
         Logger.i(LOG_TAG, "send result=$result")
         if (result != TurnStart.Started) {
-            if (result == TurnStart.Busy) sendEffect(HomeChatEffect.RoundBusy)
             updateState {
                 copy(isGenerating = agent.status.value.isRunning)
             }
             return
         }
-        draftDebouncer.cancel()
-        viewModelScope.launch {
-            runCatchingCancellable {
-                conversations.setDraftText("")
-            }.onFailure { t ->
-                Logger.w(LOG_TAG, "clear draft failed: ${t.message}")
-            }
-        }
+        clearInputDraft()
         // 输入框以本类为准：发起即清空，不从 draft 读回
         updateState {
             copy(
-                input = "",
                 pendingImages = emptyList(),
                 pendingFiles = emptyList(),
                 activeThinkingKey = null,
@@ -800,6 +821,7 @@ class HomeChatViewModel internal constructor(
 
     private suspend fun startNewConversation() {
         Logger.d(LOG_TAG, "start new conversation")
+        notifyForegroundConversation(null)
         val leavingId = agent.conversation.value.id?.value
         detachBoundAgent()
         draftDebouncer.cancel()
@@ -811,6 +833,7 @@ class HomeChatViewModel internal constructor(
                 input = currentInput,
                 savedConfigs = currentState.savedConfigs,
                 globalActiveConfigId = currentState.globalActiveConfigId,
+                slashSuggestions = currentState.slashSuggestions,
                 boundConfigId = null,
                 isLoadingConversation = true,
             )
@@ -871,7 +894,14 @@ class HomeChatViewModel internal constructor(
                     t,
                 )
                 tryIgnore { conversations.setLastOpenedConversationId("") }
-                updateState { HomeChatUiState(input = currentState.input).withClearedTransient() }
+                updateState {
+                    HomeChatUiState(
+                        input = currentState.input,
+                        savedConfigs = currentState.savedConfigs,
+                        globalActiveConfigId = currentState.globalActiveConfigId,
+                        slashSuggestions = currentState.slashSuggestions,
+                    ).withClearedTransient()
+                }
             }
         }
     }
@@ -925,18 +955,7 @@ class HomeChatViewModel internal constructor(
             }
             val title = record.summary.title.takeIf { it.isNotBlank() }
             conversationBeingLoaded = target
-            val targetAgent = withTimeoutOrNull(LOAD_AGENT_GRACE_MS) {
-                agentManager.switchTo(target)
-            }
-            if (targetAgent == null) {
-                conversationBeingLoaded = null
-                tryIgnore { agentManager.destroy(target) }
-                Logger.e(
-                    LOG_TAG,
-                    "load conversation id=$target timed out after ${LOAD_AGENT_GRACE_MS}ms",
-                )
-                throw IllegalStateException("load conversation timed out: $target")
-            }
+            val targetAgent = agentManager.switchTo(target)
             attachBoundAgent(targetAgent)
             val hadUnread = record.summary.hasUnread
             val unreadTurnId = if (hadUnread) {
@@ -981,17 +1000,17 @@ class HomeChatViewModel internal constructor(
     private suspend fun reGenerateAt(turnId: Long) {
         if (currentState.isGenerating) return
         val currentId = agent.conversation.value.id?.value ?: return
-        // 原地重生成：截断当前会话到该回合，不派生新会话。
-        // 「分叉」是显式动作（ForkKind.Fork，走 forkAt），重生成不应产生新会话。
-        val result = conversations.truncateAtTurn(currentId, turnId.toInt())
+        val result = conversations.forkAtTurn(currentId, turnId.toInt(), ForkKind.Regenerate)
             ?: return
-        Logger.i(LOG_TAG, "regenerate truncate conversationId=$currentId turnId=$turnId")
+        Logger.i(
+            LOG_TAG,
+            "regenerate fork sourceId=$currentId turnId=$turnId newId=${result.newConversationId}"
+        )
         val preservedKeys = currentState.userToggledKeys.filterKeys { k ->
             val id = k.substringBefore('_').toLongOrNull() ?: 0L
             id < turnId
         }
-        tryIgnore { agentManager.destroy(currentId) }
-        loadConversation(currentId)
+        loadConversation(result.newConversationId)
         updateState { copy(userToggledKeys = preservedKeys) }
         agent.updateDraft { draft ->
             draft.copy(
@@ -1002,8 +1021,6 @@ class HomeChatViewModel internal constructor(
         }
         if (agent.stream() == TurnStart.Started) {
             updateState { copy(input = "") }
-        } else {
-            updateState { copy(input = result.promptText) }
         }
     }
 
@@ -1085,6 +1102,7 @@ class HomeChatViewModel internal constructor(
         }
         groupIds.forEach { branchId ->
             tryIgnore { agentManager.destroy(branchId) }
+            findService<Screens>()?.onConversationDestroyed(branchId)
         }
         conversations.deleteConversation(id)
         if (!deletingCurrent) {
@@ -1131,22 +1149,17 @@ class HomeChatViewModel internal constructor(
         // 在途请求交给其他来源（或按拒绝结算）；本类不再持有来源身份
         approvalApprover.detach()
         detachBoundAgent()
+        notifyForegroundConversation(null)
         super.onCleared()
+    }
+
+    private fun notifyForegroundConversation(conversationId: String?) {
+        findService<Screens>()?.bindForegroundConversation(conversationId)
     }
 
     companion object {
         private const val LOG_TAG = "niki914_zafiro_HomeChatState"
         private const val DRAFT_SAVE_DEBOUNCE_MS = 350L
-
-        /**
-         * 流式重映射的合并窗口：窗口内连续 delta 只做一次全量重映射
-         * （分支 Room 查询 + mapper + 全页状态拷贝），显示帧率封顶 1/窗口，
-         * 与 [TextPacer] 的放出节奏同量级。
-         */
-        private const val REMAP_COALESCE_MS = 50L
-
-        /** switchTo（载入历史 + 重建引擎会话）的上限；超时销毁半载 agent 并失败返回。 */
-        const val LOAD_AGENT_GRACE_MS = 15_000L
     }
 }
 

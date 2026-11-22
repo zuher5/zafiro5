@@ -44,9 +44,19 @@
     <!-- Home -->
     <string name="ui_home_title">Zafiro</string>
     <string name="ui_home_menu_new_conversation">New conversation</string>
+    <string name="ui_home_menu_virtual_display">Virtual display</string>
+    <string name="ui_virtual_display_recent_apps">Recently used</string>
+    <string name="ui_virtual_display_all_apps">All apps</string>
+    <string name="ui_virtual_display_create_failed">Failed to create virtual display. Check permissions.</string>
+    <string name="ui_virtual_display_app_in_use_on_main">This app is currently open on the main screen</string>
+    <string name="ui_virtual_display_app_launch_failed">Failed to launch app on virtual display</string>
+    <string name="ui_virtual_display_pick_app">Choose an app</string>
+    <string name="ui_virtual_display_launching_app">Launching %1$s…</string>
+    <string name="ui_virtual_display_card_terminate">Terminate</string>
+    <string name="ui_virtual_display_terminate_title">Terminate virtual display?</string>
+    <string name="ui_virtual_display_terminate_message">This closes the virtual display bound to this conversation and stops apps running in it.</string>
+    <string name="ui_virtual_display_requires_conversation">Please start a conversation first</string>
     <string name="ui_home_input_placeholder">Type a message…</string>
-    <string name="ui_home_empty_greeting">How can I help you?</string>
-    <string name="ui_home_tap_hint">Tip: tap a message to copy, regenerate, or fork</string>
     <string name="ui_home_conversation_compacted">Conversation compacted</string>
     <string name="ui_home_conversation_compacting">Compacting</string>
     <string name="ui_tool_status_called">Called</string>
@@ -90,7 +100,6 @@
     <string name="ui_toast_copied">Copied</string>
     <string name="ui_toast_generating">Generating, please wait</string>
     <string name="ui_toast_empty_input">Please enter a message</string>
-    <string name="ui_toast_round_busy">Previous round is still running; wait or stop it first</string>
     <string name="ui_toast_no_compactable_history">No conversation history to compact</string>
     <string name="ui_home_error_retry_body">Please try again later.</string>
     <string name="ui_home_error_config_required_title">Model configuration is incomplete</string>
@@ -255,6 +264,7 @@
     <string name="ui_settings_env_context_key_date">Date</string>
     <string name="ui_settings_env_context_key_time">Time</string>
     <string name="ui_settings_env_context_key_device">Device Status</string>
+    <string name="ui_settings_env_context_key_virtual_display">Virtual display</string>
     <string name="ui_settings_env_context_group_custom">Custom Variables</string>
     <string name="ui_settings_env_context_empty_custom">No custom variables. Tap \'+\' in the top right to add.</string>
     <string name="ui_settings_env_context_variable_title_create">Add Variable</string>
@@ -268,7 +278,7 @@
     <string name="ui_settings_env_context_delete_dialog_title">Delete Variable</string>
     <string name="ui_settings_env_context_delete_dialog_text">Are you sure you want to delete variable \"%1$s\"?</string>
     <string name="ui_settings_env_context_error_key_required">Name cannot be empty</string>
-    <string name="ui_settings_env_context_error_key_reserved">Cannot use reserved names: date, time, device</string>
+    <string name="ui_settings_env_context_error_key_reserved">Cannot use reserved names: date, time, device, virtual_display</string>
     <string name="ui_settings_env_context_error_key_duplicate">Name already exists, please choose another</string>
     <string name="ui_settings_env_context_error_key_invalid_format">Invalid name format. Only letters, numbers, underscores, and dashes are allowed.</string>
     <string name="ui_settings_env_context_error_value_required">Content cannot be empty</string>
@@ -284,6 +294,7 @@
     <string name="memory_field_content">Enter content</string>
     <string name="memory_field_content_hint">For example: The user\'s birthday is Month X Day Y</string>
     <string name="memory_save_action">Save Memory</string>
+    <string name="memory_cancel_action">Cancel</string>
     <string name="memory_delete_dialog_title">Delete Memory</string>
     <string name="memory_delete_dialog_text">Are you sure you want to delete this memory?\n\n%1$s</string>
     <string name="memory_delete_dialog_confirm">Delete</string>
@@ -543,6 +554,9 @@
     <string name="ui_settings_general_language_follow_system">Follow system</string>
     <string name="ui_settings_markdown_scale_title">Markdown scale</string>
     <string name="ui_settings_markdown_scale_default">Default</string>
+    <string name="ui_settings_model_chooser_style_title">Model chooser style</string>
+    <string name="ui_settings_model_chooser_style_detailed">Detailed</string>
+    <string name="ui_settings_model_chooser_style_compact">Compact</string>
     <string name="ui_settings_general_load_last_conversation">Load last conversation on startup</string>
     <string name="ui_settings_general_idle_timeout">Idle timeout</string>
     <string name="ui_settings_general_idle_timeout_summary">End the turn when the server stays silent too long</string>
@@ -551,8 +565,6 @@
     <string name="ui_settings_general_retry_summary">Automatic retries after a failed request</string>
     <string name="ui_settings_general_keep_screen_on">Keep screen on while answering</string>
     <string name="ui_settings_general_keep_screen_on_summary">Keep the screen on while the agent is responding and running tools</string>
-    <string name="ui_settings_general_screen_control_auto_approve">Auto-approve screen control</string>
-    <string name="ui_settings_general_screen_control_auto_approve_summary">Skip confirmation before the agent reads or taps the screen.</string>
     <string name="ui_settings_runtime_control">Run control</string>
     <string name="ui_settings_runtime_control_summary">Limits, retries, and repetition detection</string>
     <string name="ui_settings_runtime_group_network">Network</string>
@@ -662,7 +674,6 @@
     <string name="ui_theme_color_lemon">Lemon</string>
     <string name="ui_theme_color_amber">Amber</string>
     <string name="ui_theme_color_sunset">Sunset</string>
-    <string name="ui_theme_color_catppuccin">Catppuccin</string>
 
     <!-- Resident Notification -->
     <string name="agent_resident_title_idle">Agent · Standby</string>

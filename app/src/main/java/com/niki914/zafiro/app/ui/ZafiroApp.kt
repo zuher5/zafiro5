@@ -45,7 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
-import com.niki914.logging.Logger
 import com.niki914.uikit.base.BaseTheme
 import com.niki914.uikit.base.ThemeStyle
 import com.niki914.uikit.base.UiStylePart
@@ -239,16 +238,7 @@ fun ZafiroApp(
 
     suspend fun deleteActiveConversation(id: String) {
         val homeEntry = controller.stack.lastOrNull { entry -> entry.page == HomePage }
-        if (homeEntry == null) {
-            // 删库已由 ViewModel 完成，这里只负责丢弃 agent 会话。
-            // 导航栈被 300ms 防抖搞乱时拿不到 Home entry，静默跳过即可：
-            // 抛错只会变成列表底下一行红字，用户看不到，等于白删一次。
-            Logger.w(TAG, "skip agent discard: Home entry absent from stack")
-            if (activeConversationId == id) {
-                activeConversationId = null
-            }
-            return
-        }
+            ?: error("Home entry is required before deleting the active conversation.")
         val homeViewModel = ViewModelProvider(homeEntry)[
             HomeChatViewModel::class.java.name,
             HomeChatViewModel::class.java,
@@ -328,9 +318,8 @@ fun ZafiroApp(
     Box(modifier = Modifier.fillMaxSize()) {
         BaseTheme(
             darkTheme = isDarkTheme,
-            dynamicColor = !themePrefs.isCatppuccin && themePrefs.seedColor == null,
+            dynamicColor = themePrefs.seedColor == null,
             seedColor = seedColor,
-            isCatppuccin = themePrefs.isCatppuccin,
             themeStyle = themePrefs.themeStyle,
             uiStyleLookup = ThemeController.uiStyleLookup(),
         ) {
@@ -483,8 +472,6 @@ private fun resolveTitle(titleSpec: PageTitleSpec): String {
         is TextTitle -> titleSpec.value
     }
 }
-
-private const val TAG = "niki914_zafiro_ZafiroApp"
 
 private fun bindAction(
     action: TopBarActionSpec?,

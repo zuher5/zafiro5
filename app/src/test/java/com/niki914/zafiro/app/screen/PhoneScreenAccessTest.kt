@@ -268,29 +268,6 @@ class PhoneScreenAccessTest {
         }
     }
 
-    @Test
-    fun autoApprovedSkipsConsentWithoutPersistingIt() = runTest {
-        withTimeout(2_000) {
-            val permissions = permissions(granted = false, grantOnRequest = true)
-            val settings = MemorySettings(granted = false, autoApproved = true)
-            var asked = false
-            val access = access(
-                permissions = permissions,
-                settings = settings,
-                askConsent = {
-                    asked = true
-                    ApprovalDecision.Deny
-                },
-                connected = { false },
-                waitUntilConnected = { true },
-            )
-
-            assertNull(access.prepare(PhoneScreenAccess.Need.Control))
-            assertTrue(!asked)
-            assertTrue(!settings.phoneUseConsentGranted.value)
-        }
-    }
-
     private fun access(
         permissions: RecordingPermissions,
         settings: MemorySettings = MemorySettings(granted = true),
@@ -338,14 +315,10 @@ class PhoneScreenAccessTest {
             throw UnsupportedOperationException("not used")
     }
 
-    private class MemorySettings(
-        granted: Boolean,
-        autoApproved: Boolean = false,
-    ) : XSettings {
+    private class MemorySettings(granted: Boolean) : XSettings {
         override val floatingBallAutoExpand = MutableStateFlow(false)
         override val appLanguageTag = MutableStateFlow("")
         override val phoneUseConsentGranted = MutableStateFlow(granted)
-        override val screenControlAutoApproved = MutableStateFlow(autoApproved)
         override suspend fun setPhoneUseConsentGranted(granted: Boolean) {
             phoneUseConsentGranted.value = granted
         }

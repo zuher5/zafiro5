@@ -58,13 +58,6 @@ object DefaultHomeConversationStore : HomeConversationStore {
         )
     }
 
-    override suspend fun truncateAtTurn(conversationId: String, turnIndex: Int): ForkResult? {
-        return ConversationRepo.truncateAtTurn(
-            conversationId = conversationId,
-            turnIndex = turnIndex,
-        )
-    }
-
     override suspend fun branchGroup(conversationId: String): List<ConversationSummary> {
         return ConversationRepo.branchGroup(conversationId)
     }

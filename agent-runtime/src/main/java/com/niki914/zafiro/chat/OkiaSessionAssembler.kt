@@ -1,4 +1,3 @@
-// githooks:ignore-file file-token-limit
 package com.niki914.zafiro.chat
 
 import com.niki914.logging.Logger
@@ -17,15 +16,16 @@ import com.niki914.okia.message.Message
 import com.niki914.okia.message.ToolCallOutcome
 import com.niki914.okia.protocol.AnthropicMessagesProtocol
 import com.niki914.okia.protocol.ChatProtocol
-import com.niki914.okia.protocol.Compat
 import com.niki914.okia.protocol.GoogleOpenAiCompat
 import com.niki914.okia.protocol.OpenAIChatCompletionCompat
 import com.niki914.okia.protocol.OpenAIChatCompletionProtocol
 import com.niki914.okia.protocol.OpenAIResponsesProtocol
 import com.niki914.okia.tooling.ToolRegistry
+import com.niki914.zafiro.api.screen.Screens
 import com.niki914.zafiro.api.util.runCatchingCancellable
 import com.niki914.zafiro.chat.agentic.AndroidImageLoader
 import com.niki914.zafiro.chat.agentic.python.PyRuntime
+import com.niki914.zafiro.chat.agentic.shell.SessionRegistry
 import com.niki914.zafiro.chat.agentic.shell.TerminalSessionPool
 import com.niki914.zafiro.chat.compaction.ContextPruner
 import com.niki914.zafiro.envcontext.DeviceStateProvider
@@ -36,21 +36,14 @@ import com.niki914.zafiro.service.findService
 import com.niki914.zafiro.settings.RuntimeEnvironment
 import com.niki914.zafiro.settings.model.LlmProtocol
 import com.niki914.zafiro.settings.model.RuntimeLlmConfig
-import com.niki914.okia.protocol.ProtocolEvent
-import com.niki914.okia.protocol.RequestSnapshot
-import com.niki914.okia.transport.HttpRequest
-import com.niki914.okia.transport.SseLine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 
 /** 孤儿工具调用兜底文案：只说结果缺失与疑似异常中断，不断言进程被杀。 */
 private const val TOOL_RESULT_MISSING =
@@ -67,8 +60,7 @@ internal class OkiaSessionAssembler(
     private val toolRegistry: ToolRegistry,
     private val imageLoader: AndroidImageLoader?,
     private val ensureImageSaver: suspend () -> ImageSaver?,
-    /** 租户（引擎）隔离键：回合终止只杀本租户的工具资源，不波及并发 Agent。 */
-    private val tenantId: String = "",
+    private val conversationIdProvider: () -> String? = { null },
 ) {
     internal companion object {
         const val LOG_TAG = "niki914_zafiro_OkiaSessionAssembler"
@@ -127,7 +119,15 @@ internal class OkiaSessionAssembler(
                 ?: findService<DeviceStateProvider>()?.getDeviceState()
                 ?: DeviceStateSnapshot()
         },
-        getConversation = { currentConversation.value }
+        getConversation = { currentConversation.value },
+        virtualDisplayProvider = {
+            val convId = conversationIdProvider() ?: currentConversation.value?.id
+            if (!convId.isNullOrBlank()) {
+                findService<Screens>()?.virtualDisplayContext(convId)
+            } else {
+                null
+            }
+        },
     )
 
     private val maskingHook = MaskingHook(
@@ -167,12 +167,9 @@ internal class OkiaSessionAssembler(
         forceNew: Boolean = false,
     ): Okia {
         if (!forceNew && restore == null) {
-            activeSession?.takeIf { sessionProtocol == protocol }
-                ?.let { return it }
+            activeSession?.takeIf { sessionProtocol == protocol }?.let { return it }
         }
-        val carried = restore ?: activeSession?.takeIf {
-            sessionProtocol != protocol
-        }?.export()
+        val carried = restore ?: activeSession?.takeIf { sessionProtocol != protocol }?.export()
         activeSession?.close()
         return openSession(protocol ?: LlmProtocol.Default, config, carried).also {
             activeSession = it
@@ -203,31 +200,10 @@ internal class OkiaSessionAssembler(
         conversationFlow.value = null
     }
 
-    /**
-     * 毒化会话的强关（引擎 stop 超时后调用）：跳过活跃回合检查取消 turnScope，
-     * 断掉僵尸回合的在途作业后整体丢弃实例。常规路径严禁调用——会绕过
-     * 「活跃回合不可 close」的并发契约。
-     */
-    suspend fun forceClosePoisonedSession() {
-        val session = activeSession ?: return
-        runCatchingCancellable { session.close(force = true) }
-            .onFailure { throwable ->
-                Logger.e(
-                    LOG_TAG,
-                    "poisoned session force close failed errorType=${throwable::class.simpleName} " +
-                            "message=${throwable.message}"
-                )
-            }
-        activeSession = null
-        sessionProtocol = null
-        sessionForwardJob?.cancel()
-        sessionForwardJob = null
-        conversationFlow.value = null
-    }
-
     suspend fun resetConversation() {
         PyRuntime.kill()
-        TerminalSessionPool.closeTenantSessions(tenantId)
+        TerminalSessionPool.closeAll()
+        SessionRegistry.clear()
         closeSession()
     }
 
@@ -265,7 +241,6 @@ internal class OkiaSessionAssembler(
             repetitionConfig = config.repetitionSensitivity.toRepetitionConfig()
         }
     }
-
 
     internal fun isImageSupported(configSupportsImages: Boolean): Boolean {
         return imageLoader != null && configSupportsImages
@@ -399,12 +374,10 @@ internal class OkiaSessionAssembler(
 
     private val killToolResourcesHook = object : Hooks {
         override suspend fun beforeStop(calls: List<ContentBlock.ToolCall>) {
-            Logger.i(
-                LOG_TAG,
-                "beforeStop killing tool resources dispatchedCalls=${calls.size} tenant=$tenantId"
-            )
+            Logger.i(LOG_TAG, "beforeStop killing tool resources dispatchedCalls=${calls.size}")
             PyRuntime.kill()
-            TerminalSessionPool.closeTenantSessions(tenantId)
+            TerminalSessionPool.closeAll()
+            SessionRegistry.clear()
         }
     }
 }

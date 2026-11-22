@@ -19,7 +19,6 @@ internal object EndpointInference {
         return host == "api.deepseek.com" || host.endsWith(".deepseek.com")
     }
 
-
     private fun deepSeekBaseOf(endpoint: String): String {
         val scheme = if (endpoint.startsWith("http://")) "http://" else "https://"
         val afterScheme = endpoint.substringAfter("://", endpoint)

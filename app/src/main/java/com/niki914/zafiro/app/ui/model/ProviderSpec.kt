@@ -14,6 +14,7 @@ sealed interface ProviderSpec {
     /** 新建配置时可选的预填模型；null 表示继续要求用户选择或手填。 */
     val initialModelId: String? get() = null
     val allowsCustomEndpointInNewConfig: Boolean
+
     /** 新建配置时预填的协议（LlmProtocol.wireId）。 */
     val defaultProtocol: String
 
@@ -46,20 +47,20 @@ data class ProviderButtonTokens(
 object ProviderSpecs {
     val default: ProviderSpec = KiloFreeSpec
 
-    // 免费档排在最前：这是 fork 存在的理由，付费档退到后面。
     val all: List<ProviderSpec> = listOf(
         KiloFreeSpec,
-        OpenAiSpec,
+        OpenCodePIProxySpec,
         AnthropicSpec,
+        OpenAiSpec,
         OpenRouterSpec,
-        GoogleSpec,
         DeepSeekSpec,
-        OpenCodeSpec,
-        CommandCodeSpec,
+        GoogleSpec,
         KimiSpec,
         BailianSpec,
         SiliconFlowSpec,
         VolcengineCodingPlanSpec,
+        OpenCodeSpec,
+        CommandCodeSpec,
     )
 
     fun find(providerId: String?): ProviderSpec {
@@ -257,24 +258,6 @@ private data object CommandCodeSpec : ProviderSpec {
     )
 }
 
-
-private data object KiloFreeSpec : ProviderSpec {
-    override val id: String = "kilo-free"
-    override val brandName: String = "KiloCode Free"
-    override val officialEndpoint: String = "https://api.kilo.ai/api/gateway/chat/completions"
-    override val exampleModelId: String = "kilo-auto/free"
-    override val allowsCustomEndpointInNewConfig: Boolean = true
-    override val defaultProtocol: String = "openai-chat-completions"
-    override val allowsEmptyApiKey: Boolean = true
-    override val iconRes: Int = R.drawable.kilo
-    override val tintIcon: Boolean = false
-    override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
-        button = ProviderButtonTokens(),
-    )
-}
-
-
-
 private data object OpenCodeSpec : ProviderSpec {
     override val id: String = "opencode"
     override val brandName: String = "OpenCode"
@@ -291,5 +274,35 @@ private data object OpenCodeSpec : ProviderSpec {
             darkContentColorRes = R.color.provider_opencode_button_dark_content,
             lightContentColorRes = R.color.provider_opencode_button_light_content,
         ),
+    )
+}
+
+private data object KiloFreeSpec : ProviderSpec {
+    override val id: String = "kilo-free"
+    override val brandName: String = "KiloCode Free"
+    override val officialEndpoint: String = "https://api.kilo.ai/api/gateway/chat/completions"
+    override val exampleModelId: String = "kilo-auto/free"
+    override val allowsCustomEndpointInNewConfig: Boolean = true
+    override val defaultProtocol: String = "openai-chat-completions"
+    override val allowsEmptyApiKey: Boolean = true
+    override val iconRes: Int = R.drawable.kilo
+    override val tintIcon: Boolean = false
+    override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
+        button = ProviderButtonTokens(),
+    )
+}
+
+private data object OpenCodePIProxySpec : ProviderSpec {
+    override val id: String = "opencode-pi"
+    override val brandName: String = "OpenCode PI"
+    override val officialEndpoint: String = "http://127.0.0.1:18080/v1/chat/completions"
+    override val exampleModelId: String = "deepseek-v4.1-flash-free"
+    override val allowsCustomEndpointInNewConfig: Boolean = true
+    override val defaultProtocol: String = "openai-chat-completions"
+    override val allowsEmptyApiKey: Boolean = true
+    override val iconRes: Int = R.drawable.opencode_pi
+    override val tintIcon: Boolean = false
+    override val visualTokens: ProviderVisualTokens = ProviderVisualTokens(
+        button = ProviderButtonTokens(),
     )
 }

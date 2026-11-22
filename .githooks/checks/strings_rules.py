@@ -26,7 +26,6 @@ KNOWN_LOCALES = (
     "values-en",
     "values-b+zh+Hant",
     "values-es",
-    "values-in",
     "values-ja",
     "values-ru",
     "values-ar",

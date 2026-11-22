@@ -418,6 +418,19 @@ class AgentRuntimeService : Service() {
             manager.createNotificationChannel(channel)
         }
 
+        // MainActivity is launchMode=singleTask; NEW_TASK reuses the existing task
+        // and routes through onNewIntent, so no duplicate activity is created
+        private fun createAppLaunchPendingIntent(): PendingIntent? {
+            val intent = Intent(this@AgentRuntimeService, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            return PendingIntent.getActivity(
+                this@AgentRuntimeService,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+
         private fun createContentIntent(uri: String?): PendingIntent? {
             if (uri.isNullOrBlank()) {
                 return null

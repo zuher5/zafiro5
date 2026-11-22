@@ -12,9 +12,6 @@ import kotlinx.coroutines.flow.Flow
 interface ConversationDao {
     companion object {
         private const val LOG_TAG = "niki914_zafiro_ConversationDao"
-
-        /** IN 列表分批上限：低于 SQLite 999 绑定变量限制，留足余量。 */
-        const val DELETE_ENTRY_CHUNK = 500
     }
 
     @Query("SELECT * FROM conversation ORDER BY updated_at DESC")
@@ -163,54 +160,6 @@ interface ConversationDao {
     @Query("DELETE FROM conversation WHERE id = :id")
     suspend fun deleteConversation(id: String): Int
 
-    /** 删除指定会话下的指定 entry（重生成原地截断：丢弃该回合及其之后的条目）。 */
-    @Query(
-        """
-        DELETE FROM conversation_entry
-        WHERE conversation_id = :conversationId AND id IN (:entryIds)
-        """,
-    )
-    suspend fun deleteEntries(conversationId: String, entryIds: List<String>): Int
-    @Query(
-        """
-        UPDATE conversation
-        SET updated_at = :updatedAt,
-            last_message_preview = :lastMessagePreview,
-            turn_count = :turnCount,
-            leaf_id = :leafId
-        WHERE id = :conversationId
-        """,
-    )
-    suspend fun updateConversationAfterTruncate(
-        conversationId: String,
-        updatedAt: Long,
-        lastMessagePreview: String,
-        turnCount: Int,
-        leafId: String?,
-    ): Int
-
-    @Transaction
-    suspend fun truncateEntriesTransaction(
-        conversationId: String,
-        entryIds: List<String>,
-        updatedAt: Long,
-        lastMessagePreview: String,
-        turnCount: Int,
-        leafId: String?,
-    ) {
-        // SQLite 绑定变量上限 999：长会话整轮截断按批删，避免 IN 列表直接抛异常
-        entryIds.chunked(DELETE_ENTRY_CHUNK).forEach { chunk ->
-            deleteEntries(conversationId, chunk)
-        }
-        updateConversationAfterTruncate(
-            conversationId = conversationId,
-            updatedAt = updatedAt,
-            lastMessagePreview = lastMessagePreview,
-            turnCount = turnCount,
-            leafId = leafId,
-        )
-    }
-
     /** 删除整个分支组（含根）；用于「删掉一个会话就是删掉它的全部重新生成版本」。 */
     @Query("DELETE FROM conversation WHERE root_id = :rootId")
     suspend fun deleteBranchGroup(rootId: String): Int
@@ -218,9 +167,6 @@ interface ConversationDao {
     /** 组内所有分支，按创建时间升序（删除时需先逐个销毁 Agent）。 */
     @Query("SELECT id FROM conversation WHERE root_id = :rootId ORDER BY created_at ASC")
     suspend fun listBranchGroupIds(rootId: String): List<String>
-
-    @Query("UPDATE conversation SET title = :title, title_edited = 1 WHERE id = :id")
-    suspend fun renameConversation(id: String, title: String): Int
 
     /** 查询指定分支组内所有包含图片缓存引用的消息 JSON。用于删除前收集待清理图片候选。 */
     @Query(

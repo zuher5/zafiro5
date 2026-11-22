@@ -1,10 +1,10 @@
-// githooks:ignore-file file-token-limit
 // 保护：导入是导出的逆过程。同 id 在合并时被盖掉、覆盖时把本地独有对话删掉、
 // 没选的组被写进去、显式空被读成内置默认、引导完成状态没随偏好写回或旧包把本机的值抹掉、
 // 电话同意和版本号被导入、同一张图再写一遍、
 // 下载目录占位符留在工具代码里、.seed 没落盘、坏包仍然改本地、前面写成功的分区
 // 在失败后不退回、快照超过三份或丢掉密钥、唯一分区写完后取消仍当成成功，
 // 这些改动会让恢复结果和报告对不上。
+// githooks:ignore-file file-token-limit
 package com.niki914.zafiro.backup
 
 import com.niki914.okia.message.ContentBlock
