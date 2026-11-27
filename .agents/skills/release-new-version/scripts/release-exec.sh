@@ -4,6 +4,12 @@
 # Usage:
 #   release-exec.sh <version_code> <version_name> <notes_file> [--xposed]
 #
+# Optional env overrides:
+#   RELEASE_REPO=owner/repo   target repo (default: owner/repo of the origin remote)
+#   RELEASE_TAG=tag           tag to publish (default: v<code>-<name> upstream, v<name> on forks)
+#   RELEASE_BRANCH=branch     branch to push the version bump to (default: current branch)
+#   XPOSED_REPO=owner/repo    required with --xposed unless the target is the upstream repo
+#
 # Example:
 #   bash .agents/skills/release-new-version/scripts/release-exec.sh 14 1.8.0 /tmp/notes.md --xposed
 
@@ -14,8 +20,23 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 
 SKILL_DIR="$REPO_ROOT/.agents/skills/release-new-version"
-MAIN_REPO="niki914/zafiro"
-XPOSED_REPO="Xposed-Modules-Repo/com.niki914.zafiro"
+
+# 目标仓库默认取 origin 的 owner/repo，不再写死上游：在 fork 里跑就是发到 fork。
+default_repo() {
+  git remote get-url origin 2>/dev/null \
+    | sed -E 's#^git@github.com:##; s#^https?://github.com/##; s#\.git$##'
+}
+MAIN_REPO="${RELEASE_REPO:-$(default_repo)}"
+if [ -z "$MAIN_REPO" ] || [ "$MAIN_REPO" = "${MAIN_REPO#*/}" ]; then
+  echo "Error: cannot derive owner/repo from origin; set RELEASE_REPO=owner/repo" >&2
+  exit 1
+fi
+
+# Xposed 仓库只在上游仓库下默认生效；fork 必须显式给 XPOSED_REPO。
+XPOSED_REPO="${XPOSED_REPO:-}"
+if [ "$MAIN_REPO" = "niki914/zafiro" ] && [ -z "$XPOSED_REPO" ]; then
+  XPOSED_REPO="Xposed-Modules-Repo/com.niki914.zafiro"
+fi
 
 if [ "$#" -lt 3 ]; then
   echo "Usage: $0 <version_code> <version_name> <notes_file> [--xposed]" >&2
@@ -31,17 +52,37 @@ if [ "${4:-}" = "--xposed" ]; then
   PUBLISH_XPOSED=true
 fi
 
+if [ "$PUBLISH_XPOSED" = true ] && [ -z "$XPOSED_REPO" ]; then
+  echo "Error: --xposed needs XPOSED_REPO=owner/repo when releasing from a fork." >&2
+  exit 1
+fi
+
+RELEASE_BRANCH="${RELEASE_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+if [ -z "$RELEASE_BRANCH" ] || [ "$RELEASE_BRANCH" = "HEAD" ]; then
+  echo "Error: detached HEAD; set RELEASE_BRANCH=<branch>." >&2
+  exit 1
+fi
+
 if [ ! -f "$NOTES_FILE" ]; then
   echo "Error: Notes file '$NOTES_FILE' not found!" >&2
   exit 1
 fi
 
-TAG_NAME="v${VERSION_CODE}-${VERSION_NAME}"
+TAG_NAME="${RELEASE_TAG:-}"
+if [ -z "$TAG_NAME" ]; then
+  # 上游发布线：v<code>-<name>；fork 发布线（本仓库）：v<name>
+  if [ "$MAIN_REPO" = "niki914/zafiro" ]; then
+    TAG_NAME="v${VERSION_CODE}-${VERSION_NAME}"
+  else
+    TAG_NAME="v${VERSION_NAME}"
+  fi
+fi
 XPOSED_TAG="${VERSION_CODE}-${VERSION_NAME}"
 RELEASE_TITLE="Release - ${VERSION_NAME}"
 
 echo "================================================="
 echo " Zafiro Automated Release Execution"
+echo " Repo: ${MAIN_REPO} (branch ${RELEASE_BRANCH})"
 echo " Version: ${VERSION_NAME} (code: ${VERSION_CODE})"
 echo " Main Tag: ${TAG_NAME}"
 if [ "$PUBLISH_XPOSED" = true ]; then
@@ -76,12 +117,12 @@ if ! grep -q "versionCode = ${VERSION_CODE}" app/build.gradle.kts || ! grep -q "
   exit 1
 fi
 
-# 4. Commit and push main
-echo "==> [3/7] Committing and pushing to main..."
+# 4. Commit and push the release branch
+echo "==> [3/7] Committing and pushing to ${RELEASE_BRANCH}..."
 git add app/build.gradle.kts README.md README_CN.md .agents/skills/release-new-version/
 if ! git diff --cached --quiet; then
   git commit -m "release: bump to ${VERSION_NAME}"
-  git push origin main
+  git push origin "$RELEASE_BRANCH"
 fi
 
 # 5. Tag and push tag
@@ -144,20 +185,20 @@ if [ "$PUBLISH_XPOSED" = true ]; then
   # Replace contribution line with open source link as per skill convention
   XPOSED_NOTES_FILE="${DOWNLOAD_DIR}/xposed_notes.md"
   sed -E \
-    -e 's/欢迎 Star、提 Issue、参与贡献/项目已开源：https:\/\/github.com\/niki914\/zafiro/g' \
-    -e 's/Welcome to Star, Issue, and contribute/Open source: https:\/\/github.com\/niki914\/zafiro/g' \
+    -e "s#欢迎 Star、提 Issue、参与贡献#项目已开源：https://github.com/${MAIN_REPO}#g" \
+    -e "s#Welcome to Star, Issue, and contribute#Open source: https://github.com/${MAIN_REPO}#g" \
     "$NOTES_FILE" > "$XPOSED_NOTES_FILE"
 
   # If notes do not contain the open source link, append it to both English and Chinese blocks
-  if ! grep -q "https://github.com/niki914/zafiro" "$XPOSED_NOTES_FILE"; then
-    awk '
+  if ! grep -q "https://github.com/${MAIN_REPO}" "$XPOSED_NOTES_FILE"; then
+    awk -v repo_url="https://github.com/${MAIN_REPO}" '
       /^---$/ {
-        print "\nOpen source: https://github.com/niki914/zafiro\n\n---"
+        print "\nOpen source: " repo_url "\n\n---"
         next
       }
       { print }
       END {
-        print "\n项目已开源：https://github.com/niki914/zafiro"
+        print "\n项目已开源：" repo_url
       }
     ' "$XPOSED_NOTES_FILE" > "${XPOSED_NOTES_FILE}.tmp" && mv "${XPOSED_NOTES_FILE}.tmp" "$XPOSED_NOTES_FILE"
   fi

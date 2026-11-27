@@ -7,6 +7,8 @@
     <string name="ui_onboard_provider_pick_description">Начните здесь, чтобы подключить свою модель.\nЧтобы продолжить, выберите провайдера.</string>
     <string name="ui_onboard_provider_pick_byok_hint">Что такое BYOK?</string>
     <string name="ui_provider_official_and_relay_summary">Официальный API и сторонние реле</string>
+    <string name="ui_provider_kilo_free_summary">Бесплатный тариф, ключ API не нужен</string>
+    <string name="ui_provider_opencode_pi_summary">Через локальный прокси, ключ API не нужен</string>
     <string name="ui_onboard_configure_title">Настройка доступа к модели</string>
     <string name="ui_onboard_configure_description">Введите параметры модели, чтобы начать.</string>
     <string name="ui_onboard_configure_next">Далее</string>

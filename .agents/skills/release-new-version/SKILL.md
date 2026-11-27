@@ -16,6 +16,19 @@ Repos involved:
 
 CI builds and signs one APK when a tag is pushed to the main repo, stamps channel `github` into its APK Signing Block, and uploads that file as the GitHub Release asset. The Xposed repo has no CI; its release is automated by the release script via `tools/apk_channel.py stamp`. Never build locally.
 
+### Fork mode (`zuher5/zafiro5`)
+
+`release-exec.sh` derives the target repo from `origin`, so in this fork it publishes to `zuher5/zafiro5`; do not pass `-R niki914/...` anywhere. In fork mode:
+
+| Item | Value |
+|------|-------|
+| Tag format | `v<versionName>` e.g. `v2.1.0` (not `v<code>-<name>`) |
+| Release branch | the current branch, or `RELEASE_BRANCH=<branch>`; never hardcode `main` |
+| Xposed | skipped unless `--xposed` is given **with** `XPOSED_REPO=owner/repo` |
+| Release assets | APK only; `mapping.zip` stays a workflow artifact |
+
+Overrides: `RELEASE_REPO`, `RELEASE_TAG`, `RELEASE_BRANCH`, `XPOSED_REPO`. Baseline for “latest release” lookups in fork mode is `gh release list -R zuher5/zafiro5`, and the changes range is `<last fork tag>..origin/<current branch>`.
+
 > [!IMPORTANT]
 > **Zero Manual File Editing During Release**: The release script (`release-exec.sh`) automatically updates `versionCode` and `versionName` in `app/build.gradle.kts`, counts lines and updates badges in `README.md` and `README_CN.md`, commits, tags, and pushes. Do **NOT** manually edit `app/build.gradle.kts` or `README.md`.
 

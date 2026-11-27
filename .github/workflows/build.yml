@@ -42,6 +42,14 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
+      # fork 的 provider 契约测试（免 Key 网关、目录拉取门槛）。限定到单个测试类，
+      # 不把存量测试一次性拉进门禁。
+      - name: Run ProviderSpec unit tests
+        run: >-
+          ./gradlew :app:testDebugUnitTest
+          --tests 'com.niki914.zafiro.app.ui.model.ProviderSpecTest'
+          --no-daemon --stacktrace
+
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:

@@ -10,6 +10,8 @@
     <string name="ui_onboard_provider_pick_description">Comience a conectar sus modelos desde aquí.\nSeleccione un proveedor para continuar.</string>
     <string name="ui_onboard_provider_pick_byok_hint">¿Qué es BYOK?</string>
     <string name="ui_provider_official_and_relay_summary">Oficial y relés de terceros</string>
+    <string name="ui_provider_kilo_free_summary">Nivel gratuito, sin clave de API</string>
+    <string name="ui_provider_opencode_pi_summary">A través de un proxy local, sin clave de API</string>
     <string name="ui_onboard_configure_title">Configurar modelo</string>
     <string name="ui_onboard_configure_description">Complete la configuración del modelo para empezar a usar Zafiro.</string>
     <string name="ui_onboard_configure_next">Siguiente</string>

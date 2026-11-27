@@ -11,6 +11,10 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+// 遥测端点：fork 构建默认关闭（空串即关闭，见 business/remote 里 baseUrl.isBlank() 的短路）。
+// 需要上报时用 -Pzafiro.telemetryBaseUrl=https://<your-worker> 注入，勿把地址写死回上游。
+val telemetryBaseUrl = providers.gradleProperty("zafiro.telemetryBaseUrl").getOrElse("")
+
 android {
     namespace = "com.niki914.zafiro.app"
     compileSdk = 37
@@ -26,7 +30,7 @@ android {
         versionName = "2.1.0"
         // Keep the fork's monotonically increasing versionCode above v2.0.2 (31).
         versionCode = 32
-        buildConfigField("String", "TELEMETRY_BASE_URL", "\"https://zafiro-telemetry.niki27687.workers.dev\"")
+        buildConfigField("String", "TELEMETRY_BASE_URL", "\"$telemetryBaseUrl\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {

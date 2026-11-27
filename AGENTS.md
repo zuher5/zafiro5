@@ -94,6 +94,10 @@ BottomSheet 用 OptionSheet
 
 AI 对话通常是以 list 的形式存放 messages，同时只会有一个对话在进行，数据结构：Conversation - List<Message>。应用通过 Room 数据库，将每次 AI 对话的内容持久化。对话列表指的是对话的列表，数据结构：ConversationList - List<Conversation>
 
+### 手机控制
+
+手机控制通过 Screens API 完成，底层基于无障碍实现。Zafiro Agent 通过内置的 phone-use Skill 来完成任务。手机控制有两种选项：运行在虚拟屏或直接运行在主屏。虚拟屏模式下有一个悬浮窗显示屏幕内容
+
 这是一个不应混淆的概念，通常在提及对话列表的时候，就是在指后者，而不是 HomeChat 对话界面
 
 ### AI 对话数据结构
@@ -126,18 +130,29 @@ Zafiro Agent 的对话功能是限定在主进程之内的，虽然有一个宿�
   - Release 构建包名为 `com.niki914.zafiro`。
   - 目的：允许同一台测试机/真机上同时安装 Release 版与 Debug 版共存，避免 `INSTALL_FAILED_DUPLICATE_PERMISSION` 权限声明冲突或签名不一致导致覆盖失败。后续维护或重构严禁移除 debug 的 `.debug` 后缀。
 - **免费模型接入 (Free LLM Providers)**:
-  - `KiloCode Free` (`kilo-free`): 直连 `https://api.kilo.ai/api/gateway/chat/completions`，支持空 API Key，默认模型 `kilo-auto/free`。
-  - `OpenCode Free` (`opencode-zen-free`): 直连 `https://opencode.ai/inference/openai/v1/chat/completions`（inference 前缀与模型事实动态从 `models.opencode.ai/api.json` field `api` 与 `opencode.ai/update/api/latest/cli/npm` 推导，写死前缀必然随 upstream 迁移失效；`/zen/v1` 与 `/inference/v1` 已退役），支持空 API Key，默认模型 `deepseek-v4.1-flash-free`。`OpenCodeFreeSupport` 维护 bridge-style wire identity：UA `opencode/<channel>/<ver>/<name>`（如 `opencode/latest/2.3.2/cli`，来自 update API，非 npm registry）、`x-opencode-client: cli`、恰好 7 个 gate headers（不发 `x-opencode-request`、不发 `Connection: close`）、`prompt_cache_key`、`<env>` 环境指纹、verbatim `read`+`shell` schema；429/403 时 `burnSessionId()` + `markIdentityStale()` reactive 自愈（不做 auto-retry，以免加剧 upstream per-IP 冷却）；additive token budgeting (`max(requested, 1024) + 4096`) 防止 reasoning 模型输出截断，ceiling 取自 katalog；OkHttp 侧 17 套件 ClientHello + 保留默认 h2+http/1.1（强制 HTTP/1.1 会剥掉 ALPN 扩展，破坏指纹）。
-  - `OpenCode PI` (`opencode-pi`): 经 Termux `pi-bansos` 或 `opencode-to-api` 代理的回退通道 (`http://127.0.0.1:18080/v1/chat/completions`)。
+  - `KiloCode Free` (`kilo-free`): 直连 `https://api.kilo.ai/api/gateway/chat/completions`，支持空 API Key，默认模型 `kilo-auto/free`，是新建配置的默认 provider（`ProviderSpecs.default`）。
+  - `OpenCode PI` (`opencode-pi`): 经 Termux `pi-bansos` 或 `opencode-to-api` 代理的回退通道 (`http://127.0.0.1:18080/v1/chat/completions`)，支持空 API Key。
+  - 曾经维护过的 `OpenCode Free` (`opencode-zen-free`) 直连通道与 `OpenCodeFreeSupport`（wire identity、gate headers、JA4 ClientHello 指纹、`burnSessionId()` 自愈、additive token budget）已在上游 2.1.0 同步时移除，仓库里没有这些代码。不要再照着旧笔记去找它们；需要时重新引入并补测试。
+  - 空 Key 的判定只有一处：`ProviderSpec.allowsEmptyApiKey`，配合 `canFetchModelCatalog(endpoint, apiKey, spec)`（`ui/model/ProviderSpec.kt`）。新增无 Key 网关时改这两处，不要在 `ConfigureState` 里另写 `apiKey.isBlank()` 判断；该契约由 `app/src/test/.../ui/model/ProviderSpecTest.kt` 看住。
   - 设置页中的 `proxy` 仅支持标准 HTTP/SOCKS 代理；像 Vercel relay 等需要自定义 `x-relay-target` 头的服务不能直接填入普通代理输入框。
 - **会话滑动快捷操作 (Session Swipe Actions)**:
   - 对话历史列表中每一项封装在 `SwipeToDismissBox` 中：向右滑重命名会话，向左滑删除会话。在进行合并和 UI 重构时必须完整保留该能力。
 - **Upstream 同步基线**:
-  - 已完整合并 upstream `v20-2.0.0`（包含 Room 全文搜索 `ZafiroSearchBar`、Viewer 媒体与 Web 预览、Slash Suggestions、Quick Prompts、HomeModelSwitchSheet、Orphan Image Cleanup、输入框折叠优化、多主题系统 `BaseTheme` / `ZafiroTopBarLayout` / UI styles）。
+  - 已完整合并 upstream `v21-2.1.0`（`bd3767ef`，含 Room 全文搜索 `ZafiroSearchBar`、Viewer 媒体与 Web 预览、Slash Suggestions、Quick Prompts、HomeModelSwitchSheet、Orphan Image Cleanup、输入框折叠优化、多主题系统 `BaseTheme` / `ZafiroTopBarLayout` / UI styles）。
+  - 分支纪律：`main` 与本仓库发布内容保持一致（每次发布后把 `main` fast-forward 到发布 commit 并推送）；日常开发在 `feat/**` 分支。GitHub 默认分支为 `main`，不要让它长期落后。
+  - 本 fork 相对 upstream 只有一层薄改动（provider、滑动操作、图标、`versionCode` 线、CI）。同步上游时优先 `git merge upstream/main`，不要 rebase 已推送的历史。
 - **构建与发布约束 (GitHub Actions Only)**:
   - Android 构建只在 GitHub Actions 执行；本地环境不作为 Gradle、Chaquopy 或签名构建环境，不要在本地运行 Android build。
   - Release 构建使用 `.github/workflows/release.yml` 的 `workflow_dispatch` 或版本 tag 触发；签名构建依赖 GitHub Secrets。
   - 触发 workflow 前必须确认目标 commit 已推送到 GitHub，并保留 workflow run URL 与最终 artifact/release 状态作为验证证据。
+  - 本 fork 的 tag 采用 `v<versionName>`（如 `v2.1.0`），不是上游的 `v<code>-<name>`。
+  - `release-exec.sh` 的目标仓库取自 `origin`（可用 `RELEASE_REPO`、`RELEASE_TAG`、`RELEASE_BRANCH` 覆盖），发布分支默认当前分支；Xposed 仓库只在上游仓库下默认启用，fork 用 `--xposed` 时必须显式给 `XPOSED_REPO`。
+  - `mapping.zip` 只作为 workflow artifact 保留，不进入公开 Release。
+- **遥测 (Telemetry)**:
+  - `TELEMETRY_BASE_URL` 默认空串 = 关闭（`business/remote` 的 `baseUrl.isBlank()` 短路）。本仓库不再默认上报到上游 worker；需要时用 `-Pzafiro.telemetryBaseUrl=https://<own-worker>` 注入。
+- **明文流量与高危权限 (Accepted Risks)**:
+  - `android:usesCleartextTraffic="true"` 是 BYOK 直连 `http://127.0.0.1:18080`、局域网 Ollama 等自建端点的前提，network security config 无法表达任意 CIDR，故保留；不要为了“更安全”关掉它，否则本地代理通道整体失效。
+  - `MANAGE_EXTERNAL_STORAGE`、`allowBackup` 属于产品能力（文件工具、备份恢复），改动前先读 `business/files` 与 backup 相关代码。
 - **构建指令语义 (Release Command Semantics)** — 用户以短语下达构建/发布指令，按字面范围执行，不扩大也不缩小：
   - **`debug release`**：只构建 Debug APK，不打 tag、不发 Release。Debug 包名带 `.debug` 后缀（`com.niki914.zafiro.debug`，与 Release 共存，见上）。产物为 `Build APK` workflow 的 artifact。
   - **`tag release`**：执行 Signed Release 并直接打版本 tag（`v<versionName>`）推送，由 CI `Release Build` 构建签名 APK 并创建 GitHub Release，随后设置标题与双语 notes。

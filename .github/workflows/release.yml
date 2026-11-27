@@ -60,8 +60,7 @@ jobs:
           zip -j "mapping.zip" \
             app/build/outputs/mapping/release/mapping.txt
 
-      - name: Upload APK artifact
-        if: github.event_name == 'workflow_dispatch'
+      - name: Upload APK and mapping artifact
         uses: actions/upload-artifact@v4
         with:
           name: zafiro-release
@@ -78,14 +77,19 @@ jobs:
             "zafiro-release.apk" \
             github
 
-      - name: Create GitHub Release
+      # mapping.zip 只走 workflow artifact，不进公开 Release（避免把混淆映射公开发布）。
+      # 上传与创建分开判断，不用 `A || B` 掩盖失败。
+      - name: Create or update GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "${{ github.ref_name }}" Zafiro-*.apk --clobber 2>/dev/null || \
-          gh release create "${{ github.ref_name }}" \
-            zafiro-release.apk \
-            mapping.zip \
-            --title "${{ github.ref_name }}" \
-            --generate-notes
+          set -euo pipefail
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            echo "Release ${GITHUB_REF_NAME} exists, uploading APK"
+            gh release upload "${GITHUB_REF_NAME}" zafiro-release.apk --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" zafiro-release.apk \
+              --title "${GITHUB_REF_NAME}" \
+              --generate-notes
+          fi

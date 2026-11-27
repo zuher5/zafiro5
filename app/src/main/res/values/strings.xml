@@ -10,6 +10,8 @@
     <string name="ui_onboard_provider_pick_description">从这里开始接入您的模型能力。\n选择一个提供商以继续。</string>
     <string name="ui_onboard_provider_pick_byok_hint">什么是 BYOK？</string>
     <string name="ui_provider_official_and_relay_summary">支持官方及第三方中转</string>
+    <string name="ui_provider_kilo_free_summary">免费额度，无需 API Key</string>
+    <string name="ui_provider_opencode_pi_summary">经本地代理接入，无需 API Key</string>
     <string name="ui_onboard_configure_title">配置模型接入信息</string>
     <string name="ui_onboard_configure_description">填写模型配置，完成后即可开始使用。</string>
     <string name="ui_onboard_configure_next">下一步</string>

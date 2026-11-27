@@ -676,8 +676,8 @@ class ConfigureViewModel internal constructor(
                 protocolWireId = state.protocolWireId,
             )
             if (key == lastCatalogKey) return@debounce
-            // 空值短路：Key 或 endpoint 为空直接不发，保留旧缓存
-            if (key.endpoint.isBlank() || (key.apiKey.isBlank() && !state.providerSpec.allowsEmptyApiKey)) return@debounce
+            // 空值短路：endpoint 为空、或非无 key 网关的 Key 为空时直接不发，保留旧缓存
+            if (!canFetchModelCatalog(key.endpoint, key.apiKey, state.providerSpec)) return@debounce
             val protocol = LlmProtocol.fromWire(key.protocolWireId)
             val modelsUrl = EndpointInference.modelsUrl(key.endpoint, protocol)
                 ?: return@debounce
@@ -735,7 +735,8 @@ class ConfigureViewModel internal constructor(
         val endpoint = state.endpointInput.trim()
         val apiKey = state.apiKeyInput.trim()
         val protocolWireId = state.protocolWireId
-        if (endpoint.isBlank() || apiKey.isBlank()) {
+        // 与 scheduleCatalogFetch 同一判据：无 key 网关允许空 API Key 拉目录
+        if (!canFetchModelCatalog(endpoint, apiKey, state.providerSpec)) {
             updateState { copy(catalogFetchStatus = ModelCatalogFetchStatus.Failure) }
             return
         }

@@ -68,6 +68,14 @@ object ProviderSpecs {
     }
 }
 
+/**
+ * 模型目录拉取的唯一门槛：endpoint 必填，API Key 仅在非无 key 网关时必填。
+ * 配置页有两处入口（防抖拉取与手动刷新），都走这里，避免再出现「一处放行一处拦截」。
+ */
+internal fun canFetchModelCatalog(endpoint: String, apiKey: String, spec: ProviderSpec): Boolean {
+    return endpoint.isNotBlank() && (apiKey.isNotBlank() || spec.allowsEmptyApiKey)
+}
+
 private data object VolcengineCodingPlanSpec : ProviderSpec {
     override val id: String = "volcengine"
     override val brandName: String = "火山引擎"
@@ -282,6 +290,7 @@ private data object KiloFreeSpec : ProviderSpec {
     override val brandName: String = "KiloCode Free"
     override val officialEndpoint: String = "https://api.kilo.ai/api/gateway/chat/completions"
     override val exampleModelId: String = "kilo-auto/free"
+    override val summaryRes: Int = R.string.ui_provider_kilo_free_summary
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true
@@ -297,6 +306,7 @@ private data object OpenCodePIProxySpec : ProviderSpec {
     override val brandName: String = "OpenCode PI"
     override val officialEndpoint: String = "http://127.0.0.1:18080/v1/chat/completions"
     override val exampleModelId: String = "deepseek-v4.1-flash-free"
+    override val summaryRes: Int = R.string.ui_provider_opencode_pi_summary
     override val allowsCustomEndpointInNewConfig: Boolean = true
     override val defaultProtocol: String = "openai-chat-completions"
     override val allowsEmptyApiKey: Boolean = true

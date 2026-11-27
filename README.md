@@ -1,6 +1,6 @@
 <div align="right">
 
-[中文](README_CN.md) | [Release](https://github.com/niki914/zafiro/releases/latest)
+[中文](README_CN.md) | [Release](https://github.com/zuher5/zafiro5/releases/latest)
 
 </div>
 
@@ -9,11 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/niki914/zafiro/releases/latest">
-    <img src="https://img.shields.io/github/v/release/niki914/zafiro?color=a1168e&include_prereleases&logo=github&style=for-the-badge&labelColor=700f63" alt="release"/>
+  <a href="https://github.com/zuher5/zafiro5/releases/latest">
+    <img src="https://img.shields.io/github/v/release/zuher5/zafiro5?color=a1168e&include_prereleases&logo=github&style=for-the-badge&labelColor=700f63" alt="release"/>
   </a>
-  <a href="https://github.com/niki914/zafiro/releases">
-    <img src="https://img.shields.io/github/downloads/niki914/zafiro/total?color=ff9500&style=for-the-badge&logo=github&labelColor=a6660d" alt="downloads"/>
+  <a href="https://github.com/zuher5/zafiro5/releases">
+    <img src="https://img.shields.io/github/downloads/zuher5/zafiro5/total?color=ff9500&style=for-the-badge&logo=github&labelColor=a6660d" alt="downloads"/>
   </a>
   <a href="https://github.com/niki914/zafiro/stargazers">
     <img src="https://img.shields.io/github/stars/niki914/zafiro?color=ffff00&style=for-the-badge&labelColor=a1a116&logo=github" alt="stars"/>
@@ -48,9 +48,23 @@ https://github.com/user-attachments/assets/c2c8ffac-1609-4b98-a624-c65b93990435
   <img src="https://github.com/niki914/zafiro/blob/main/res/screenshots/7.png?raw=true" width="13%" />
 </p>
 
+## This fork
+
+This repository is a personal fork of [niki914/zafiro](https://github.com/niki914/zafiro), kept in sync with upstream releases and adding a thin layer on top. Download builds from [this fork's releases](https://github.com/zuher5/zafiro5/releases/latest), not upstream's.
+
+What the fork adds:
+
+- **KiloCode Free** and **OpenCode PI** providers that work without an API key; KiloCode Free is the default provider for a new setup, so the app is usable right after install.
+- **Swipe actions** in the conversation history: swipe right to rename a session, swipe left to delete it.
+- **Red launcher icon**, and a fork-owned `versionCode` line so upgrades over earlier fork builds keep working.
+- **Telemetry is off by default** in fork builds; the upstream reporting endpoint is not contacted. Build with `-Pzafiro.telemetryBaseUrl=https://<your-worker>` to enable it against your own endpoint.
+- Release tags use `v<versionName>` (e.g. `v2.1.0`); builds run on GitHub Actions only.
+
+Everything else — agent runtime, Phone-Use, Skills, MCP, the UI — is upstream's work. Fork-specific maintainer rules live in [`AGENTS.md`](AGENTS.md).
+
 ## Installation
 
-[Download here](https://github.com/niki914/zafiro/releases/latest) or [build from source](#build-from-source)
+[Download here](https://github.com/zuher5/zafiro5/releases/latest) or [build from source](#build-from-source)
 
 ## Core Capabilities
 
@@ -108,7 +122,9 @@ Flexible settings let you decide when to invoke Zafiro and when to fall back to 
 ## Community
 
 - [Telegram](https://t.me/+ZPX2xtSl6RwyZGNl) — discuss, ask questions, give feedback
-- [GitHub Issues](https://github.com/niki914/zafiro/issues) — report bugs or request features
+- [GitHub Issues](https://github.com/zuher5/zafiro5/issues) — report bugs or request features
+
+Upstream issues belong to [niki914/zafiro](https://github.com/niki914/zafiro/issues); anything specific to the providers or swipe actions above belongs here.
 
 When reporting an issue, please include as much detail as possible: phone model and Android version, system voice assistant and its version, Zafiro version, steps to reproduce, and screenshots or screen recordings.
 
@@ -142,8 +158,8 @@ We welcome sponsorships through the following channels:
 > - Android Studio (or Android SDK + JDK 17)
 > - An Android 8+ device
 
-1. Clone this repo: `git clone https://github.com/niki914/zafiro.git`
-2. Enter the project directory: `cd zafiro`
+1. Clone this repo: `git clone https://github.com/zuher5/zafiro5.git`
+2. Enter the project directory: `cd zafiro5`
 3. Build the debug APK: `./gradlew assembleDebug` (or install to device: `./gradlew installDebug`)
 <details>
 <summary>Release Signing</summary>
