@@ -27,9 +27,9 @@ android {
         applicationId = "com.niki914.zafiro"
         minSdk = 26
         targetSdk = 34
-        versionName = "2.1.0"
+        versionName = "2.1.1"
         // Keep the fork's monotonically increasing versionCode above v2.0.2 (31).
-        versionCode = 32
+        versionCode = 33
         buildConfigField("String", "TELEMETRY_BASE_URL", "\"$telemetryBaseUrl\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
