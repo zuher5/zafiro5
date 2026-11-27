@@ -27,7 +27,7 @@ import com.niki914.zafiro.app.ui.settings.form.EditableSettingsDetailFormScaffol
 /**
  * Saved Configuration 详情页（模板同 McpServerDetailContent）：
  * isCreating = 新建（品牌选择后进入），否则按 configId 加载编辑。
- * 生效中的配置不提供删除入口（右上角无 Delete）。
+ * 生效中的配置同样可以从右上角删除：仓库在删除后把 activeId 落到剩余配置（或清空）。
  */
 @Composable
 fun SavedConfigDetailContent(
@@ -79,16 +79,12 @@ fun SavedConfigDetailContent(
         }
     }
 
-    // 生效中的配置不提供删除入口
-    val isEditingActiveConfig = uiState.editingConfigId != null &&
-            uiState.editingConfigId == uiState.activeConfigId
-
     EditableSettingsDetailChrome(
         isCreating = page.isCreating,
         hasUnsavedChanges = { uiState.hasUnsavedChanges },
         unsavedFieldLabelRes = { uiState.unsavedFieldLabelRes() },
         onDiscardChanges = onBack,
-        onDelete = if (page.isCreating || isEditingActiveConfig) {
+        onDelete = if (page.isCreating) {
             null
         } else {
             { showDeleteConfirmation = true }
